@@ -1,0 +1,52 @@
+{
+  "name": "tsdi",
+  "version": "0.1.0",
+  "description": "Dependency Injection container (IoC) for TypeScript",
+  "main": "dist/lib/decorators.js",
+  "scripts": {
+    "clean": "rimraf dist",
+    "prebuild": "npm run clean",
+    "build": "tsc --sourceMap",
+    "pretest": "npm run build",
+    "test": "mocha dist/tests/",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -w",
+    "preversion": "npm test",
+    "version": "npm run build && conventional-changelog -p angular -v -r 0 > CHANGELOG.md && git add -A .",
+    "postversion": "git push && git push --tags",
+    "prepublish": "not-in-install && npm run build || echo 'In install cycle, skipping prepublish'",
+    "precoverage": "npm run clean && tsc --inlineSourceMap",
+    "coverage": "nyc --reporter lcov ./node_modules/.bin/mocha dist/tests/"
+  },
+  "author": {
+    "name": "Markus Wolf",
+    "email": "knister.peter@shadowrun-clan.de"
+  },
+  "repository": {
+    "type": "git",
+    "url": "KnisterPeter/tsdi"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "3.4.1",
+    "coveralls": "2.11.6",
+    "cz-conventional-changelog": "1.1.5",
+    "exorcist": "0.4.0",
+    "in-publish": "2.0.0",
+    "mocha": "2.3.4",
+    "nyc": "5.3.0",
+    "rimraf": "2.5.0",
+    "tslint": "3.2.1",
+    "typescript": "1.7.5"
+  },
+  "dependencies": {
+    "reflect-metadata": "0.1.3"
+  },
+  "publishConfig": {
+    "tag": "next"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
