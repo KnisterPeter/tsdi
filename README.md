@@ -5,7 +5,7 @@
 [![Coveralls branch](https://img.shields.io/coveralls/KnisterPeter/tsdi/master.svg)](https://coveralls.io/github/KnisterPeter/tsdi)
 [![David](https://img.shields.io/david/KnisterPeter/tsdi.svg)](https://david-dm.org/KnisterPeter/tsdi)
 [![David](https://img.shields.io/david/dev/KnisterPeter/tsdi.svg)](https://david-dm.org/KnisterPeter/tsdi#info=devDependencies&view=table)
-[![npm](https://img.shields.io/npm/v/react-to-typescript-definitions.svg)](https://www.npmjs.com/package/tsdi)
+[![npm](https://img.shields.io/npm/v/tsdi.svg)](https://www.npmjs.com/package/tsdi)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
 Dependency Injection container (IoC) for TypeScript.
