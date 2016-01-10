@@ -31,24 +31,28 @@ export class TSDI {
 
 }
 
-export function Component<T>(target: any): any {
-  Reflect.defineMetadata('component:constructor', target, target);
-  let injects: any[] = Reflect.getMetadata('component:injects', target.prototype);
-  Reflect.deleteMetadata('component:injects', target.prototype);
-  Reflect.defineMetadata('component:injects', injects, target);
-  return target;
+export function Component(): ClassDecorator {
+  return function(target: any): any {
+    Reflect.defineMetadata('component:constructor', target, target);
+    let injects: any[] = Reflect.getMetadata('component:injects', target.prototype);
+    Reflect.deleteMetadata('component:injects', target.prototype);
+    Reflect.defineMetadata('component:injects', injects, target);
+    return target;
+  };
 }
 
-export function Inject(target: Object, propertyKey: string): void {
-  const rtti: any = Reflect.getMetadata('design:type', target, propertyKey);
+export function Inject(): PropertyDecorator {
+  return function(target: Object, propertyKey: string): void {
+    const rtti: any = Reflect.getMetadata('design:type', target, propertyKey);
 
-  let injects: any[] = Reflect.getMetadata('component:injects', target);
-  if (!injects) {
-    injects = [];
-    Reflect.defineMetadata('component:injects', injects, target);
-  }
-  injects.push({
-    property: propertyKey,
-    rtti: rtti
-  });
+    let injects: any[] = Reflect.getMetadata('component:injects', target);
+    if (!injects) {
+      injects = [];
+      Reflect.defineMetadata('component:injects', injects, target);
+    }
+    injects.push({
+      property: propertyKey,
+      rtti: rtti
+    });
+  };
 }

@@ -1,10 +1,10 @@
 import { Component, Inject } from '../lib/decorators';
 import { Dependency } from './dependency';
 
-@Component
+@Component()
 export class User {
 
-  @Inject
+  @Inject()
   private dependency: Dependency;
 
   public getDep(): Dependency {

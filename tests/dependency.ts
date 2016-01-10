@@ -1,6 +1,6 @@
 import { Component } from '../lib/decorators';
 
-@Component
+@Component()
 export class Dependency {
 
   public echo(input: string): string {
