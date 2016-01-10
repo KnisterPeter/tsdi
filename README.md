@@ -25,7 +25,7 @@ npm install tsdi --save
 ```js
 import { Component } from 'tsdi';
 
-@Component
+@Component()
 export class Dependency {
 
   public echo(input: string): string {
@@ -39,10 +39,10 @@ export class Dependency {
 import { Component, Inject } from 'tsdi';
 import { Dependency } from './dependency';
 
-@Component
+@Component()
 export class User {
 
-  @Inject
+  @Inject()
   private dependency: Dependency;
 
   public getDep(): Dependency {
