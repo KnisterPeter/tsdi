@@ -10,6 +10,12 @@
 
 Dependency Injection container (IoC) for TypeScript.
 
+# Features
+
+* Type based dependency injetion
+* Type auto registration
+* Lifecycle methods
+
 # Usage
 
 ## Installation
@@ -36,7 +42,7 @@ export class Dependency {
 ```
 
 ```js
-import { Component, Inject } from 'tsdi';
+import { Component, Inject, Initialize } from 'tsdi';
 import { Dependency } from './dependency';
 
 @Component()
@@ -45,12 +51,19 @@ export class User {
   @Inject()
   private dependency: Dependency;
 
+  private message: string;
+
+  @Initialize()
+  public init(): void {
+    this.message = 'hello';
+  }
+
   public getDep(): Dependency {
     return this.dependency;
   }
 
   public method(): string {
-    return this.dependency.echo('hello');
+    return this.dependency.echo(this.message);
   }
 
 }
@@ -67,3 +80,10 @@ tsdi.register(Dependency);
 const user: User = tsdi.get(User);
 console.log(user.method()); // outputs 'hello'
 ```
+
+## Future ideas / Roadmap
+
+* Constructor injection
+* Lazy dependency injection
+* Property value injection
+* Interface based injection
