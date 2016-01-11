@@ -1,3 +1,13 @@
+<a name="0.3.0"></a>
+# [0.3.0](https://github.com/knisterpeter/tsdi/compare/v0.2.0...v0.3.0) (2016-01-11)
+
+
+### Features
+
+* Added component scanner for auto registration of components ([a8915e2](https://github.com/knisterpeter/tsdi/commit/a8915e2))
+
+
+
 <a name="0.2.0"></a>
 # [0.2.0](https://github.com/knisterpeter/tsdi/compare/v0.1.1...v0.2.0) (2016-01-10)
 
