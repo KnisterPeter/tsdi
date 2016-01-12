@@ -1,8 +1,9 @@
 import 'reflect-metadata';
 
+type Constructable<T> = { new(): T; };
 type InjectMetadata = {
   property: string,
-  rtti: Function;
+  rtti: Constructable<any>;
 };
 type ComponentListener = (component: Function) => void;
 
@@ -25,7 +26,7 @@ function addListener(listener: ComponentListener): void {
 
 export class TSDI {
 
-  private components: Function[] = [];
+  private components: Constructable<any>[] = [];
 
   private instances: {[idx: number]: Object} = {};
 
@@ -33,13 +34,13 @@ export class TSDI {
     addListener(this.register.bind(this));
   }
 
-  public register(component: Function): void {
+  public register(component: Constructable<any>): void {
     if (this.components.indexOf(component) == -1) {
       this.components.push(component);
     }
   }
 
-  public get(component: Function): any {
+  public get<T>(component: Constructable<T>): T {
     const idx: number = this.components.indexOf(component);
     let instance: any = this.instances[idx];
     if (!instance) {
@@ -73,7 +74,7 @@ export function Component(): ClassDecorator {
 
 export function Inject(): PropertyDecorator {
   return function(target: Object, propertyKey: string): void {
-    const rtti: Function = Reflect.getMetadata('design:type', target, propertyKey);
+    const rtti: Constructable<any> = Reflect.getMetadata('design:type', target, propertyKey);
 
     let injects: InjectMetadata[] = Reflect.getMetadata('component:injects', target);
     if (!injects) {
