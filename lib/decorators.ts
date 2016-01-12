@@ -1,11 +1,15 @@
 import 'reflect-metadata';
 
-type ComponentListener = (component: any) => void;
+type InjectMetadata = {
+  property: string,
+  rtti: Function;
+};
+type ComponentListener = (component: Function) => void;
 
 let listeners: ComponentListener[] = [];
-const knownComponents: any[] = [];
+const knownComponents: Function[] = [];
 
-function addKnownComponent(component: any): void {
+function addKnownComponent(component: Function): void {
   knownComponents.push(component);
   for (let listener of listeners) {
     listener(component);
@@ -21,7 +25,7 @@ function addListener(listener: ComponentListener): void {
 
 export class TSDI {
 
-  private components: Object[] = [];
+  private components: Function[] = [];
 
   private instances: {[idx: number]: Object} = {};
 
@@ -29,20 +33,20 @@ export class TSDI {
     addListener(this.register.bind(this));
   }
 
-  public register(component: Object): void {
+  public register(component: Function): void {
     if (this.components.indexOf(component) == -1) {
       this.components.push(component);
     }
   }
 
-  public get(component: any): any {
+  public get(component: Function): any {
     const idx: number = this.components.indexOf(component);
     let instance: any = this.instances[idx];
     if (!instance) {
-      const template: any = this.components[idx];
-      const constructor: any =  Reflect.getMetadata('component:constructor', template);
-      instance = new (constructor)();
-      let injects: any[] = Reflect.getMetadata('component:injects', template.prototype);
+      const template: Function = this.components[idx];
+      const constructor: ObjectConstructor =  Reflect.getMetadata('component:constructor', template);
+      instance = new constructor();
+      let injects: InjectMetadata[] = Reflect.getMetadata('component:injects', template.prototype);
       if (injects) {
         for (let inject of injects) {
           instance[inject.property] = this.get(this.components[this.components.indexOf(inject.rtti)]);
@@ -60,7 +64,7 @@ export class TSDI {
 }
 
 export function Component(): ClassDecorator {
-  return function(target: any): any {
+  return function<TFunction extends Function>(target: TFunction): TFunction {
     addKnownComponent(target);
     Reflect.defineMetadata('component:constructor', target, target);
     return target;
@@ -69,16 +73,16 @@ export function Component(): ClassDecorator {
 
 export function Inject(): PropertyDecorator {
   return function(target: Object, propertyKey: string): void {
-    const rtti: any = Reflect.getMetadata('design:type', target, propertyKey);
+    const rtti: Function = Reflect.getMetadata('design:type', target, propertyKey);
 
-    let injects: any[] = Reflect.getMetadata('component:injects', target);
+    let injects: InjectMetadata[] = Reflect.getMetadata('component:injects', target);
     if (!injects) {
       injects = [];
       Reflect.defineMetadata('component:injects', injects, target);
     }
     injects.push({
       property: propertyKey,
-      rtti: rtti
+      rtti
     });
   };
 }
