@@ -1,3 +1,14 @@
+<a name="0.4.0"></a>
+# [0.4.0](https://github.com/knisterpeter/tsdi/compare/v0.3.0...v0.4.0) (2016-01-16)
+
+
+### Features
+
+* Add typesafety for container.get ([9d9103d](https://github.com/knisterpeter/tsdi/commit/9d9103d))
+* Implemented interface based/name based injection ([36e0226](https://github.com/knisterpeter/tsdi/commit/36e0226))
+
+
+
 <a name="0.3.0"></a>
 # [0.3.0](https://github.com/knisterpeter/tsdi/compare/v0.2.0...v0.3.0) (2016-01-11)
 
