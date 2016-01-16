@@ -1,7 +1,8 @@
+import 'source-map-support/register';
 import { assert } from 'chai';
+import { TSDI, Component, Inject } from '../lib/decorators';
 import { User } from './user';
 import { Dependency } from './dependency';
-import { TSDI, Component } from '../lib/decorators';
 
 describe('TSDI', () => {
 
@@ -53,6 +54,39 @@ describe('TSDI', () => {
 
       const late: Late = container.get(Late);
       assert.isTrue(late instanceof Late);
+    });
+
+    it('components could be queried by name', () => {
+      const container: TSDI = new TSDI();
+      container.enableComponentScanner();
+
+      @Component()
+      class A {
+        public m(): string { return 'a'; }
+      }
+
+      @Component()
+      class B extends A {
+        public m(): string { return 'b'; }
+      }
+
+      @Component({name: 'Foo'})
+      class C extends A {
+        public m(): string { return 'c'; }
+      }
+
+      @Component({name: 'Bar'})
+      class D extends A {
+
+        @Inject({name: 'Foo'})
+        private _a: A;
+
+        public m(): string {
+          return this._a.m();
+        }
+      }
+
+      assert.equal(container.get(A, 'Bar').m(), 'c');
     });
 
   });

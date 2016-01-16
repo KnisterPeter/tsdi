@@ -1,59 +1,98 @@
 import 'reflect-metadata';
 
 type Constructable<T> = { new(): T; };
+
+export interface IComponentOptions {
+  name?: string;
+}
+
+export interface IInjectOptions {
+  name?: string;
+}
+
 type InjectMetadata = {
-  property: string,
+  property: string;
   rtti: Constructable<any>;
+  options: IInjectOptions;
 };
-type ComponentListener = (component: Function) => void;
+
+type ComponentMetadata = {
+  fn: Constructable<any>;
+  options: IComponentOptions;
+};
+
+type ComponentListener = (componentMetadata: ComponentMetadata) => void;
 
 let listeners: ComponentListener[] = [];
-const knownComponents: Function[] = [];
+const knownComponents: ComponentMetadata[] = [];
 
-function addKnownComponent(component: Function): void {
-  knownComponents.push(component);
+function addKnownComponent(componentMetadata: ComponentMetadata): void {
+  knownComponents.push(componentMetadata);
   for (let listener of listeners) {
-    listener(component);
+    listener(componentMetadata);
   }
 }
 
 function addListener(listener: ComponentListener): void {
   listeners.push(listener);
-  for (let component of knownComponents) {
-    listener(component);
+  for (let componentMetadata of knownComponents) {
+    listener(componentMetadata);
   }
 }
 
 export class TSDI {
 
-  private components: Constructable<any>[] = [];
+  private components: ComponentMetadata[] = [];
 
   private instances: {[idx: number]: Object} = {};
 
   public enableComponentScanner(): void {
-    addListener(this.register.bind(this));
+    addListener(this.registerComponent.bind(this));
   }
 
-  public register(component: Constructable<any>): void {
-    if (this.components.indexOf(component) == -1) {
-      this.components.push(component);
+  private registerComponent(componentMetadata: ComponentMetadata): void {
+    if (this.components.indexOf(componentMetadata) == -1) {
+      this.components.push(componentMetadata);
     }
   }
 
-  public get<T>(component: Constructable<T>): T {
-    const idx: number = this.components.indexOf(component);
+  public register(component: Constructable<any>, name?: string): void {
+    this.registerComponent({
+      fn: component,
+      options: {
+        name
+      }
+    });
+  }
+
+  private getComponentMetadataIndex(component: Constructable<any>, name?: string): number {
+    let idx: number;
+    for (let i: number = 0, n: number = this.components.length; i < n; i++) {
+      const componentMetadata: ComponentMetadata = this.components[i];
+      if (name && name == componentMetadata.options.name) {
+        return i;
+      } else if (componentMetadata.fn == component) {
+        idx = i;
+      }
+    }
+    return idx;
+  }
+
+  public get<T>(component: Constructable<T>, hint?: string): T {
+    let idx: number = this.getComponentMetadataIndex(component, hint);
     let instance: any = this.instances[idx];
     if (!instance) {
-      const template: Function = this.components[idx];
-      const constructor: ObjectConstructor =  Reflect.getMetadata('component:constructor', template);
+      const componentMetadata: ComponentMetadata = this.components[idx];
+      const constructor: ObjectConstructor =  Reflect.getMetadata('component:constructor', componentMetadata.fn);
       instance = new constructor();
-      let injects: InjectMetadata[] = Reflect.getMetadata('component:injects', template.prototype);
+      let injects: InjectMetadata[] = Reflect.getMetadata('component:injects', componentMetadata.fn.prototype);
       if (injects) {
         for (let inject of injects) {
-          instance[inject.property] = this.get(this.components[this.components.indexOf(inject.rtti)]);
+          const injectIdx: number = this.getComponentMetadataIndex(inject.rtti, inject.options.name);
+          instance[inject.property] = this.get(this.components[injectIdx].fn);
         }
       }
-      const init: string = Reflect.getMetadata('component:init', template.prototype);
+      const init: string = Reflect.getMetadata('component:init', componentMetadata.fn.prototype);
       if (init) {
         (instance[init] as Function).call(instance);
       }
@@ -64,15 +103,18 @@ export class TSDI {
 
 }
 
-export function Component(): ClassDecorator {
+export function Component(options: IComponentOptions = {}): ClassDecorator {
   return function<TFunction extends Function>(target: TFunction): TFunction {
-    addKnownComponent(target);
+    addKnownComponent({
+      fn: target as any,
+      options
+    });
     Reflect.defineMetadata('component:constructor', target, target);
     return target;
   };
 }
 
-export function Inject(): PropertyDecorator {
+export function Inject(options: IInjectOptions = {}): PropertyDecorator {
   return function(target: Object, propertyKey: string): void {
     const rtti: Constructable<any> = Reflect.getMetadata('design:type', target, propertyKey);
 
@@ -83,7 +125,8 @@ export function Inject(): PropertyDecorator {
     }
     injects.push({
       property: propertyKey,
-      rtti
+      rtti,
+      options
     });
   };
 }

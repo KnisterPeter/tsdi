@@ -15,6 +15,8 @@ Dependency Injection container (IoC) for TypeScript.
 * Type based dependency injetion
 * Type auto registration
 * Lifecycle methods
+* Interface based injection
+* Name based injection (hints)
 
 # Usage
 
@@ -81,9 +83,33 @@ const user: User = tsdi.get(User);
 console.log(user.method()); // outputs 'hello'
 ```
 
+### Name based injection (hints)
+
+```js
+import { TSDI, Component, Inject } from 'tsdi';
+
+@Component()
+class A {}
+
+@Component()
+class B extends A {}
+@Component({name: 'Bar'})
+class C extends A {}
+
+@Component({name: 'Foo'})
+class D extends A {
+  @Inject({name: 'Bar'})
+  private a: A;
+}
+
+const tsdi: TSDI = new TSDI();
+tsdi.enableComponentScanner();
+const a: A = tsdi.get(A, 'Foo');
+```
+
+
 ## Future ideas / Roadmap
 
 * Constructor injection
 * Lazy dependency injection
 * Property value injection
-* Interface based injection
