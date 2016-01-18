@@ -12,53 +12,80 @@ describe('TSDI', () => {
 
     beforeEach(() => {
       tsdi = new TSDI();
-      tsdi.register(User);
-      tsdi.register(Dependency);
+    });
+
+    afterEach(() => {
+      tsdi.close();
     });
 
     it('a returned component should be of the requested instance', () => {
+      tsdi.register(User);
+      tsdi.register(Dependency);
       const user: User = tsdi.get(User);
       assert.isTrue(user instanceof User);
     });
 
     it('a returned instance should have all dependencies satisfied', () => {
+      tsdi.register(User);
+      tsdi.register(Dependency);
       const user: User = tsdi.get(User);
       assert.equal(user.method(), 'hello');
     });
 
     it('two returned instances should have the same dependency instances', () => {
+      tsdi.register(User);
+      tsdi.register(Dependency);
       const user1: User = tsdi.get(User);
       const user2: User = tsdi.get(User);
       assert.equal(user1.getDep(), user2.getDep());
     });
 
     it('a returned instance should call decorated lifecycle methods when available', () => {
+      tsdi.register(User);
+      tsdi.register(Dependency);
       const user: User = tsdi.get(User);
       assert.equal(user.initResult(), 'init');
     });
 
     it('enabling componentScanner should add all known components to the container', () => {
-      const container: TSDI = new TSDI();
-      container.enableComponentScanner();
-      const user: User = container.get(User);
+      tsdi.enableComponentScanner();
+      const user: User = tsdi.get(User);
       assert.isTrue(user instanceof User);
     });
 
     it('a container with enabled componentScanner should lazy register components', () => {
-      const container: TSDI = new TSDI();
-      container.enableComponentScanner();
+      tsdi.enableComponentScanner();
 
       @Component()
       class Late {
       }
 
-      const late: Late = container.get(Late);
+      const late: Late = tsdi.get(Late);
       assert.isTrue(late instanceof Late);
     });
 
+    it('components could registered by name', () => {
+      class A {}
+      @Component()
+      class B extends A {}
+
+      tsdi.register(A);
+      tsdi.register(B, 'Foo');
+      assert.equal(tsdi.get(A, 'Foo'), tsdi.get(B));
+    });
+
+    it('components could registered with metadata', () => {
+      class A {}
+      @Component({name: 'RegisteredWithMetadata'})
+      class B extends A {}
+
+      tsdi.register(A);
+      tsdi.register(B);
+      assert.equal(tsdi.get(A, 'RegisteredWithMetadata'), tsdi.get(B));
+    });
+
     it('components could be queried by name', () => {
-      const container: TSDI = new TSDI();
-      container.enableComponentScanner();
+      tsdi.enableComponentScanner();
 
       @Component()
       class A {
@@ -79,16 +106,28 @@ describe('TSDI', () => {
       class D extends A {
 
         @Inject({name: 'Foo'})
-        private _a: A;
+        private a: A;
 
         public m(): string {
-          return this._a.m();
+          return this.a.m();
         }
       }
 
-      assert.equal(container.get(A, 'Bar').m(), 'c');
+      assert.equal(tsdi.get(A, 'Bar').m(), 'c');
     });
 
+    it('should not allow registration with duplicate component name', () => {
+      class A {};
+      class B {};
+
+      tsdi.register(A, 'Name');
+      try {
+        tsdi.register(B, 'Name');
+        assert.fail('Should throw an error');
+      } catch (e) {
+        //
+      }
+    });
   });
 
   describe('without container instance', () => {

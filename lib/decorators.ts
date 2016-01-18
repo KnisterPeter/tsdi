@@ -23,10 +23,32 @@ type ComponentMetadata = {
 
 type ComponentListener = (componentMetadata: ComponentMetadata) => void;
 
+function findIndexOf<T>(list: T[], test: (element: T) => boolean): number {
+  let idx: number = -1;
+  for (let i: number = 0, n: number = list.length; i < n; i++) {
+    if (test(list[i])) {
+      idx = i;
+    }
+  }
+  return idx;
+}
+
+function removeElement<T>(list: T[], test: (element: T) => boolean): T[] {
+  const idx: number = findIndexOf(list, test);
+  if (idx > -1) {
+    return Array.prototype.concat.call([], list.slice(0, idx), list.slice(idx + 1));
+  }
+  return list;
+}
+
 let listeners: ComponentListener[] = [];
-const knownComponents: ComponentMetadata[] = [];
+let knownComponents: ComponentMetadata[] = [];
 
 function addKnownComponent(componentMetadata: ComponentMetadata): void {
+  if (componentMetadata.options.name && findIndexOf(knownComponents,
+      (meta: ComponentMetadata) => meta.options.name == componentMetadata.options.name) > -1) {
+    console.warn(`Component with name '${componentMetadata.options.name}' already defined.`);
+  }
   knownComponents.push(componentMetadata);
   for (let listener of listeners) {
     listener(componentMetadata);
@@ -40,27 +62,55 @@ function addListener(listener: ComponentListener): void {
   }
 }
 
+function removeListener(listener: ComponentListener): void {
+  listeners = removeElement(listeners, (l: ComponentListener) => l == listener);
+}
+
 export class TSDI {
 
   private components: ComponentMetadata[] = [];
 
   private instances: {[idx: number]: Object} = {};
 
+  private listener: ComponentListener;
+
+  public close(): void {
+    if (this.listener) {
+      removeListener(this.listener);
+      this.listener = null;
+    }
+  }
+
   public enableComponentScanner(): void {
-    addListener(this.registerComponent.bind(this));
+    if (!this.listener) {
+      this.listener = this.registerComponent.bind(this);
+      addListener(this.listener);
+    }
   }
 
   private registerComponent(componentMetadata: ComponentMetadata): void {
     if (this.components.indexOf(componentMetadata) == -1) {
+      if (componentMetadata.options.name && findIndexOf(this.components,
+          (meta: ComponentMetadata) => meta.options.name == componentMetadata.options.name) > -1) {
+        throw new Error(`Component with name '${componentMetadata.options.name}' already registered.`);
+      }
+
       this.components.push(componentMetadata);
     }
   }
 
   public register(component: Constructable<any>, name?: string): void {
+    let componentName: string = name;
+    if (!componentName) {
+      const options: IComponentOptions =  Reflect.getMetadata('component:options', component);
+      if (options) {
+        componentName = options.name;
+      }
+    }
     this.registerComponent({
       fn: component,
       options: {
-        name
+        name: componentName
       }
     });
   }
@@ -110,6 +160,7 @@ export function Component(options: IComponentOptions = {}): ClassDecorator {
       options
     });
     Reflect.defineMetadata('component:constructor', target, target);
+    Reflect.defineMetadata('component:options', options, target);
     return target;
   };
 }
