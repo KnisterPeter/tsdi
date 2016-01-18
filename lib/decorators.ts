@@ -74,6 +74,12 @@ export class TSDI {
 
   private listener: ComponentListener;
 
+  private properties: {[key: string]: any} = {};
+
+  public addProperty(key: string, value: any): void {
+    this.properties[key] = value;
+  }
+
   public close(): void {
     if (this.listener) {
       removeListener(this.listener);
@@ -138,8 +144,12 @@ export class TSDI {
       let injects: InjectMetadata[] = Reflect.getMetadata('component:injects', componentMetadata.fn.prototype);
       if (injects) {
         for (let inject of injects) {
-          const injectIdx: number = this.getComponentMetadataIndex(inject.rtti, inject.options.name);
-          instance[inject.property] = this.get(this.components[injectIdx].fn);
+          if (inject.options.name && this.properties[inject.options.name]) {
+            instance[inject.property] = this.properties[inject.options.name];
+          } else {
+            const injectIdx: number = this.getComponentMetadataIndex(inject.rtti, inject.options.name);
+            instance[inject.property] = this.get(this.components[injectIdx].fn);
+          }
         }
       }
       const init: string = Reflect.getMetadata('component:init', componentMetadata.fn.prototype);

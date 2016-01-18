@@ -17,6 +17,7 @@ Dependency Injection container (IoC) for TypeScript.
 * Lifecycle methods
 * Interface based injection
 * Name based injection (hints)
+* Property value injection
 
 # Usage
 
@@ -107,9 +108,24 @@ tsdi.enableComponentScanner();
 const a: A = tsdi.get(A, 'Foo');
 ```
 
+### Property value injection (configuration)
+
+```js
+import { TSDI, Component, Inject } from 'tsdi';
+
+@Component()
+class A {
+  @Inject({name: 'config-key'})
+  public some: string;
+}
+
+const tsdi: TSDI = new TSDI();
+tsdi.addProperty('config-key', 'config-value');
+tsdi.register(A);
+console.log(tsdi.get(A).some); // 'config-value'
+```
 
 ## Future ideas / Roadmap
 
 * Constructor injection
 * Lazy dependency injection
-* Property value injection

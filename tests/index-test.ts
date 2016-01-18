@@ -128,6 +128,19 @@ describe('TSDI', () => {
         //
       }
     });
+
+    it('should inject defined properties', () => {
+      @Component()
+      class A {
+        @Inject({name: 'prop'})
+        private _prop: string;
+
+        public get prop(): string { return this._prop; }
+      }
+      tsdi.addProperty('prop', 'injected-value');
+      tsdi.register(A);
+      assert.equal(tsdi.get(A).prop, 'injected-value');
+    });
   });
 
   describe('without container instance', () => {
