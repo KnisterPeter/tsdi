@@ -1,3 +1,14 @@
+<a name="0.5.0"></a>
+# [0.5.0](https://github.com/knisterpeter/tsdi/compare/v0.4.0...v0.5.0) (2016-01-18)
+
+
+### Features
+
+* Do not duplicate components with same name ([5eeb95a](https://github.com/knisterpeter/tsdi/commit/5eeb95a))
+* Implemented property value injection ([07bf213](https://github.com/knisterpeter/tsdi/commit/07bf213))
+
+
+
 <a name="0.4.0"></a>
 # [0.4.0](https://github.com/knisterpeter/tsdi/compare/v0.3.0...v0.4.0) (2016-01-16)
 
