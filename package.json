@@ -27,7 +27,7 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "chai": "3.4.1",
+    "chai": "3.5.0",
     "coveralls": "2.11.6",
     "cz-conventional-changelog": "1.1.5",
     "exorcist": "0.4.0",
