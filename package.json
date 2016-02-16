@@ -4,7 +4,8 @@
   "description": "Dependency Injection container (IoC) for TypeScript",
   "main": "dist/lib/decorators.js",
   "files": [
-    "dist"
+    "dist",
+    "index.d.ts"
   ],
   "scripts": {
     "clean": "rimraf dist",
