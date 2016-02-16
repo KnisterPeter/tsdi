@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-type Constructable<T> = { new(): T; };
+export type Constructable<T> = { new(): T; };
 
 export interface IComponentOptions {
   name?: string;

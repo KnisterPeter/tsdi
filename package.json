@@ -3,6 +3,9 @@
   "version": "0.5.0",
   "description": "Dependency Injection container (IoC) for TypeScript",
   "main": "dist/lib/decorators.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "clean": "rimraf dist",
     "prebuild": "npm run clean",
