@@ -1,3 +1,13 @@
+<a name="0.5.3"></a>
+## [0.5.3](https://github.com/knisterpeter/tsdi/compare/v0.5.2...v0.5.3) (2016-02-16)
+
+
+### Bug Fixes
+
+* Another fix for typings packaging ([6eb439a](https://github.com/knisterpeter/tsdi/commit/6eb439a))
+
+
+
 <a name="0.5.2"></a>
 ## [0.5.2](https://github.com/knisterpeter/tsdi/compare/v0.5.1...v0.5.2) (2016-02-16)
 
