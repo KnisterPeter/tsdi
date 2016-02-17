@@ -11,6 +11,7 @@
     "clean": "rimraf dist",
     "prebuild": "npm run clean",
     "build": "tsc --sourceMap",
+    "postbuild": "cp dist/lib/decorators.d.ts index.d.ts",
     "pretest": "npm run build",
     "test": "mocha dist/tests/",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -w",
