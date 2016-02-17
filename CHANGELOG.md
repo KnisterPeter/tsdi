@@ -1,3 +1,13 @@
+<a name="0.5.4"></a>
+## [0.5.4](https://github.com/knisterpeter/tsdi/compare/v0.5.3...v0.5.4) (2016-02-17)
+
+
+### Bug Fixes
+
+* Finished typescript packaging for npm ([e986879](https://github.com/knisterpeter/tsdi/commit/e986879))
+
+
+
 <a name="0.5.3"></a>
 ## [0.5.3](https://github.com/knisterpeter/tsdi/compare/v0.5.2...v0.5.3) (2016-02-16)
 
