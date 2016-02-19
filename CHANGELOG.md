@@ -1,3 +1,13 @@
+<a name="0.5.5"></a>
+## [0.5.5](https://github.com/knisterpeter/tsdi/compare/v0.5.4...v0.5.5) (2016-02-19)
+
+
+### Bug Fixes
+
+* Fixed properties with falsy values ([869e3e3](https://github.com/knisterpeter/tsdi/commit/869e3e3))
+
+
+
 <a name="0.5.4"></a>
 ## [0.5.4](https://github.com/knisterpeter/tsdi/compare/v0.5.3...v0.5.4) (2016-02-17)
 
