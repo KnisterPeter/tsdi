@@ -144,7 +144,7 @@ export class TSDI {
       let injects: InjectMetadata[] = Reflect.getMetadata('component:injects', componentMetadata.fn.prototype);
       if (injects) {
         for (let inject of injects) {
-          if (inject.options.name && this.properties[inject.options.name]) {
+          if (inject.options.name && typeof this.properties[inject.options.name] != 'undefined') {
             instance[inject.property] = this.properties[inject.options.name];
           } else {
             const injectIdx: number = this.getComponentMetadataIndex(inject.rtti, inject.options.name);

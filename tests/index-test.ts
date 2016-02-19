@@ -133,13 +133,13 @@ describe('TSDI', () => {
       @Component()
       class A {
         @Inject({name: 'prop'})
-        private _prop: string;
+        private _prop: boolean;
 
-        public get prop(): string { return this._prop; }
+        public get prop(): boolean { return this._prop; }
       }
-      tsdi.addProperty('prop', 'injected-value');
+      tsdi.addProperty('prop', false);
       tsdi.register(A);
-      assert.equal(tsdi.get(A).prop, 'injected-value');
+      assert.equal(tsdi.get(A).prop, false);
     });
   });
 
