@@ -128,4 +128,7 @@ console.log(tsdi.get(A).some); // 'config-value'
 ## Future ideas / Roadmap
 
 * Constructor injection
+* Providers (@Provider)
+* Factories (@Factory)
 * Lazy dependency injection
+* Singletons vs Instances
