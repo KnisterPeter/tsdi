@@ -148,6 +148,9 @@ export class TSDI {
             instance[inject.property] = this.properties[inject.options.name];
           } else {
             const injectIdx: number = this.getComponentMetadataIndex(inject.rtti, inject.options.name);
+            if (!this.components[injectIdx]) {
+              throw new Error(`Failed to get inject '${inject.options.name}'`);
+            }
             instance[inject.property] = this.get(this.components[injectIdx].fn);
           }
         }
