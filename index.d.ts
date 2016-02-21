@@ -12,12 +12,14 @@ export declare class TSDI {
     private instances;
     private listener;
     private properties;
+    constructor();
     addProperty(key: string, value: any): void;
     close(): void;
     enableComponentScanner(): void;
     private registerComponent(componentMetadata);
     register(component: Constructable<any>, name?: string): void;
     private getComponentMetadataIndex(component, name?);
+    private throwComponentNotFoundError(component, name);
     get<T>(component: Constructable<T>, hint?: string): T;
 }
 export declare function Component(options?: IComponentOptions): ClassDecorator;

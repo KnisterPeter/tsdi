@@ -141,6 +141,30 @@ describe('TSDI', () => {
       tsdi.register(A);
       assert.equal(tsdi.get(A).prop, false);
     });
+
+    it('should throw if requried component was not found', () => {
+      @Component()
+      class A {}
+      try {
+        tsdi.get(A);
+        assert.fail('Should throw');
+      } catch (e) {
+        assert.equal(e.message, "Component 'A' not found");
+      }
+    });
+
+    it('should add itself to the component list', () => {
+      tsdi.enableComponentScanner();
+
+      @Component()
+      class A {
+        @Inject()
+        private _tsdi: TSDI;
+
+        public get prop(): TSDI { return this._tsdi; }
+      }
+      assert.strictEqual(tsdi.get(A).prop, tsdi);
+    });
   });
 
   describe('without container instance', () => {

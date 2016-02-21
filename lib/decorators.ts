@@ -76,6 +76,14 @@ export class TSDI {
 
   private properties: {[key: string]: any} = {};
 
+  constructor() {
+    this.registerComponent({
+      fn: TSDI,
+      options: {}
+    });
+    this.instances[0] = this;
+  }
+
   public addProperty(key: string, value: any): void {
     this.properties[key] = value;
   }
@@ -134,11 +142,24 @@ export class TSDI {
     return idx;
   }
 
+  private throwComponentNotFoundError(component: Constructable<any>, name: string): void {
+    if (!name) {
+      name = (component as any).name;
+    }
+    if (!name) {
+      name = 'unknown';
+    }
+    throw new Error(`Component '${name}' not found`);
+  }
+
   public get<T>(component: Constructable<T>, hint?: string): T {
     let idx: number = this.getComponentMetadataIndex(component, hint);
     let instance: any = this.instances[idx];
     if (!instance) {
       const componentMetadata: ComponentMetadata = this.components[idx];
+      if (!componentMetadata) {
+        this.throwComponentNotFoundError(component, hint);
+      }
       const constructor: ObjectConstructor =  Reflect.getMetadata('component:constructor', componentMetadata.fn);
       instance = new constructor();
       let injects: InjectMetadata[] = Reflect.getMetadata('component:injects', componentMetadata.fn.prototype);
