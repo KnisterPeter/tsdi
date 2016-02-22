@@ -1,3 +1,13 @@
+<a name="0.7.0"></a>
+# [0.7.0](https://github.com/knisterpeter/tsdi/compare/v0.6.0...v0.7.0) (2016-02-22)
+
+
+### Features
+
+* Implemented constructor parameter injection ([091de6e](https://github.com/knisterpeter/tsdi/commit/091de6e))
+
+
+
 <a name="0.6.0"></a>
 # [0.6.0](https://github.com/knisterpeter/tsdi/compare/v0.5.5...v0.6.0) (2016-02-21)
 
