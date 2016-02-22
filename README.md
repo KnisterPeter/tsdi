@@ -29,6 +29,12 @@ Install as npm package:
 npm install tsdi --save
 ```
 
+Install latest development version:
+
+```sh
+npm install tsdi@next --save
+```
+
 ## API
 
 
