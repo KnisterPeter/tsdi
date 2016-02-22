@@ -1,3 +1,13 @@
+<a name="0.8.0"></a>
+# [0.8.0](https://github.com/knisterpeter/tsdi/compare/v0.7.1...v0.8.0) (2016-02-22)
+
+
+### Features
+
+* Implemented non singleton instances ([4d0873c](https://github.com/knisterpeter/tsdi/commit/4d0873c))
+
+
+
 <a name="0.7.1"></a>
 ## [0.7.1](https://github.com/knisterpeter/tsdi/compare/v0.7.0...v0.7.1) (2016-02-22)
 
