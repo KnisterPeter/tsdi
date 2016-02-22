@@ -165,6 +165,25 @@ describe('TSDI', () => {
       }
       assert.strictEqual(tsdi.get(A).prop, tsdi);
     });
+
+    it('should inject annotated constructor parameters', () => {
+      tsdi.enableComponentScanner();
+
+      @Component()
+      class B {}
+
+      @Component()
+      class A {
+        private _tsdi: TSDI;
+
+        constructor(@Inject() container: TSDI, @Inject() b: B) {
+          this._tsdi = container;
+        }
+
+        public get prop(): TSDI { return this._tsdi; }
+      }
+      assert.strictEqual(tsdi.get(A).prop, tsdi);
+    });
   });
 
   describe('without container instance', () => {

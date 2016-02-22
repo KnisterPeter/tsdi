@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-export type Constructable<T> = { new(): T; };
+export type Constructable<T> = { new(...args: any[]): T; };
 
 export interface IComponentOptions {
   name?: string;
@@ -152,6 +152,17 @@ export class TSDI {
     throw new Error(`Component '${name}' not found`);
   }
 
+  private getConstructorParameters(componentMetadata: ComponentMetadata): any[] {
+    let parameterMetadata: any[] = Reflect.getMetadata('component:parameters', componentMetadata.fn);
+    if (parameterMetadata) {
+      return parameterMetadata
+        .sort((a: any, b: any) => a.index - b.index)
+        .map((parameter: any) => this.getComponentMetadataIndex((parameter as any).rtti))
+        .map((index: number) => this.get(this.components[index].fn));
+    }
+    return [];
+  }
+
   public get<T>(component: Constructable<T>, hint?: string): T {
     let idx: number = this.getComponentMetadataIndex(component, hint);
     let instance: any = this.instances[idx];
@@ -160,8 +171,9 @@ export class TSDI {
       if (!componentMetadata) {
         this.throwComponentNotFoundError(component, hint);
       }
-      const constructor: ObjectConstructor =  Reflect.getMetadata('component:constructor', componentMetadata.fn);
-      instance = new constructor();
+      const constructor: any =  Reflect.getMetadata('component:constructor', componentMetadata.fn);
+      let parameters: any[] = this.getConstructorParameters(componentMetadata);
+      instance = new constructor(...parameters);
       let injects: InjectMetadata[] = Reflect.getMetadata('component:injects', componentMetadata.fn.prototype);
       if (injects) {
         for (let inject of injects) {
@@ -199,20 +211,36 @@ export function Component(options: IComponentOptions = {}): ClassDecorator {
   };
 }
 
-export function Inject(options: IInjectOptions = {}): PropertyDecorator {
-  return function(target: Object, propertyKey: string): void {
-    const rtti: Constructable<any> = Reflect.getMetadata('design:type', target, propertyKey);
+export function Inject(options: IInjectOptions = {}): any {
+  return function(target: Object, propertyKey: string, index?: number): void {
+    if (typeof index == 'undefined') {
+      // Annotated property
+      const rtti: Constructable<any> = Reflect.getMetadata('design:type', target, propertyKey);
 
-    let injects: InjectMetadata[] = Reflect.getMetadata('component:injects', target);
-    if (!injects) {
-      injects = [];
-      Reflect.defineMetadata('component:injects', injects, target);
+      let injects: InjectMetadata[] = Reflect.getMetadata('component:injects', target);
+      if (!injects) {
+        injects = [];
+        Reflect.defineMetadata('component:injects', injects, target);
+      }
+      injects.push({
+        property: propertyKey,
+        rtti,
+        options
+      });
+    } else {
+      // Annotated parameter
+      const rtti: any = Reflect.getMetadata('design:paramtypes', target, propertyKey);
+
+      let parameters: any[] = Reflect.getMetadata('component:parameters', target);
+      if (!parameters) {
+        parameters = [];
+        Reflect.defineMetadata('component:parameters', parameters, target);
+      }
+      parameters.push({
+        index,
+        rtti: rtti[index]
+      });
     }
-    injects.push({
-      property: propertyKey,
-      rtti,
-      options
-    });
   };
 }
 
