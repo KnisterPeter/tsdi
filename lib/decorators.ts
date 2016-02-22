@@ -16,6 +16,12 @@ type InjectMetadata = {
   options: IInjectOptions;
 };
 
+type ParameterMetadata = {
+  index: number;
+  rtti: Constructable<any>;
+  options: IInjectOptions;
+};
+
 type ComponentMetadata = {
   fn: Constructable<any>;
   options: IComponentOptions;
@@ -153,11 +159,11 @@ export class TSDI {
   }
 
   private getConstructorParameters(componentMetadata: ComponentMetadata): any[] {
-    let parameterMetadata: any[] = Reflect.getMetadata('component:parameters', componentMetadata.fn);
+    let parameterMetadata: ParameterMetadata[] = Reflect.getMetadata('component:parameters', componentMetadata.fn);
     if (parameterMetadata) {
       return parameterMetadata
-        .sort((a: any, b: any) => a.index - b.index)
-        .map((parameter: any) => this.getComponentMetadataIndex((parameter as any).rtti))
+        .sort((a: ParameterMetadata, b: ParameterMetadata) => a.index - b.index)
+        .map((parameter: ParameterMetadata) => this.getComponentMetadataIndex(parameter.rtti, parameter.options.name))
         .map((index: number) => this.get(this.components[index].fn));
     }
     return [];
@@ -231,14 +237,15 @@ export function Inject(options: IInjectOptions = {}): any {
       // Annotated parameter
       const rtti: any = Reflect.getMetadata('design:paramtypes', target, propertyKey);
 
-      let parameters: any[] = Reflect.getMetadata('component:parameters', target);
+      let parameters: ParameterMetadata[] = Reflect.getMetadata('component:parameters', target);
       if (!parameters) {
         parameters = [];
         Reflect.defineMetadata('component:parameters', parameters, target);
       }
       parameters.push({
         index,
-        rtti: rtti[index]
+        rtti: rtti[index],
+        options
       });
     }
   };
