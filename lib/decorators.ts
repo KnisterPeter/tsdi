@@ -4,6 +4,7 @@ export type Constructable<T> = { new(...args: any[]): T; };
 
 export interface IComponentOptions {
   name?: string;
+  singleton?: boolean;
 }
 
 export interface IInjectOptions {
@@ -169,11 +170,15 @@ export class TSDI {
     return [];
   }
 
+  private isSingleton(componentMetadata: ComponentMetadata): boolean {
+    return typeof componentMetadata.options.singleton == 'undefined' || componentMetadata.options.singleton;
+  }
+
   public get<T>(component: Constructable<T>, hint?: string): T {
     let idx: number = this.getComponentMetadataIndex(component, hint);
+    const componentMetadata: ComponentMetadata = this.components[idx];
     let instance: any = this.instances[idx];
-    if (!instance) {
-      const componentMetadata: ComponentMetadata = this.components[idx];
+    if (!instance || !this.isSingleton(componentMetadata)) {
       if (!componentMetadata) {
         this.throwComponentNotFoundError(component, hint);
       }

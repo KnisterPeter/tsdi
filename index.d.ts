@@ -3,6 +3,7 @@ export declare type Constructable<T> = {
 };
 export interface IComponentOptions {
     name?: string;
+    singleton?: boolean;
 }
 export interface IInjectOptions {
     name?: string;
@@ -21,6 +22,7 @@ export declare class TSDI {
     private getComponentMetadataIndex(component, name?);
     private throwComponentNotFoundError(component, name);
     private getConstructorParameters(componentMetadata);
+    private isSingleton(componentMetadata);
     get<T>(component: Constructable<T>, hint?: string): T;
 }
 export declare function Component(options?: IComponentOptions): ClassDecorator;

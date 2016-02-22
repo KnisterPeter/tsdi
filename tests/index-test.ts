@@ -184,6 +184,15 @@ describe('TSDI', () => {
       }
       assert.strictEqual(tsdi.get(A).prop, tsdi);
     });
+
+    it('should create a new instance for non-singletons', () => {
+      tsdi.enableComponentScanner();
+
+      @Component({singleton: false})
+      class A {}
+
+      assert.notEqual(tsdi.get(A), tsdi.get(A));
+    });
   });
 
   describe('without container instance', () => {
