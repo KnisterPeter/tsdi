@@ -1,3 +1,13 @@
+<a name="0.9.0"></a>
+# [0.9.0](https://github.com/knisterpeter/tsdi/compare/v0.8.0...v0.9.0) (2016-02-25)
+
+
+### Features
+
+* Implemented factories ([ed414d7](https://github.com/knisterpeter/tsdi/commit/ed414d7))
+
+
+
 <a name="0.8.0"></a>
 # [0.8.0](https://github.com/knisterpeter/tsdi/compare/v0.7.1...v0.8.0) (2016-02-22)
 
