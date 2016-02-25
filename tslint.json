@@ -27,7 +27,7 @@
     "no-duplicate-variable": true,
     "no-empty": true,
     "no-eval": true,
-    "no-inferrable-types": false,
+    "no-inferrable-types": true,
     "no-internal-module": true,
     "no-require-imports": false,
     "no-shadowed-variable": true,
@@ -56,9 +56,7 @@
     "typedef": [
       true,
       "call-signature",
-      "parameter",
       "property-declaration",
-      "variable-declaration",
       "member-variable-declaration"
     ],
     "typedef-whitespace": [

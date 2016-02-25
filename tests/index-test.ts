@@ -1,6 +1,6 @@
 import 'source-map-support/register';
 import { assert } from 'chai';
-import { TSDI, Component, Inject } from '../lib/decorators';
+import { TSDI, Component, Inject, Factory } from '../lib/decorators';
 import { User } from './user';
 import { Dependency } from './dependency';
 
@@ -192,6 +192,40 @@ describe('TSDI', () => {
       class A {}
 
       assert.notEqual(tsdi.get(A), tsdi.get(A));
+    });
+
+    it('should register factories on components', () => {
+      tsdi.enableComponentScanner();
+
+      class B {}
+
+      @Component()
+      class A {
+        @Factory()
+        public someFactory(): B {
+          return new B();
+        }
+      }
+
+      assert.instanceOf(tsdi.get(B), B);
+      assert.strictEqual(tsdi.get(B), tsdi.get(B));
+    });
+
+    it('should return a new component on each call for non singleton factories', () => {
+      tsdi.enableComponentScanner();
+
+      class B {}
+
+      @Component()
+      class A {
+        @Factory({singleton: false})
+        public someFactory(): B {
+          return new B();
+        }
+      }
+
+      assert.instanceOf(tsdi.get(B), B);
+      assert.notEqual(tsdi.get(B), tsdi.get(B));
     });
   });
 

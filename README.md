@@ -20,6 +20,7 @@ Dependency Injection container (IoC) for TypeScript.
 * Property value injection
 * Constructor injection (parameters)
 * Singletons vs Instances
+* Factories
 
 # Usage
 
@@ -160,6 +161,27 @@ const b1: B = tsdi.get(B);
 // b0 === b1
 ```
 
+### Factories
+
+```js
+import { TSDI, Component, Factory } from 'tsdi';
+
+class A {}
+
+@Component()
+class B {
+  @Factory()
+  public createA(): A {
+    return new A();
+  }
+}
+
+const tsdi: TSDI = new TSDI();
+tsdi.enableComponentScanner();
+
+tsdi.get(A);
+```
+
 ### Property value injection (configuration)
 
 ```js
@@ -179,6 +201,6 @@ console.log(tsdi.get(A).some); // 'config-value'
 
 ## Future ideas / Roadmap
 
-* Providers (@Provider)
-* Factories (@Factory)
 * Lazy dependency injection
+* Static factories
+* Factories for non classes/types

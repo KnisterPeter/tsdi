@@ -11,6 +11,11 @@ export interface IInjectOptions {
   name?: string;
 }
 
+export interface IFactoryOptions {
+  name?: string;
+  singleton?: boolean;
+}
+
 type InjectMetadata = {
   property: string;
   rtti: Constructable<any>;
@@ -28,11 +33,18 @@ type ComponentMetadata = {
   options: IComponentOptions;
 };
 
-type ComponentListener = (componentMetadata: ComponentMetadata) => void;
+type FactoryMetadata = {
+  factoryType: Constructable<any>;
+  fn: <T>(...args: any[]) => T;
+  options: IFactoryOptions;
+};
+
+type ComponentOrFactoryMetadata = ComponentMetadata | FactoryMetadata;
+type ComponentListener = (metadata: ComponentOrFactoryMetadata) => void;
 
 function findIndexOf<T>(list: T[], test: (element: T) => boolean): number {
-  let idx: number = -1;
-  for (let i: number = 0, n: number = list.length; i < n; i++) {
+  let idx = -1;
+  for (let i = 0, n = list.length; i < n; i++) {
     if (test(list[i])) {
       idx = i;
     }
@@ -41,41 +53,36 @@ function findIndexOf<T>(list: T[], test: (element: T) => boolean): number {
 }
 
 function removeElement<T>(list: T[], test: (element: T) => boolean): T[] {
-  const idx: number = findIndexOf(list, test);
+  const idx = findIndexOf(list, test);
   if (idx > -1) {
-    return Array.prototype.concat.call([], list.slice(0, idx), list.slice(idx + 1));
+    return [...list.slice(0, idx), ...list.slice(idx + 1)];
   }
   return list;
 }
 
 let listeners: ComponentListener[] = [];
-let knownComponents: ComponentMetadata[] = [];
+let knownComponents: ComponentOrFactoryMetadata[] = [];
 
-function addKnownComponent(componentMetadata: ComponentMetadata): void {
-  if (componentMetadata.options.name && findIndexOf(knownComponents,
-      (meta: ComponentMetadata) => meta.options.name == componentMetadata.options.name) > -1) {
-    console.warn(`Component with name '${componentMetadata.options.name}' already defined.`);
+function addKnownComponent(metadata: ComponentOrFactoryMetadata): void {
+  if (metadata.options.name && findIndexOf(knownComponents, meta => meta.options.name == metadata.options.name) > -1) {
+    console.warn(`Component with name '${metadata.options.name}' already defined.`);
   }
-  knownComponents.push(componentMetadata);
-  for (let listener of listeners) {
-    listener(componentMetadata);
-  }
+  knownComponents.push(metadata);
+  listeners.forEach(listener => listener(metadata));
 }
 
 function addListener(listener: ComponentListener): void {
   listeners.push(listener);
-  for (let componentMetadata of knownComponents) {
-    listener(componentMetadata);
-  }
+  knownComponents.forEach(metadata => listener(metadata));
 }
 
 function removeListener(listener: ComponentListener): void {
-  listeners = removeElement(listeners, (l: ComponentListener) => l == listener);
+  listeners = removeElement(listeners, l => l == listener);
 }
 
 export class TSDI {
 
-  private components: ComponentMetadata[] = [];
+  private components: ComponentOrFactoryMetadata[] = [];
 
   private instances: {[idx: number]: Object} = {};
 
@@ -112,7 +119,7 @@ export class TSDI {
   private registerComponent(componentMetadata: ComponentMetadata): void {
     if (this.components.indexOf(componentMetadata) == -1) {
       if (componentMetadata.options.name && findIndexOf(this.components,
-          (meta: ComponentMetadata) => meta.options.name == componentMetadata.options.name) > -1) {
+          meta => meta.options.name == componentMetadata.options.name) > -1) {
         throw new Error(`Component with name '${componentMetadata.options.name}' already registered.`);
       }
 
@@ -138,11 +145,11 @@ export class TSDI {
 
   private getComponentMetadataIndex(component: Constructable<any>, name?: string): number {
     let idx: number;
-    for (let i: number = 0, n: number = this.components.length; i < n; i++) {
-      const componentMetadata: ComponentMetadata = this.components[i];
-      if (name && name == componentMetadata.options.name) {
+    for (let i = 0, n = this.components.length; i < n; i++) {
+      const metadata = this.components[i];
+      if (name && name == metadata.options.name) {
         return i;
-      } else if (componentMetadata.fn == component) {
+      } else if (metadata.fn == component || (metadata as FactoryMetadata).factoryType == component) {
         idx = i;
       }
     }
@@ -150,7 +157,7 @@ export class TSDI {
   }
 
   private throwComponentNotFoundError(component: Constructable<any>, name: string): void {
-    if (!name) {
+    if (component && !name) {
       name = (component as any).name;
     }
     if (!name) {
@@ -159,53 +166,71 @@ export class TSDI {
     throw new Error(`Component '${name}' not found`);
   }
 
-  private getConstructorParameters(componentMetadata: ComponentMetadata): any[] {
-    let parameterMetadata: ParameterMetadata[] = Reflect.getMetadata('component:parameters', componentMetadata.fn);
+  private getConstructorParameters(metadata: ComponentOrFactoryMetadata): any[] {
+    let parameterMetadata: ParameterMetadata[] = Reflect.getMetadata('component:parameters', metadata.fn);
     if (parameterMetadata) {
       return parameterMetadata
-        .sort((a: ParameterMetadata, b: ParameterMetadata) => a.index - b.index)
-        .map((parameter: ParameterMetadata) => this.getComponentMetadataIndex(parameter.rtti, parameter.options.name))
-        .map((index: number) => this.get(this.components[index].fn));
+        .sort((a, b) => a.index - b.index)
+        .map(parameter => this.getComponentMetadataIndex(parameter.rtti, parameter.options.name))
+        .map(index => this.getOrCreate(this.components[index], index));
     }
     return [];
   }
 
-  private isSingleton(componentMetadata: ComponentMetadata): boolean {
-    return typeof componentMetadata.options.singleton == 'undefined' || componentMetadata.options.singleton;
+  private isSingleton(metadata: ComponentOrFactoryMetadata): boolean {
+    return typeof metadata.options.singleton == 'undefined' || metadata.options.singleton;
   }
 
-  public get<T>(component: Constructable<T>, hint?: string): T {
-    let idx: number = this.getComponentMetadataIndex(component, hint);
-    const componentMetadata: ComponentMetadata = this.components[idx];
+  private getOrCreate<T>(metadata: ComponentOrFactoryMetadata, idx: number): T {
     let instance: any = this.instances[idx];
-    if (!instance || !this.isSingleton(componentMetadata)) {
-      if (!componentMetadata) {
-        this.throwComponentNotFoundError(component, hint);
-      }
-      const constructor: any =  Reflect.getMetadata('component:constructor', componentMetadata.fn);
-      let parameters: any[] = this.getConstructorParameters(componentMetadata);
-      instance = new constructor(...parameters);
-      let injects: InjectMetadata[] = Reflect.getMetadata('component:injects', componentMetadata.fn.prototype);
-      if (injects) {
-        for (let inject of injects) {
-          if (inject.options.name && typeof this.properties[inject.options.name] != 'undefined') {
-            instance[inject.property] = this.properties[inject.options.name];
-          } else {
-            const injectIdx: number = this.getComponentMetadataIndex(inject.rtti, inject.options.name);
-            if (!this.components[injectIdx]) {
-              throw new Error(`Failed to get inject '${inject.options.name}'`);
+    if (!instance || !this.isSingleton(metadata)) {
+      if ((metadata as FactoryMetadata).factoryType) {
+        instance = (metadata as FactoryMetadata).fn(this);
+      } else {
+        const constructor: any =  Reflect.getMetadata('component:constructor', metadata.fn);
+        let parameters = this.getConstructorParameters(metadata);
+        instance = new constructor(...parameters);
+        let injects: InjectMetadata[] = Reflect.getMetadata('component:injects', metadata.fn.prototype);
+        if (injects) {
+          for (let inject of injects) {
+            if (inject.options.name && typeof this.properties[inject.options.name] != 'undefined') {
+              instance[inject.property] = this.properties[inject.options.name];
+            } else {
+              const injectIdx = this.getComponentMetadataIndex(inject.rtti, inject.options.name);
+              if (!this.components[injectIdx]) {
+                throw new Error(`Failed to get inject '${inject.options.name}'`);
+              }
+              instance[inject.property] = this.getOrCreate(this.components[injectIdx], injectIdx);
             }
-            instance[inject.property] = this.get(this.components[injectIdx].fn);
           }
         }
-      }
-      const init: string = Reflect.getMetadata('component:init', componentMetadata.fn.prototype);
-      if (init) {
-        (instance[init] as Function).call(instance);
+        const init: string = Reflect.getMetadata('component:init', metadata.fn.prototype);
+        if (init) {
+          (instance[init] as Function).call(instance);
+        }
       }
     }
     this.instances[idx] = instance;
     return instance;
+  }
+
+  public get<T>(hint: string): T;
+  public get<T>(component: Constructable<T>): T;
+  public get<T>(component: Constructable<T>, hint: string): T;
+  public get<T>(componentOrHint: Constructable<T>|string, hint?: string): T {
+    let component: Constructable<T>;
+    if (typeof componentOrHint === 'string') {
+      hint = componentOrHint as any;
+      component = undefined;
+    } else {
+      component = componentOrHint as Constructable<T>;
+    }
+    const idx = this.getComponentMetadataIndex(component, hint);
+    const metadata = this.components[idx];
+    if (!metadata) {
+      this.throwComponentNotFoundError(component, hint);
+    }
+    return this.getOrCreate<T>(metadata, idx);
   }
 
 }
@@ -259,5 +284,18 @@ export function Inject(options: IInjectOptions = {}): any {
 export function Initialize(): MethodDecorator {
   return function(target: Object, propertyKey: string): void {
     Reflect.defineMetadata('component:init', propertyKey, target);
+  };
+}
+
+export function Factory(options: IFactoryOptions = {}): MethodDecorator {
+  return function(target: Object, propertyKey: string): void {
+    const rtti = Reflect.getMetadata('design:returntype', target, propertyKey);
+    addKnownComponent({
+      factoryType: rtti,
+      fn: (tsdi: TSDI): any => {
+        return (tsdi.get((target as any).prototype) as any)[propertyKey]();
+      },
+      options
+    });
   };
 }
