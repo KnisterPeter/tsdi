@@ -1,3 +1,13 @@
+<a name="0.9.2"></a>
+## [0.9.2](https://github.com/knisterpeter/tsdi/compare/v0.9.1...v0.9.2) (2016-02-26)
+
+
+### Bug Fixes
+
+* Allow injection of incomplete dependencies ([e6c0d30](https://github.com/knisterpeter/tsdi/commit/e6c0d30))
+
+
+
 <a name="0.9.1"></a>
 ## [0.9.1](https://github.com/knisterpeter/tsdi/compare/v0.9.0...v0.9.1) (2016-02-26)
 
