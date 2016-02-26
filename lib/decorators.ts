@@ -186,10 +186,14 @@ export class TSDI {
     if (!instance || !this.isSingleton(metadata)) {
       if ((metadata as FactoryMetadata).factoryType) {
         instance = (metadata as FactoryMetadata).fn(this);
+        this.instances[idx] = instance;
       } else {
         const constructor: any =  Reflect.getMetadata('component:constructor', metadata.fn);
         let parameters = this.getConstructorParameters(metadata);
         instance = new constructor(...parameters);
+        // Note: This stores an incomplete instance (injects/properties/...)
+        // But it allows recursive use of injects
+        this.instances[idx] = instance;
         let injects: InjectMetadata[] = Reflect.getMetadata('component:injects', metadata.fn.prototype);
         if (injects) {
           for (let inject of injects) {
@@ -210,7 +214,6 @@ export class TSDI {
         }
       }
     }
-    this.instances[idx] = instance;
     return instance;
   }
 
