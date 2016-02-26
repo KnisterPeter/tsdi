@@ -1,3 +1,9 @@
+<a name="0.9.1"></a>
+## [0.9.1](https://github.com/knisterpeter/tsdi/compare/v0.9.0...v0.9.1) (2016-02-26)
+
+
+
+
 <a name="0.9.0"></a>
 # [0.9.0](https://github.com/knisterpeter/tsdi/compare/v0.8.0...v0.9.0) (2016-02-25)
 
