@@ -1,3 +1,13 @@
+<a name="0.9.3"></a>
+## [0.9.3](https://github.com/knisterpeter/tsdi/compare/v0.9.2...v0.9.3) (2016-02-27)
+
+
+### Bug Fixes
+
+* Fixed factory handling ([5aa7853](https://github.com/knisterpeter/tsdi/commit/5aa7853))
+
+
+
 <a name="0.9.2"></a>
 ## [0.9.2](https://github.com/knisterpeter/tsdi/compare/v0.9.1...v0.9.2) (2016-02-26)
 
