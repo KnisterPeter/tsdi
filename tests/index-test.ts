@@ -93,17 +93,17 @@ describe('TSDI', () => {
       }
 
       @Component()
-      class B extends A {
+      class BExtendsA extends A {
         public m(): string { return 'b'; }
       }
 
       @Component({name: 'Foo'})
-      class C extends A {
+      class CExtendsA extends A {
         public m(): string { return 'c'; }
       }
 
       @Component({name: 'Bar'})
-      class D extends A {
+      class DExtendsA extends A {
 
         @Inject({name: 'Foo'})
         private a: A;
@@ -116,40 +116,44 @@ describe('TSDI', () => {
       assert.equal(tsdi.get(A, 'Bar').m(), 'c');
     });
 
-    it('should not allow registration with duplicate component name', () => {
+    it('should not allow registration with duplicate component name', (done: MochaDone) => {
       class A {};
       class B {};
 
-      tsdi.register(A, 'Name');
+      const oldConsole = console;
       try {
-        tsdi.register(B, 'Name');
-        assert.fail('Should throw an error');
-      } catch (e) {
-        //
+        console.warn = function(msg: string): void {
+          assert.equal(msg, "Component with name 'DuplicateComponentName' already registered.");
+          done();
+        };
+        tsdi.register(A, 'DuplicateComponentName');
+        tsdi.register(B, 'DuplicateComponentName');
+      } finally {
+        console = oldConsole;
       }
     });
 
     it('should inject defined properties', () => {
       @Component()
-      class A {
+      class ComponentWithProperties {
         @Inject({name: 'prop'})
         private _prop: boolean;
 
         public get prop(): boolean { return this._prop; }
       }
       tsdi.addProperty('prop', false);
-      tsdi.register(A);
-      assert.equal(tsdi.get(A).prop, false);
+      tsdi.register(ComponentWithProperties);
+      assert.equal(tsdi.get(ComponentWithProperties).prop, false);
     });
 
     it('should throw if requried component was not found', () => {
       @Component()
-      class A {}
+      class NonRegisteredComponent {}
       try {
-        tsdi.get(A);
+        tsdi.get(NonRegisteredComponent);
         assert.fail('Should throw');
       } catch (e) {
-        assert.equal(e.message, "Component 'A' not found");
+        assert.equal(e.message, "Component 'NonRegisteredComponent' not found");
       }
     });
 
@@ -157,78 +161,78 @@ describe('TSDI', () => {
       tsdi.enableComponentScanner();
 
       @Component()
-      class A {
+      class ComponentWithContainerDependency {
         @Inject()
         private _tsdi: TSDI;
 
         public get prop(): TSDI { return this._tsdi; }
       }
-      assert.strictEqual(tsdi.get(A).prop, tsdi);
+      assert.strictEqual(tsdi.get(ComponentWithContainerDependency).prop, tsdi);
     });
 
     it('should inject annotated constructor parameters', () => {
       tsdi.enableComponentScanner();
 
       @Component()
-      class B {}
+      class ConstructorParameterComponent {}
 
       @Component()
-      class A {
+      class ComponentWithConstructor {
         private _tsdi: TSDI;
 
-        constructor(@Inject() container: TSDI, @Inject() b: B) {
+        constructor(@Inject() container: TSDI, @Inject() b: ConstructorParameterComponent) {
           this._tsdi = container;
         }
 
         public get prop(): TSDI { return this._tsdi; }
       }
-      assert.strictEqual(tsdi.get(A).prop, tsdi);
+      assert.strictEqual(tsdi.get(ComponentWithConstructor).prop, tsdi);
     });
 
     it('should create a new instance for non-singletons', () => {
       tsdi.enableComponentScanner();
 
       @Component({singleton: false})
-      class A {}
+      class NonSingletonComponent {}
 
-      assert.notEqual(tsdi.get(A), tsdi.get(A));
+      assert.notEqual(tsdi.get(NonSingletonComponent), tsdi.get(NonSingletonComponent));
     });
 
     it('should register factories on components', () => {
       tsdi.enableComponentScanner();
 
-      class B {}
+      class NonSingletonObject {}
 
       @Component()
-      class A {
+      class FactoryComponentWithSingletonFactory {
         @Factory()
-        public someFactory(): B {
-          return new B();
+        public someFactory(): NonSingletonObject {
+          return new NonSingletonObject();
         }
       }
 
       @Component()
       class C {}
 
-      assert.instanceOf(tsdi.get(B), B);
-      assert.strictEqual(tsdi.get(B), tsdi.get(B));
+      assert.instanceOf(tsdi.get(NonSingletonObject), NonSingletonObject);
+      assert.strictEqual(tsdi.get(NonSingletonObject), tsdi.get(NonSingletonObject));
     });
 
     it('should return a new component on each call for non singleton factories', () => {
       tsdi.enableComponentScanner();
 
-      class B {}
+      class NonSingletonObject {}
 
       @Component()
-      class A {
+      class FactoryComponentWithNonSingletonFactory {
         @Factory({singleton: false})
-        public someFactory(): B {
-          return new B();
+        public someFactory(): NonSingletonObject {
+          return new NonSingletonObject();
         }
       }
 
-      assert.instanceOf(tsdi.get(B), B);
-      assert.notEqual(tsdi.get(B), tsdi.get(B));
+      assert.instanceOf(tsdi.get(NonSingletonObject), NonSingletonObject);
+      assert.notEqual(tsdi.get(NonSingletonObject), tsdi.get(NonSingletonObject));
     });
   });
 

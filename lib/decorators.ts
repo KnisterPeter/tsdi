@@ -17,9 +17,10 @@ export interface IFactoryOptions {
 }
 
 type InjectMetadata = {
+  target: Object;
   property: string;
-  rtti: Constructable<any>;
   options: IInjectOptions;
+  type: Constructable<any>;
 };
 
 type ParameterMetadata = {
@@ -34,9 +35,10 @@ type ComponentMetadata = {
 };
 
 type FactoryMetadata = {
-  factoryType: Constructable<any>;
-  fn: <T>(...args: any[]) => T;
+  target: Object;
+  property: string;
   options: IFactoryOptions;
+  rtti: Constructable<any>;
 };
 
 type ComponentOrFactoryMetadata = ComponentMetadata | FactoryMetadata;
@@ -65,7 +67,7 @@ let knownComponents: ComponentOrFactoryMetadata[] = [];
 
 function addKnownComponent(metadata: ComponentOrFactoryMetadata): void {
   if (metadata.options.name && findIndexOf(knownComponents, meta => meta.options.name == metadata.options.name) > -1) {
-    console.warn(`Component with name '${metadata.options.name}' already defined.`);
+    throw new Error(`Duplicate name '${metadata.options.name}' for known Components.`);
   }
   knownComponents.push(metadata);
   listeners.forEach(listener => listener(metadata));
@@ -120,7 +122,7 @@ export class TSDI {
     if (this.components.indexOf(componentMetadata) == -1) {
       if (componentMetadata.options.name && findIndexOf(this.components,
           meta => meta.options.name == componentMetadata.options.name) > -1) {
-        throw new Error(`Component with name '${componentMetadata.options.name}' already registered.`);
+        console.warn(`Component with name '${componentMetadata.options.name}' already registered.`);
       }
 
       this.components.push(componentMetadata);
@@ -144,13 +146,14 @@ export class TSDI {
   }
 
   private getComponentMetadataIndex(component: Constructable<any>, name?: string): number {
-    let idx: number;
+    let idx: number = -1;
     for (let i = 0, n = this.components.length; i < n; i++) {
       const metadata = this.components[i];
       if (name && name === metadata.options.name) {
         return i;
-      } else if (metadata.fn === component
-          || (metadata as FactoryMetadata).factoryType === component) {
+      } else if (typeof component !== 'undefined'
+          && ((metadata as ComponentMetadata).fn === component
+            || (metadata as FactoryMetadata).rtti === component)) {
         idx = i;
       }
     }
@@ -168,7 +171,8 @@ export class TSDI {
   }
 
   private getConstructorParameters(metadata: ComponentOrFactoryMetadata): any[] {
-    let parameterMetadata: ParameterMetadata[] = Reflect.getMetadata('component:parameters', metadata.fn);
+    let parameterMetadata: ParameterMetadata[] = Reflect.getMetadata('component:parameters',
+      (metadata as ComponentMetadata).fn);
     if (parameterMetadata) {
       return parameterMetadata
         .sort((a, b) => a.index - b.index)
@@ -183,33 +187,41 @@ export class TSDI {
   }
 
   private getOrCreate<T>(metadata: ComponentOrFactoryMetadata, idx: number): T {
+    // TODO: Use T here
     let instance: any = this.instances[idx];
     if (!instance || !this.isSingleton(metadata)) {
-      if ((metadata as FactoryMetadata).factoryType) {
-        instance = (metadata as FactoryMetadata).fn(this);
+      if ((metadata as FactoryMetadata).rtti) {
+        const factoryMetadata = metadata as FactoryMetadata;
+        instance = (this.get(factoryMetadata.target.constructor as any) as any)[factoryMetadata.property]();
         this.instances[idx] = instance;
       } else {
-        const constructor: any =  Reflect.getMetadata('component:constructor', metadata.fn);
+        const componentMetadata = metadata as ComponentMetadata;
+        const constructor: Constructable<T> =  componentMetadata.fn as any;
         let parameters = this.getConstructorParameters(metadata);
         instance = new constructor(...parameters);
         // Note: This stores an incomplete instance (injects/properties/...)
         // But it allows recursive use of injects
         this.instances[idx] = instance;
-        let injects: InjectMetadata[] = Reflect.getMetadata('component:injects', metadata.fn.prototype);
+        let injects: InjectMetadata[] = Reflect.getMetadata('component:injects', componentMetadata.fn.prototype);
         if (injects) {
           for (let inject of injects) {
             if (inject.options.name && typeof this.properties[inject.options.name] != 'undefined') {
               instance[inject.property] = this.properties[inject.options.name];
             } else {
-              const injectIdx = this.getComponentMetadataIndex(inject.rtti, inject.options.name);
-              if (!this.components[injectIdx]) {
+              const injectIdx = this.getComponentMetadataIndex(inject.type, inject.options.name);
+              if (injectIdx === -1 && !inject.type) {
+                throw new Error('Injecting undefined type on ' + (inject.target as any).constructor.name
+                  + '#' + inject.property + ': Probably a cyclic dependency, switch to name based injection');
+              }
+              const injectMetadata = this.components[injectIdx];
+              if (!injectMetadata) {
                 throw new Error(`Failed to get inject '${inject.options.name}'`);
               }
-              instance[inject.property] = this.getOrCreate(this.components[injectIdx], injectIdx);
+              instance[inject.property] = this.getOrCreate(injectMetadata, injectIdx);
             }
           }
         }
-        const init: string = Reflect.getMetadata('component:init', metadata.fn.prototype);
+        const init: string = Reflect.getMetadata('component:init', componentMetadata.fn.prototype);
         if (init) {
           (instance[init] as Function).call(instance);
         }
@@ -239,47 +251,61 @@ export class TSDI {
 
 }
 
-export function Component(options: IComponentOptions = {}): ClassDecorator {
+function getNamedOptions<T extends {name?: string}>(optionOrString: T | string): T {
+  if (typeof optionOrString === 'string') {
+    return {
+      name: optionOrString
+    } as any;
+  }
+  return optionOrString as T;
+}
+
+export function Component(optionsOrString: IComponentOptions | string = {}): ClassDecorator {
   return function<TFunction extends Function>(target: TFunction): TFunction {
+    // console.log(`@Component ${(target as any).name}`);
+    const options = getNamedOptions<IComponentOptions>(optionsOrString);
+    if (!options.name) {
+      options.name = (target as any).name;
+    }
     addKnownComponent({
       fn: target as any,
       options
     });
-    Reflect.defineMetadata('component:constructor', target, target);
     Reflect.defineMetadata('component:options', options, target);
     return target;
   };
 }
 
-export function Inject(options: IInjectOptions = {}): any {
-  return function(target: Object, propertyKey: string, index?: number): void {
-    if (typeof index == 'undefined') {
+export function Inject(optionsOrString: IInjectOptions | string = {}): PropertyDecorator & ParameterDecorator {
+  return function(target: Object, propertyKey: string, parameterIndex?: number): void {
+    const options = getNamedOptions<IInjectOptions>(optionsOrString);
+    if (typeof parameterIndex == 'undefined') {
       // Annotated property
-      const rtti: Constructable<any> = Reflect.getMetadata('design:type', target, propertyKey);
-
+      // console.log(`@Inject ${(target.constructor as any).name}#${propertyKey}`);
+      const type: Constructable<any> = Reflect.getMetadata('design:type', target, propertyKey);
       let injects: InjectMetadata[] = Reflect.getMetadata('component:injects', target);
       if (!injects) {
         injects = [];
         Reflect.defineMetadata('component:injects', injects, target);
       }
       injects.push({
+        target,
         property: propertyKey,
-        rtti,
-        options
+        options,
+        type
       });
     } else {
       // Annotated parameter
-      const rtti: any = Reflect.getMetadata('design:paramtypes', target, propertyKey);
-
+      // console.log(`@Inject ${propertyKey}`);
       let parameters: ParameterMetadata[] = Reflect.getMetadata('component:parameters', target);
       if (!parameters) {
         parameters = [];
         Reflect.defineMetadata('component:parameters', parameters, target);
       }
       parameters.push({
-        index,
-        rtti: rtti[index],
-        options
+        options,
+        index: parameterIndex,
+        rtti: Reflect.getMetadata('design:paramtypes', target, propertyKey)[parameterIndex]
       });
     }
   };
@@ -287,19 +313,19 @@ export function Inject(options: IInjectOptions = {}): any {
 
 export function Initialize(): MethodDecorator {
   return function(target: Object, propertyKey: string): void {
+    // console.log(`@Initialize ${(target as any)[propertyKey].name}`);
     Reflect.defineMetadata('component:init', propertyKey, target);
   };
 }
 
 export function Factory(options: IFactoryOptions = {}): MethodDecorator {
   return function(target: Object, propertyKey: string): void {
-    const rtti = Reflect.getMetadata('design:returntype', target, propertyKey);
+    // console.log(`@Factory ${(target as any)[propertyKey].name}`);
     addKnownComponent({
-      factoryType: rtti,
-      fn: (tsdi: TSDI): any => {
-        return (tsdi.get(target.constructor as any) as any)[propertyKey]();
-      },
-      options
+      target,
+      property: propertyKey,
+      options,
+      rtti: Reflect.getMetadata('design:returntype', target, propertyKey)
     });
   };
 }

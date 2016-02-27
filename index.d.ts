@@ -32,7 +32,7 @@ export declare class TSDI {
     get<T>(component: Constructable<T>): T;
     get<T>(component: Constructable<T>, hint: string): T;
 }
-export declare function Component(options?: IComponentOptions): ClassDecorator;
-export declare function Inject(options?: IInjectOptions): any;
+export declare function Component(optionsOrString?: IComponentOptions | string): ClassDecorator;
+export declare function Inject(optionsOrString?: IInjectOptions | string): PropertyDecorator & ParameterDecorator;
 export declare function Initialize(): MethodDecorator;
 export declare function Factory(options?: IFactoryOptions): MethodDecorator;
