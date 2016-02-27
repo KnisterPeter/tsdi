@@ -14,7 +14,7 @@
     "build": "tsc --sourceMap",
     "postbuild": "cp dist/lib/decorators.d.ts index.d.ts",
     "pretest": "npm run build",
-    "test": "mocha dist/tests/",
+    "test": "mocha -r source-map-support/register dist/tests/",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -w",
     "preversion": "npm test",
     "version": "npm run build && conventional-changelog -p angular -v -r 0 > CHANGELOG.md && git add -A .",
