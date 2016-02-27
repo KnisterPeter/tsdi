@@ -1,3 +1,13 @@
+<a name="0.9.4"></a>
+## [0.9.4](https://github.com/knisterpeter/tsdi/compare/v0.9.3...v0.9.4) (2016-02-27)
+
+
+### Bug Fixes
+
+* Fixed error handling and cyclic dependencies ([bdc9095](https://github.com/knisterpeter/tsdi/commit/bdc9095))
+
+
+
 <a name="0.9.3"></a>
 ## [0.9.3](https://github.com/knisterpeter/tsdi/compare/v0.9.2...v0.9.3) (2016-02-27)
 
