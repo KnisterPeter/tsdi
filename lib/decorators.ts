@@ -147,9 +147,10 @@ export class TSDI {
     let idx: number;
     for (let i = 0, n = this.components.length; i < n; i++) {
       const metadata = this.components[i];
-      if (name && name == metadata.options.name) {
+      if (name && name === metadata.options.name) {
         return i;
-      } else if (metadata.fn == component || (metadata as FactoryMetadata).factoryType == component) {
+      } else if (metadata.fn === component
+          || (metadata as FactoryMetadata).factoryType === component) {
         idx = i;
       }
     }
@@ -296,7 +297,7 @@ export function Factory(options: IFactoryOptions = {}): MethodDecorator {
     addKnownComponent({
       factoryType: rtti,
       fn: (tsdi: TSDI): any => {
-        return (tsdi.get((target as any).prototype) as any)[propertyKey]();
+        return (tsdi.get(target.constructor as any) as any)[propertyKey]();
       },
       options
     });

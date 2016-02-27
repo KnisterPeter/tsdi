@@ -207,6 +207,9 @@ describe('TSDI', () => {
         }
       }
 
+      @Component()
+      class C {}
+
       assert.instanceOf(tsdi.get(B), B);
       assert.strictEqual(tsdi.get(B), tsdi.get(B));
     });
