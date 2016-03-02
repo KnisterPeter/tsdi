@@ -116,11 +116,11 @@ describe('TSDI', () => {
       assert.equal(tsdi.get(A, 'Bar').m(), 'c');
     });
 
-    it('should not allow registration with duplicate component name', (done: MochaDone) => {
+    it('should warn if register component with duplicate name', (done: MochaDone) => {
       class A {};
       class B {};
 
-      const oldConsole = console;
+      const consoleWarn = console.warn;
       try {
         console.warn = function(msg: string): void {
           assert.equal(msg, "Component with name 'DuplicateComponentName' already registered.");
@@ -129,7 +129,7 @@ describe('TSDI', () => {
         tsdi.register(A, 'DuplicateComponentName');
         tsdi.register(B, 'DuplicateComponentName');
       } finally {
-        console = oldConsole;
+        console.warn = consoleWarn;
       }
     });
 
