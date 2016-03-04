@@ -208,10 +208,13 @@ export class TSDI {
             if (inject.options.name && typeof this.properties[inject.options.name] != 'undefined') {
               instance[inject.property] = this.properties[inject.options.name];
             } else {
-              const injectIdx = this.getComponentMetadataIndex(inject.type, inject.options.name);
-              if (injectIdx === -1 && !inject.type) {
-                throw new Error('Injecting undefined type on ' + (inject.target as any).constructor.name
-                  + '#' + inject.property + ': Probably a cyclic dependency, switch to name based injection');
+              let injectIdx = this.getComponentMetadataIndex(inject.type, inject.options.name);
+              if (injectIdx === -1) {
+                if (!inject.type || inject.options.name) {
+                  throw new Error('Injecting undefined type on ' + (inject.target as any).constructor.name
+                    + '#' + inject.property + ': Probably a cyclic dependency, switch to name based injection');
+                }
+                injectIdx = this.getComponentMetadataIndex(inject.type, (inject.type as any).name);
               }
               const injectMetadata = this.components[injectIdx];
               if (!injectMetadata) {

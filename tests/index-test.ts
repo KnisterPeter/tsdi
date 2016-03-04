@@ -234,6 +234,25 @@ describe('TSDI', () => {
       assert.instanceOf(tsdi.get(NonSingletonObject), NonSingletonObject);
       assert.notEqual(tsdi.get(NonSingletonObject), tsdi.get(NonSingletonObject));
     });
+
+    it('inject should fallback to typename if no explicit name given', () => {
+      tsdi.enableComponentScanner();
+
+      @Component()
+      class InjectedComponent {
+      }
+
+      @Component()
+      class ComponentWithNonNamedInject {
+        @Inject()
+        private _comp: InjectedComponent;
+        get comp(): InjectedComponent {
+          return this._comp;
+        }
+      }
+
+      assert.strictEqual(tsdi.get(ComponentWithNonNamedInject).comp, tsdi.get(InjectedComponent));
+    });
   });
 
   describe('without container instance', () => {
