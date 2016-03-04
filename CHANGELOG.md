@@ -1,3 +1,14 @@
+<a name="0.9.5"></a>
+## [0.9.5](https://github.com/knisterpeter/tsdi/compare/v0.9.4...v0.9.5) (2016-03-04)
+
+
+### Bug Fixes
+
+* Inject should fallback to type name ([792ee0a](https://github.com/knisterpeter/tsdi/commit/792ee0a))
+* Updates to typescript 1.8 ([69a3912](https://github.com/knisterpeter/tsdi/commit/69a3912))
+
+
+
 <a name="0.9.4"></a>
 ## [0.9.4](https://github.com/knisterpeter/tsdi/compare/v0.9.3...v0.9.4) (2016-02-27)
 
