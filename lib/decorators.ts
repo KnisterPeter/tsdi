@@ -211,14 +211,14 @@ export class TSDI {
               let injectIdx = this.getComponentMetadataIndex(inject.type, inject.options.name);
               if (injectIdx === -1) {
                 if (!inject.type || inject.options.name) {
-                  throw new Error('Injecting undefined type on ' + (inject.target as any).constructor.name
+                  throw new Error('Injecting undefined type on ' + (inject.target.constructor as any).name
                     + '#' + inject.property + ': Probably a cyclic dependency, switch to name based injection');
                 }
                 injectIdx = this.getComponentMetadataIndex(inject.type, (inject.type as any).name);
               }
               const injectMetadata = this.components[injectIdx];
               if (!injectMetadata) {
-                throw new Error(`Failed to get inject '${inject.options.name}'`);
+                throw new Error(`Failed to get inject '${inject.options.name}' for '${(inject.target.constructor as any).name}#${inject.property}'`);
               }
               instance[inject.property] = this.getOrCreate(injectMetadata, injectIdx);
             }
