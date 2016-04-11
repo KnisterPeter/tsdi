@@ -42,7 +42,7 @@
     "nyc": "6.4.0",
     "rimraf": "2.5.2",
     "source-map-support": "0.4.0",
-    "tslint": "3.7.1",
+    "tslint": "3.7.2",
     "typescript": "1.8.9"
   },
   "dependencies": {
