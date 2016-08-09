@@ -46,7 +46,7 @@
     "typescript": "1.8.10"
   },
   "dependencies": {
-    "reflect-metadata": "0.1.4"
+    "reflect-metadata": "0.1.5"
   },
   "publishConfig": {
     "tag": "next"
