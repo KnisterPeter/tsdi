@@ -55,5 +55,12 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
+  },
+  "nyc": {
+    "exclude": [
+      "node_modules",
+      "coverage",
+      "dist/tests"
+    ]
   }
 }
