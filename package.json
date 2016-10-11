@@ -38,7 +38,7 @@
     "cz-conventional-changelog": "1.2.0",
     "exorcist": "0.4.0",
     "in-publish": "2.0.0",
-    "mocha": "3.1.1",
+    "mocha": "3.1.2",
     "nyc": "8.3.1",
     "rimraf": "2.5.4",
     "source-map-support": "0.4.3",
