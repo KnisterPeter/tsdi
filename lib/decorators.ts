@@ -2,16 +2,19 @@ import 'reflect-metadata';
 
 export type Constructable<T> = { new(...args: any[]): T; };
 
-export interface IComponentOptions {
+export type IComponentOptions = ComponentOptions;
+export interface ComponentOptions {
   name?: string;
   singleton?: boolean;
 }
 
-export interface IInjectOptions {
+export type IInjectOptions = InjectOptions;
+export interface InjectOptions {
   name?: string;
 }
 
-export interface IFactoryOptions {
+export type IFactoryOptions = FactoryOptions;
+export interface FactoryOptions {
   name?: string;
   singleton?: boolean;
 }
@@ -63,10 +66,10 @@ function removeElement<T>(list: T[], test: (element: T) => boolean): T[] {
 }
 
 let listeners: ComponentListener[] = [];
-let knownComponents: ComponentOrFactoryMetadata[] = [];
+const knownComponents: ComponentOrFactoryMetadata[] = [];
 
 function addKnownComponent(metadata: ComponentOrFactoryMetadata): void {
-  if (metadata.options.name && findIndexOf(knownComponents, meta => meta.options.name == metadata.options.name) > -1) {
+  if (metadata.options.name && findIndexOf(knownComponents, meta => meta.options.name === metadata.options.name) > -1) {
     throw new Error(`Duplicate name '${metadata.options.name}' for known Components.`);
   }
   knownComponents.push(metadata);
@@ -79,7 +82,7 @@ function addListener(listener: ComponentListener): void {
 }
 
 function removeListener(listener: ComponentListener): void {
-  listeners = removeElement(listeners, l => l == listener);
+  listeners = removeElement(listeners, l => l === listener);
 }
 
 export class TSDI {
@@ -88,7 +91,7 @@ export class TSDI {
 
   private instances: {[idx: number]: Object} = {};
 
-  private listener: ComponentListener;
+  private listener: ComponentListener|undefined;
 
   private properties: {[key: string]: any} = {};
 
@@ -107,21 +110,23 @@ export class TSDI {
   public close(): void {
     if (this.listener) {
       removeListener(this.listener);
-      this.listener = null;
+      this.listener = undefined;
     }
   }
 
   public enableComponentScanner(): void {
     if (!this.listener) {
       this.listener = this.registerComponent.bind(this);
-      addListener(this.listener);
+      if (this.listener) {
+        addListener(this.listener);
+      }
     }
   }
 
   private registerComponent(componentMetadata: ComponentMetadata): void {
-    if (this.components.indexOf(componentMetadata) == -1) {
+    if (this.components.indexOf(componentMetadata) === -1) {
       if (componentMetadata.options.name && findIndexOf(this.components,
-          meta => meta.options.name == componentMetadata.options.name) > -1) {
+          meta => meta.options.name === componentMetadata.options.name) > -1) {
         console.warn(`Component with name '${componentMetadata.options.name}' already registered.`);
       }
 
@@ -130,7 +135,7 @@ export class TSDI {
   }
 
   public register(component: Constructable<any>, name?: string): void {
-    let componentName: string = name;
+    let componentName = name;
     if (!componentName) {
       const options: IComponentOptions =  Reflect.getMetadata('component:options', component);
       if (options) {
@@ -145,22 +150,27 @@ export class TSDI {
     });
   }
 
-  private getComponentMetadataIndex(component: Constructable<any>, name?: string): number {
+  private getComponentMetadataIndex(component: Constructable<any> | undefined, name?: string): number {
     let idx: number = -1;
     for (let i = 0, n = this.components.length; i < n; i++) {
       const metadata = this.components[i];
       if (name && name === metadata.options.name) {
         return i;
-      } else if (typeof component !== 'undefined'
-          && ((metadata as ComponentMetadata).fn === component
-            || (metadata as FactoryMetadata).rtti === component)) {
+      } else if (this.isComponentMetadataIndexFromComponentOrFactory(component, metadata)) {
         idx = i;
       }
     }
     return idx;
   }
 
-  private throwComponentNotFoundError(component: Constructable<any>, name: string): void {
+  private isComponentMetadataIndexFromComponentOrFactory(component: Constructable<any> | undefined,
+      metadata: ComponentOrFactoryMetadata): boolean {
+    return typeof component !== 'undefined'
+          && ((metadata as ComponentMetadata).fn === component
+            || (metadata as FactoryMetadata).rtti === component);
+  }
+
+  private throwComponentNotFoundError(component: Constructable<any> | undefined, name: string | undefined): void {
     if (component && !name) {
       name = (component as any).name;
     }
@@ -171,7 +181,7 @@ export class TSDI {
   }
 
   private getConstructorParameters(metadata: ComponentOrFactoryMetadata): any[] {
-    let parameterMetadata: ParameterMetadata[] = Reflect.getMetadata('component:parameters',
+    const parameterMetadata: ParameterMetadata[] = Reflect.getMetadata('component:parameters',
       (metadata as ComponentMetadata).fn);
     if (parameterMetadata) {
       return parameterMetadata
@@ -183,11 +193,11 @@ export class TSDI {
   }
 
   private isSingleton(metadata: ComponentOrFactoryMetadata): boolean {
-    return typeof metadata.options.singleton == 'undefined' || metadata.options.singleton;
+    return typeof metadata.options.singleton === 'undefined' || metadata.options.singleton;
   }
 
   private getOrCreate<T>(metadata: ComponentOrFactoryMetadata, idx: number): T {
-    // TODO: Use T here
+    // todo: Use T here
     let instance: any = this.instances[idx];
     if (!instance || !this.isSingleton(metadata)) {
       if ((metadata as FactoryMetadata).rtti) {
@@ -197,33 +207,12 @@ export class TSDI {
       } else {
         const componentMetadata = metadata as ComponentMetadata;
         const constructor: Constructable<T> =  componentMetadata.fn as any;
-        let parameters = this.getConstructorParameters(metadata);
+        const parameters = this.getConstructorParameters(metadata);
         instance = new constructor(...parameters);
-        // Note: This stores an incomplete instance (injects/properties/...)
-        // But it allows recursive use of injects
+        // note: This stores an incomplete instance (injects/properties/...)
+        // but it allows recursive use of injects
         this.instances[idx] = instance;
-        let injects: InjectMetadata[] = Reflect.getMetadata('component:injects', componentMetadata.fn.prototype);
-        if (injects) {
-          for (let inject of injects) {
-            if (inject.options.name && typeof this.properties[inject.options.name] != 'undefined') {
-              instance[inject.property] = this.properties[inject.options.name];
-            } else {
-              let injectIdx = this.getComponentMetadataIndex(inject.type, inject.options.name);
-              if (injectIdx === -1) {
-                if (!inject.type || inject.options.name) {
-                  throw new Error('Injecting undefined type on ' + (inject.target.constructor as any).name
-                    + '#' + inject.property + ': Probably a cyclic dependency, switch to name based injection');
-                }
-                injectIdx = this.getComponentMetadataIndex(inject.type, (inject.type as any).name);
-              }
-              const injectMetadata = this.components[injectIdx];
-              if (!injectMetadata) {
-                throw new Error(`Failed to get inject '${inject.options.name}' for '${(inject.target.constructor as any).name}#${inject.property}'`);
-              }
-              instance[inject.property] = this.getOrCreate(injectMetadata, injectIdx);
-            }
-          }
-        }
+        this.injectIntoInstance(instance, componentMetadata);
         const init: string = Reflect.getMetadata('component:init', componentMetadata.fn.prototype);
         if (init) {
           (instance[init] as Function).call(instance);
@@ -233,11 +222,40 @@ export class TSDI {
     return instance;
   }
 
-  public get<T>(hint: string): T;
-  public get<T>(component: Constructable<T>): T;
+  private injectIntoInstance(instance: any, componentMetadata: ComponentMetadata): void {
+    const injects: InjectMetadata[] = Reflect.getMetadata('component:injects', componentMetadata.fn.prototype);
+    if (injects) {
+      for (const inject of injects) {
+        if (inject.options.name && typeof this.properties[inject.options.name] !== 'undefined') {
+          instance[inject.property] = this.properties[inject.options.name];
+        } else {
+          instance[inject.property] = this.getComponentDependency(inject);
+        }
+      }
+    }
+  }
+
+  private getComponentDependency(inject: InjectMetadata): any {
+    let injectIdx = this.getComponentMetadataIndex(inject.type, inject.options.name);
+    if (injectIdx === -1) {
+      if (!inject.type || inject.options.name) {
+        throw new Error(`Injecting undefined type on ${(inject.target.constructor as any).name}`
+          + `#${inject.property}: Probably a cyclic dependency, switch to name based injection`);
+      }
+      injectIdx = this.getComponentMetadataIndex(inject.type, (inject.type as any).name);
+    }
+    const injectMetadata = this.components[injectIdx];
+    if (!injectMetadata) {
+      throw new Error(`Failed to get inject '${inject.options.name}' for `
+        + `'${(inject.target.constructor as any).name}#${inject.property}'`);
+    }
+    return this.getOrCreate(injectMetadata, injectIdx);
+  }
+
+  public get<T>(componentOrHint: string|Constructable<T>): T;
   public get<T>(component: Constructable<T>, hint: string): T;
   public get<T>(componentOrHint: Constructable<T>|string, hint?: string): T {
-    let component: Constructable<T>;
+    let component: Constructable<T> | undefined;
     if (typeof componentOrHint === 'string') {
       hint = componentOrHint as any;
       component = undefined;
@@ -256,9 +274,10 @@ export class TSDI {
 
 function getNamedOptions<T extends {name?: string}>(optionOrString: T | string): T {
   if (typeof optionOrString === 'string') {
-    return {
+    const named = {
       name: optionOrString
-    } as any;
+    };
+    return named as T;
   }
   return optionOrString as T;
 }
@@ -282,8 +301,8 @@ export function Component(optionsOrString: IComponentOptions | string = {}): Cla
 export function Inject(optionsOrString: IInjectOptions | string = {}): PropertyDecorator & ParameterDecorator {
   return function(target: Object, propertyKey: string, parameterIndex?: number): void {
     const options = getNamedOptions<IInjectOptions>(optionsOrString);
-    if (typeof parameterIndex == 'undefined') {
-      // Annotated property
+    if (typeof parameterIndex === 'undefined') {
+      // annotated property
       // console.log(`@Inject ${(target.constructor as any).name}#${propertyKey}`);
       const type: Constructable<any> = Reflect.getMetadata('design:type', target, propertyKey);
       let injects: InjectMetadata[] = Reflect.getMetadata('component:injects', target);
@@ -298,7 +317,7 @@ export function Inject(optionsOrString: IInjectOptions | string = {}): PropertyD
         type
       });
     } else {
-      // Annotated parameter
+      // annotated parameter
       // console.log(`@Inject ${propertyKey}`);
       let parameters: ParameterMetadata[] = Reflect.getMetadata('component:parameters', target);
       if (!parameters) {

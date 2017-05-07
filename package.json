@@ -9,19 +9,20 @@
     "lib"
   ],
   "scripts": {
+    "linter": "tslint --project ./tsconfig.json",
     "clean": "rimraf dist",
     "prebuild": "npm run clean",
     "build": "tsc --sourceMap",
     "postbuild": "cp dist/lib/decorators.d.ts index.d.ts",
     "pretest": "npm run build",
-    "test": "mocha -r source-map-support/register dist/tests/",
+    "test": "nyc mocha -r source-map-support/register dist/tests/",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -w",
     "preversion": "npm test",
     "version": "npm run build && conventional-changelog -p angular -v -r 0 > CHANGELOG.md && git add -A .",
     "postversion": "git push && git push --tags",
     "prepublish": "not-in-install && npm run build || echo 'In install cycle, skipping prepublish'",
     "precoverage": "npm run clean && tsc --inlineSourceMap",
-    "coverage": "nyc --reporter lcov ./node_modules/.bin/mocha dist/tests/"
+    "coverage": "nyc report --reporter=lcov && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls"
   },
   "author": {
     "name": "Markus Wolf",
@@ -33,20 +34,21 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "chai": "3.5.0",
-    "coveralls": "2.11.15",
-    "cz-conventional-changelog": "1.2.0",
-    "exorcist": "0.4.0",
+    "@knisterpeter/standard-tslint": "^1.5.1",
+    "chai": "^3.5.0",
+    "coveralls": "^2.13.1",
+    "cz-conventional-changelog": "^2.0.0",
+    "exorcist": "^0.4.0",
     "in-publish": "2.0.0",
-    "mocha": "3.2.0",
-    "nyc": "10.1.2",
-    "rimraf": "2.5.4",
-    "source-map-support": "0.4.10",
-    "tslint": "4.3.1",
-    "typescript": "2.1.5"
+    "mocha": "^3.3.0",
+    "nyc": "^10.3.2",
+    "rimraf": "^2.6.1",
+    "source-map-support": "^0.4.15",
+    "tslint": "^5.2.0",
+    "typescript": "^2.3.2"
   },
   "dependencies": {
-    "reflect-metadata": "0.1.9"
+    "reflect-metadata": "^0.1.10"
   },
   "publishConfig": {
     "tag": "next"

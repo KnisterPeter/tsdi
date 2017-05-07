@@ -2,14 +2,17 @@ import 'reflect-metadata';
 export declare type Constructable<T> = {
     new (...args: any[]): T;
 };
-export interface IComponentOptions {
+export declare type IComponentOptions = ComponentOptions;
+export interface ComponentOptions {
     name?: string;
     singleton?: boolean;
 }
-export interface IInjectOptions {
+export declare type IInjectOptions = InjectOptions;
+export interface InjectOptions {
     name?: string;
 }
-export interface IFactoryOptions {
+export declare type IFactoryOptions = FactoryOptions;
+export interface FactoryOptions {
     name?: string;
     singleton?: boolean;
 }
@@ -25,12 +28,14 @@ export declare class TSDI {
     private registerComponent(componentMetadata);
     register(component: Constructable<any>, name?: string): void;
     private getComponentMetadataIndex(component, name?);
+    private isComponentMetadataIndexFromComponentOrFactory(component, metadata);
     private throwComponentNotFoundError(component, name);
     private getConstructorParameters(metadata);
     private isSingleton(metadata);
     private getOrCreate<T>(metadata, idx);
-    get<T>(hint: string): T;
-    get<T>(component: Constructable<T>): T;
+    private injectIntoInstance(instance, componentMetadata);
+    private getComponentDependency(inject);
+    get<T>(componentOrHint: string | Constructable<T>): T;
     get<T>(component: Constructable<T>, hint: string): T;
 }
 export declare function Component(optionsOrString?: IComponentOptions | string): ClassDecorator;
