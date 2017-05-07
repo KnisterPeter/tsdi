@@ -1,8 +1,9 @@
-import 'source-map-support/register';
 import { assert } from 'chai';
+import 'source-map-support/register';
+
 import { TSDI, Component, Inject, Factory } from '../lib/decorators';
-import { User } from './user';
 import { Dependency } from './dependency';
+import { User } from './user';
 
 describe('TSDI', () => {
 
@@ -117,8 +118,8 @@ describe('TSDI', () => {
     });
 
     it('should warn if register component with duplicate name', (done: MochaDone) => {
-      class A {};
-      class B {};
+      class A {}
+      class B {}
 
       const consoleWarn = console.warn;
       try {

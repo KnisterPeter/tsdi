@@ -9,19 +9,20 @@
     "lib"
   ],
   "scripts": {
+    "linter": "tslint --project ./tsconfig.json",
     "clean": "rimraf dist",
     "prebuild": "npm run clean",
     "build": "tsc --sourceMap",
     "postbuild": "cp dist/lib/decorators.d.ts index.d.ts",
     "pretest": "npm run build",
-    "test": "mocha -r source-map-support/register dist/tests/",
+    "test": "nyc mocha -r source-map-support/register dist/tests/",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -w",
     "preversion": "npm test",
     "version": "npm run build && conventional-changelog -p angular -v -r 0 > CHANGELOG.md && git add -A .",
     "postversion": "git push && git push --tags",
     "prepublish": "not-in-install && npm run build || echo 'In install cycle, skipping prepublish'",
     "precoverage": "npm run clean && tsc --inlineSourceMap",
-    "coverage": "nyc --reporter lcov ./node_modules/.bin/mocha dist/tests/"
+    "coverage": "nyc report --reporter=lcov && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls"
   },
   "author": {
     "name": "Markus Wolf",
