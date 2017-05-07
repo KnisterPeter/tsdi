@@ -4,11 +4,13 @@
     "target": "es5",
     "module": "commonjs",
     "outDir": "dist",
-    "noImplicitAny": true,
+    "strict": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist",
+    "index.d.ts"
   ]
 }

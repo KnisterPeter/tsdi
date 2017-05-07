@@ -33,20 +33,21 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "chai": "3.5.0",
-    "coveralls": "2.11.15",
-    "cz-conventional-changelog": "1.2.0",
-    "exorcist": "0.4.0",
+    "@knisterpeter/standard-tslint": "^1.5.1",
+    "chai": "^3.5.0",
+    "coveralls": "^2.13.1",
+    "cz-conventional-changelog": "^2.0.0",
+    "exorcist": "^0.4.0",
     "in-publish": "2.0.0",
-    "mocha": "3.2.0",
-    "nyc": "10.1.2",
-    "rimraf": "2.5.4",
-    "source-map-support": "0.4.10",
-    "tslint": "4.3.1",
-    "typescript": "2.1.5"
+    "mocha": "^3.3.0",
+    "nyc": "^10.3.2",
+    "rimraf": "^2.6.1",
+    "source-map-support": "^0.4.15",
+    "tslint": "^5.2.0",
+    "typescript": "^2.3.2"
   },
   "dependencies": {
-    "reflect-metadata": "0.1.9"
+    "reflect-metadata": "^0.1.10"
   },
   "publishConfig": {
     "tag": "next"
