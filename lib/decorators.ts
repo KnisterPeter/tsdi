@@ -70,7 +70,7 @@ const knownComponents: ComponentOrFactoryMetadata[] = [];
 
 function addKnownComponent(metadata: ComponentOrFactoryMetadata): void {
   if (metadata.options.name && findIndexOf(knownComponents, meta => meta.options.name === metadata.options.name) > -1) {
-    throw new Error(`Duplicate name '${metadata.options.name}' for known Components.`);
+    return;
   }
   knownComponents.push(metadata);
   listeners.forEach(listener => listener(metadata));
