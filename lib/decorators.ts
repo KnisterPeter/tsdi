@@ -236,6 +236,17 @@ export class TSDI {
     return instance;
   }
 
+  public configureExternal<T>(args: any[], target: any): T {
+    const parameters = this.getConstructorParameters({fn: target, options: {}});
+    const instance = new target(...args, ...parameters);
+    this.injectIntoInstance(instance, {fn: target, options: {}});
+    const init: string = Reflect.getMetadata('component:init', target.prototype);
+    if (init) {
+      (instance as any)[init].call(instance);
+    }
+    return instance;
+  }
+
   private injectIntoInstance(instance: any, componentMetadata: ComponentMetadata): void {
     const injects: InjectMetadata[] = Reflect.getMetadata('component:injects', componentMetadata.fn.prototype);
     if (injects) {
@@ -314,18 +325,10 @@ export function Component(optionsOrString: IComponentOptions | string = {}): Cla
 
 export function External(): ClassDecorator {
   return function<TFunction extends Function>(target: TFunction): TFunction {
+    // console.log(`@External ${(target as any).name}`);
     addKnownExternal(target);
     const constructor = function InjectedConstructor(this: any, ...args: any[]): any {
-      const inst = target.apply(this, args) || new (target as any)(...args);
-      const injects: InjectMetadata[] = Reflect.getMetadata('component:injects', target.prototype);
-      if (injects) {
-        for (const inject of injects) {
-          if ((target as any).__tsdi__) {
-            inst[inject.property] = (target as any).__tsdi__.get(inject.type);
-          }
-        }
-      }
-      return inst;
+      return (target as any).__tsdi__.configureExternal(args, target);
     };
     constructor.prototype = target.prototype;
     return constructor as any;

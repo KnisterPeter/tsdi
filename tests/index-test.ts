@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import 'source-map-support/register';
 
-import { TSDI, Component, Inject, Factory, External } from '../lib/decorators';
+import { TSDI, Component, Inject, Factory, External, Initialize } from '../lib/decorators';
 import { Dependency } from './dependency';
 import { User } from './user';
 
@@ -259,14 +259,69 @@ describe('TSDI', () => {
       it('should inject dependencies', () => {
         tsdi.enableComponentScanner();
 
+        @Component('user2')
+        class User2 extends User {
+        }
+
         @External()
         class ExternalClass {
           @Inject()
-          public injected: User;
+          public user: User;
+          @Inject('user2')
+          public user2: User;
         }
 
         const external = new ExternalClass();
-        assert.equal(external.injected, tsdi.get(User));
+        assert.equal(external.user, tsdi.get(User));
+        assert.equal(external.user2, tsdi.get(User2));
+      });
+
+      it('should call the initializer', () => {
+        tsdi.enableComponentScanner();
+
+        let called = false;
+        const fn = () => called = true;
+
+        @External()
+        class ExternalClass {
+          @Initialize()
+          public init(): void {
+            fn();
+          }
+        }
+
+        const external = new ExternalClass();
+        assert.isTrue(called);
+      });
+
+      it('should inject defined properties', () => {
+        tsdi.enableComponentScanner();
+
+        @External()
+        class ExternalClass {
+          @Inject('prop')
+          private _prop: boolean;
+
+          public get prop(): boolean { return this._prop; }
+        }
+        tsdi.addProperty('prop', false);
+
+        assert.equal(new ExternalClass().prop, false);
+      });
+
+      it('should allow constructor injection', () => {
+        tsdi.enableComponentScanner();
+
+        @External()
+        class ExternalClass {
+          public injected: User;
+
+          constructor(value: string, @Inject() user?: User) {
+            this.injected = user!;
+          }
+        }
+
+        assert.equal(new ExternalClass('value').injected, tsdi.get(User));
       });
     });
   });

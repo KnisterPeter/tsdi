@@ -209,16 +209,27 @@ import { TSDI, Component, External } from 'tsdi';
 @Component
 class A {}
 
+@Component
+class B {}
+
 @External()
-class B {
+class C {
   @Inject()
   public a: A;
+
+  public b: B;
+
+  constructor(@Inject() b: B) {
+    this.b = b;
+  }
+
+  @Initialize()
+  public init() {
+  }
 }
 
 const tsdi: TSDI = new TSDI();
 tsdi.enableComponentScanner();
-
-const a = (new B()).a;
 ```
 
 ## Future ideas / Roadmap
