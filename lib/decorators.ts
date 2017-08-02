@@ -202,7 +202,7 @@ export class TSDI {
     if (!instance || !this.isSingleton(metadata)) {
       if ((metadata as FactoryMetadata).rtti) {
         const factoryMetadata = metadata as FactoryMetadata;
-        instance = (this.get(factoryMetadata.target.constructor as any) as any)[factoryMetadata.property]();
+        instance = this.get(factoryMetadata.target.constructor as Constructable<any>)[factoryMetadata.property]();
         this.instances[idx] = instance;
       } else {
         const componentMetadata = metadata as ComponentMetadata;
@@ -260,7 +260,7 @@ export class TSDI {
       hint = componentOrHint as any;
       component = undefined;
     } else {
-      component = componentOrHint as Constructable<T>;
+      component = componentOrHint;
     }
     const idx = this.getComponentMetadataIndex(component, hint);
     const metadata = this.components[idx];
@@ -279,7 +279,7 @@ function getNamedOptions<T extends {name?: string}>(optionOrString: T | string):
     };
     return named as T;
   }
-  return optionOrString as T;
+  return optionOrString;
 }
 
 export function Component(optionsOrString: IComponentOptions | string = {}): ClassDecorator {
