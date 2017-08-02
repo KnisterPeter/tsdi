@@ -48,9 +48,6 @@
   "dependencies": {
     "reflect-metadata": "^0.1.10"
   },
-  "publishConfig": {
-    "tag": "next"
-  },
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
