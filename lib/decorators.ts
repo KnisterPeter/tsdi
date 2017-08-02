@@ -243,7 +243,7 @@ export class TSDI {
     this.injectIntoInstance(instance, {fn: target, options: {}});
     const init: string = Reflect.getMetadata('component:init', target.prototype);
     if (init) {
-      (instance as any)[init].call(instance);
+      instance[init].call(instance);
     }
     return instance;
   }
