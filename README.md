@@ -7,6 +7,7 @@
 [![David](https://img.shields.io/david/dev/KnisterPeter/tsdi.svg)](https://david-dm.org/KnisterPeter/tsdi#info=devDependencies&view=table)
 [![npm](https://img.shields.io/npm/v/tsdi.svg)](https://www.npmjs.com/package/tsdi)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
+[![Standard Version](https://img.shields.io/badge/release-standard%20version-brightgreen.svg)](https://github.com/conventional-changelog/standard-version)
 
 Dependency Injection container (IoC) for TypeScript.
 
