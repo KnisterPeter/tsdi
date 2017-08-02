@@ -87,6 +87,7 @@ function addKnownExternal(external: Function): void {
 function addListener(listener: ComponentListener): void {
   listeners.push(listener);
   knownComponents.forEach(metadata => listener(metadata));
+  knownExternals.forEach(external => listener(external));
 }
 
 function removeListener(listener: ComponentListener): void {
