@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import 'source-map-support/register';
 
-import { TSDI, Component, Inject, Factory } from '../lib/decorators';
+import { TSDI, Component, Inject, Factory, External } from '../lib/decorators';
 import { Dependency } from './dependency';
 import { User } from './user';
 
@@ -253,6 +253,21 @@ describe('TSDI', () => {
       }
 
       assert.strictEqual(tsdi.get(ComponentWithNonNamedInject).comp, tsdi.get(InjectedComponent));
+    });
+
+    describe('with external classes', () => {
+      it('should inject dependencies', () => {
+        tsdi.enableComponentScanner();
+
+        @External()
+        class ExternalClass {
+          @Inject()
+          public injected: User;
+        }
+
+        const external = new ExternalClass();
+        assert.equal(external.injected, tsdi.get(User));
+      });
     });
   });
 

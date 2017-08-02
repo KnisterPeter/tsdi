@@ -45,7 +45,7 @@ type FactoryMetadata = {
 };
 
 type ComponentOrFactoryMetadata = ComponentMetadata | FactoryMetadata;
-type ComponentListener = (metadata: ComponentOrFactoryMetadata) => void;
+type ComponentListener = (metadataOrExternal: ComponentOrFactoryMetadata | Function) => void;
 
 function findIndexOf<T>(list: T[], test: (element: T) => boolean): number {
   let idx = -1;
@@ -67,6 +67,7 @@ function removeElement<T>(list: T[], test: (element: T) => boolean): T[] {
 
 let listeners: ComponentListener[] = [];
 const knownComponents: ComponentOrFactoryMetadata[] = [];
+const knownExternals: Function[] = [];
 
 function addKnownComponent(metadata: ComponentOrFactoryMetadata): void {
   if (metadata.options.name && findIndexOf(knownComponents, meta => meta.options.name === metadata.options.name) > -1) {
@@ -74,6 +75,13 @@ function addKnownComponent(metadata: ComponentOrFactoryMetadata): void {
   }
   knownComponents.push(metadata);
   listeners.forEach(listener => listener(metadata));
+}
+
+function addKnownExternal(external: Function): void {
+  if (findIndexOf(knownExternals, fn => fn === external) === -1) {
+    knownExternals.push(external);
+    listeners.forEach(listener => listener(external));
+  }
 }
 
 function addListener(listener: ComponentListener): void {
@@ -116,14 +124,20 @@ export class TSDI {
 
   public enableComponentScanner(): void {
     if (!this.listener) {
-      this.listener = this.registerComponent.bind(this);
+      this.listener = (metadataOrExternal: ComponentOrFactoryMetadata | Function) => {
+        if (typeof metadataOrExternal === 'function')  {
+          (metadataOrExternal as any).__tsdi__ = this;
+        } else {
+          this.registerComponent(metadataOrExternal);
+        }
+      };
       if (this.listener) {
         addListener(this.listener);
       }
     }
   }
 
-  private registerComponent(componentMetadata: ComponentMetadata): void {
+  private registerComponent(componentMetadata: ComponentOrFactoryMetadata): void {
     if (this.components.indexOf(componentMetadata) === -1) {
       if (componentMetadata.options.name && findIndexOf(this.components,
           meta => meta.options.name === componentMetadata.options.name) > -1) {
@@ -295,6 +309,26 @@ export function Component(optionsOrString: IComponentOptions | string = {}): Cla
     });
     Reflect.defineMetadata('component:options', options, target);
     return target;
+  };
+}
+
+export function External(): ClassDecorator {
+  return function<TFunction extends Function>(target: TFunction): TFunction {
+    addKnownExternal(target);
+    const constructor = function InjectedConstructor(this: any, ...args: any[]): any {
+      const inst = target.apply(this, args) || new (target as any)(...args);
+      const injects: InjectMetadata[] = Reflect.getMetadata('component:injects', target.prototype);
+      if (injects) {
+        for (const inject of injects) {
+          if ((target as any).__tsdi__) {
+            inst[inject.property] = (target as any).__tsdi__.get(inject.type);
+          }
+        }
+      }
+      return inst;
+    };
+    constructor.prototype = target.prototype;
+    return constructor as any;
   };
 }
 

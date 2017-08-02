@@ -22,6 +22,7 @@ Dependency Injection container (IoC) for TypeScript.
 * Constructor injection (parameters)
 * Singletons vs Instances
 * Factories
+* External components (components where the constructor could not be called by tsdi)
 
 # Usage
 
@@ -198,6 +199,26 @@ const tsdi: TSDI = new TSDI();
 tsdi.addProperty('config-key', 'config-value');
 tsdi.register(A);
 console.log(tsdi.get(A).some); // 'config-value'
+```
+
+### Externals
+
+```js
+import { TSDI, Component, External } from 'tsdi';
+
+@Component
+class A {}
+
+@External()
+class B {
+  @Inject()
+  public a: A;
+}
+
+const tsdi: TSDI = new TSDI();
+tsdi.enableComponentScanner();
+
+const a = (new B()).a;
 ```
 
 ## Future ideas / Roadmap
