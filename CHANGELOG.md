@@ -1,3 +1,24 @@
+# Change Log
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+<a name="0.10.0"></a>
+# [0.10.0](https://github.com/KnisterPeter/tsdi/compare/v0.9.5...v0.10.0) (2017-08-02)
+
+
+### Bug Fixes
+
+* register externals on container startup ([a2a600a](https://github.com/KnisterPeter/tsdi/commit/a2a600a))
+
+
+### Features
+
+* add external components ([f93e9db](https://github.com/KnisterPeter/tsdi/commit/f93e9db))
+* Added more info if injection fails ([3fec2f1](https://github.com/KnisterPeter/tsdi/commit/3fec2f1))
+* allow constructor injection and initialze method ([ba05742](https://github.com/KnisterPeter/tsdi/commit/ba05742))
+
+
+
 <a name="0.9.5"></a>
 ## [0.9.5](https://github.com/knisterpeter/tsdi/compare/v0.9.4...v0.9.5) (2016-03-04)
 
@@ -186,6 +207,3 @@
 ### Features
 
 * Initial release ([c71a2ee](https://github.com/knisterpeter/tsdi/commit/c71a2ee))
-
-
-
