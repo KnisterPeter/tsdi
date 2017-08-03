@@ -1,5 +1,7 @@
 # tsdi
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/KnisterPeter/tsdi.svg)](https://greenkeeper.io/)
+
 [![GitHub license](https://img.shields.io/github/license/KnisterPeter/tsdi.svg)]()
 [![Travis](https://img.shields.io/travis/KnisterPeter/tsdi.svg)](https://travis-ci.org/KnisterPeter/tsdi)
 [![Coveralls branch](https://img.shields.io/coveralls/KnisterPeter/tsdi/master.svg)](https://coveralls.io/github/KnisterPeter/tsdi)
