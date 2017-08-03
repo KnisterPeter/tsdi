@@ -33,6 +33,9 @@
   "license": "MIT",
   "devDependencies": {
     "@knisterpeter/standard-tslint": "^1.5.1",
+    "@types/chai": "^4.0.2",
+    "@types/mocha": "^2.2.41",
+    "@types/node": "^8.0.19",
     "chai": "^3.5.0",
     "coveralls": "^2.13.1",
     "cz-conventional-changelog": "^2.0.0",
