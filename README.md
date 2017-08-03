@@ -230,6 +230,9 @@ class C {
 
 const tsdi: TSDI = new TSDI();
 tsdi.enableComponentScanner();
+
+const c = new C();
+console.log(c.a);
 ```
 
 ## Future ideas / Roadmap
