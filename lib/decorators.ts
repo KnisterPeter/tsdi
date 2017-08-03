@@ -182,7 +182,9 @@ export class TSDI {
       metadata: ComponentOrFactoryMetadata): boolean {
     return typeof component !== 'undefined'
           && ((metadata as ComponentMetadata).fn === component
-            || (metadata as FactoryMetadata).rtti === component);
+            || (metadata as FactoryMetadata).rtti
+              && Object.keys((metadata as FactoryMetadata).rtti).length > 0
+              && (metadata as FactoryMetadata).rtti === component);
   }
 
   private throwComponentNotFoundError(component: Constructable<any> | undefined, name: string | undefined): void {
