@@ -2,6 +2,8 @@ import { assert } from 'chai';
 import 'source-map-support/register';
 
 import { TSDI, Component, Inject, Factory, External, Initialize } from '../lib/decorators';
+import { Cyclic1 } from './cyclic1';
+import { Cyclic2 } from './cyclic2';
 import { Dependency } from './dependency';
 import { User } from './user';
 
@@ -255,6 +257,30 @@ describe('TSDI', () => {
       assert.strictEqual(tsdi.get(ComponentWithNonNamedInject).comp, tsdi.get(InjectedComponent));
     });
 
+    it('should report an error for a probable cyclic dependency', () => {
+      tsdi.enableComponentScanner();
+      assert.throws(() => tsdi.get(Cyclic1), /Probably a cyclic dependency/);
+    });
+
+    it('should report an error if named injection could not resolve to a component', () => {
+      tsdi.enableComponentScanner();
+
+      @Component()
+      class UnknownComponent {
+      }
+
+      @Component()
+      class ComponentWithNamedInject {
+        @Inject('unknown')
+        private _comp: UnknownComponent;
+        get comp(): UnknownComponent {
+          return this._comp;
+        }
+      }
+
+      assert.throws(() => tsdi.get(ComponentWithNamedInject), "Component named 'unknown' not found");
+    });
+
     describe('with external classes', () => {
       it('should inject dependencies', () => {
         tsdi.enableComponentScanner();
@@ -272,8 +298,8 @@ describe('TSDI', () => {
         }
 
         const external = new ExternalClass();
-        assert.equal(external.user, tsdi.get(User));
-        assert.equal(external.user2, tsdi.get(User2));
+        assert.strictEqual(external.user, tsdi.get(User));
+        assert.strictEqual(external.user2, tsdi.get(User2));
       });
 
       it('should call the initializer', () => {
