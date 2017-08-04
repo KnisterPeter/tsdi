@@ -1,6 +1,6 @@
 {
   "name": "tsdi",
-  "version": "0.10.1",
+  "version": "0.10.2",
   "description": "Dependency Injection container (IoC) for TypeScript",
   "main": "dist/lib/decorators.js",
   "files": [
