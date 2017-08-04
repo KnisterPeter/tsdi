@@ -47,6 +47,10 @@ type FactoryMetadata = {
 type ComponentOrFactoryMetadata = ComponentMetadata | FactoryMetadata;
 type ComponentListener = (metadataOrExternal: ComponentOrFactoryMetadata | Function) => void;
 
+function isFactoryMetadata(metadata: ComponentOrFactoryMetadata): metadata is FactoryMetadata {
+  return Boolean((metadata as FactoryMetadata).rtti);
+}
+
 function findIndexOf<T>(list: T[], test: (element: T) => boolean): number {
   let idx = -1;
   for (let i = 0, n = list.length; i < n; i++) {
@@ -166,25 +170,26 @@ export class TSDI {
   }
 
   private getComponentMetadataIndex(component: Constructable<any> | undefined, name?: string): number {
-    let idx: number = -1;
     for (let i = 0, n = this.components.length; i < n; i++) {
-      const metadata = this.components[i];
-      if (name && name === metadata.options.name) {
-        return i;
-      } else if (this.isComponentMetadataIndexFromComponentOrFactory(component, metadata)) {
-        idx = i;
+      if (name) {
+        if (name === this.components[i].options.name) {
+          return i;
+        }
+      } else {
+        if (this.isComponentMetadataIndexFromComponentOrFactory(component, this.components[i])) {
+          return i;
+        }
       }
     }
-    return idx;
+    return -1;
   }
 
   private isComponentMetadataIndexFromComponentOrFactory(component: Constructable<any> | undefined,
       metadata: ComponentOrFactoryMetadata): boolean {
     return typeof component !== 'undefined'
           && ((metadata as ComponentMetadata).fn === component
-            || (metadata as FactoryMetadata).rtti
-              && Object.keys((metadata as FactoryMetadata).rtti).length > 0
-              && (metadata as FactoryMetadata).rtti === component);
+            || isFactoryMetadata(metadata)
+              && metadata.rtti === component);
   }
 
   private throwComponentNotFoundError(component: Constructable<any> | undefined, name: string | undefined): void {
@@ -217,20 +222,18 @@ export class TSDI {
     // todo: Use T here
     let instance: any = this.instances[idx];
     if (!instance || !this.isSingleton(metadata)) {
-      if ((metadata as FactoryMetadata).rtti) {
-        const factoryMetadata = metadata as FactoryMetadata;
-        instance = this.get(factoryMetadata.target.constructor as Constructable<any>)[factoryMetadata.property]();
+      if (isFactoryMetadata(metadata)) {
+        instance = this.get(metadata.target.constructor as Constructable<any>)[metadata.property]();
         this.instances[idx] = instance;
       } else {
-        const componentMetadata = metadata as ComponentMetadata;
-        const constructor: Constructable<T> =  componentMetadata.fn as any;
+        const constructor: Constructable<T> =  metadata.fn as any;
         const parameters = this.getConstructorParameters(metadata);
         instance = new constructor(...parameters);
         // note: This stores an incomplete instance (injects/properties/...)
         // but it allows recursive use of injects
         this.instances[idx] = instance;
-        this.injectIntoInstance(instance, componentMetadata);
-        const init: string = Reflect.getMetadata('component:init', componentMetadata.fn.prototype);
+        this.injectIntoInstance(instance, metadata);
+        const init: string = Reflect.getMetadata('component:init', metadata.fn.prototype);
         if (init) {
           (instance[init] as Function).call(instance);
         }
@@ -266,10 +269,7 @@ export class TSDI {
   private getComponentDependency(inject: InjectMetadata): any {
     let injectIdx = this.getComponentMetadataIndex(inject.type, inject.options.name);
     if (injectIdx === -1) {
-      if (!inject.type || inject.options.name) {
-        throw new Error(`Injecting undefined type on ${(inject.target.constructor as any).name}`
-          + `#${inject.property}: Probably a cyclic dependency, switch to name based injection`);
-      }
+      this.checkAndThrowDependencyError(inject);
       injectIdx = this.getComponentMetadataIndex(inject.type, (inject.type as any).name);
     }
     const injectMetadata = this.components[injectIdx];
@@ -278,6 +278,17 @@ export class TSDI {
         + `'${(inject.target.constructor as any).name}#${inject.property}'`);
     }
     return this.getOrCreate(injectMetadata, injectIdx);
+  }
+
+  private checkAndThrowDependencyError(inject: InjectMetadata): void {
+    if (inject.type && inject.options.name) {
+      throw new Error(`Injecting undefined type on ${(inject.target.constructor as any).name}`
+        + `#${inject.property}: Component named '${inject.options.name}' not found`);
+    }
+    if (!inject.type || inject.options.name) {
+      throw new Error(`Injecting undefined type on ${(inject.target.constructor as any).name}`
+        + `#${inject.property}: Probably a cyclic dependency, switch to name based injection`);
+    }
   }
 
   public get<T>(componentOrHint: string|Constructable<T>): T;
