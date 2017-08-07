@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.10.3"></a>
+## [0.10.3](https://github.com/KnisterPeter/tsdi/compare/v0.10.2...v0.10.3) (2017-08-07)
+
+
+### Bug Fixes
+
+* do not autoname components ([b60f61e](https://github.com/KnisterPeter/tsdi/commit/b60f61e))
+
+
+
 <a name="0.10.2"></a>
 ## [0.10.2](https://github.com/KnisterPeter/tsdi/compare/v0.10.1...v0.10.2) (2017-08-04)
 
