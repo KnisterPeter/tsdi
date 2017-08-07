@@ -325,9 +325,6 @@ export function Component(optionsOrString: IComponentOptions | string = {}): Cla
   return function<TFunction extends Function>(target: TFunction): TFunction {
     // console.log(`@Component ${(target as any).name}`);
     const options = getNamedOptions<IComponentOptions>(optionsOrString);
-    if (!options.name) {
-      options.name = (target as any).name;
-    }
     addKnownComponent({
       fn: target as any,
       options
