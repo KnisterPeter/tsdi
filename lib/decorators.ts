@@ -341,6 +341,7 @@ export function External(): ClassDecorator {
     const constructor = function InjectedConstructor(this: any, ...args: any[]): any {
       return (target as any).__tsdi__.configureExternal(args, target);
     };
+    (constructor as any).displayName = (target as any).name;
     constructor.prototype = target.prototype;
     return constructor as any;
   };
