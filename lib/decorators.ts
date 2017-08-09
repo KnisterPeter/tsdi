@@ -209,8 +209,8 @@ export class TSDI {
     if (parameterMetadata) {
       return parameterMetadata
         .sort((a, b) => a.index - b.index)
-        .map(parameter => this.getComponentMetadataIndex(parameter.rtti, parameter.options.name))
-        .map(index => this.getOrCreate(this.components[index], index));
+        .map(parameter => ({index: this.getComponentMetadataIndex(parameter.rtti, parameter.options.name), parameter}))
+        .map(({index, parameter}) => this.getOrCreate(this.components[index], index));
     }
     return [];
   }
@@ -338,8 +338,10 @@ function getNamedOptions<T extends {name?: string}>(optionOrString: T | string):
   return optionOrString;
 }
 
-export function Component(optionsOrString: IComponentOptions | string = {}): ClassDecorator {
-  return function<TFunction extends Function>(target: TFunction): TFunction {
+export function Component<TFunction extends Function>(target: TFunction): TFunction;
+export function Component(optionsOrString?: IComponentOptions | string): ClassDecorator;
+export function Component<TFunction extends Function>(...args: any[]): ClassDecorator| TFunction {
+  const decorate = (target: TFunction, optionsOrString: IComponentOptions | string = {}) => {
     // console.log(`@Component ${(target as any).name}`);
     const options = getNamedOptions<IComponentOptions>(optionsOrString);
     addKnownComponent({
@@ -349,10 +351,20 @@ export function Component(optionsOrString: IComponentOptions | string = {}): Cla
     Reflect.defineMetadata('component:options', options, target);
     return target;
   };
-}
 
-export function External(): ClassDecorator {
-  return function<TFunction extends Function>(target: TFunction): TFunction {
+  if (args.length === 1 && typeof args[0] === 'function') {
+    return decorate(args[0], {});
+  }
+  return function(target: TFunction): TFunction {
+    return decorate(target, args[0] || {});
+  } as ClassDecorator;
+}
+export const component = Component;
+
+export function External<TFunction extends Function>(target: TFunction): TFunction;
+export function External(): ClassDecorator;
+export function External<TFunction extends Function>(...args: any[]): ClassDecorator | TFunction {
+  const decorate = (target: TFunction) => {
     // console.log(`@External ${(target as any).name}`);
     addKnownExternal(target);
     const constructor = function InjectedConstructor(this: any, ...args: any[]): any {
@@ -362,54 +374,110 @@ export function External(): ClassDecorator {
     constructor.prototype = target.prototype;
     return constructor as any;
   };
-}
 
-export function Inject(optionsOrString: IInjectOptions | string = {}): PropertyDecorator & ParameterDecorator {
-  return function(target: Object, propertyKey: string, parameterIndex?: number): void {
-    const options = getNamedOptions<IInjectOptions>(optionsOrString);
+  if (args.length > 0) {
+    return decorate(args[0]);
+  }
+  return function(target: TFunction): TFunction {
+    return decorate(target);
+  } as ClassDecorator;
+}
+export const external = External;
+
+export function Inject(target: Object, propertyKey: string | symbol, parameterIndex?: number): void;
+export function Inject(optionsOrString?: IInjectOptions | string): PropertyDecorator & ParameterDecorator;
+export function Inject(...args: any[]): PropertyDecorator & ParameterDecorator | void {
+  const defaultOptions = (optionsOrString?: IInjectOptions | string) => {
+    const options = getNamedOptions<IInjectOptions>(optionsOrString || {});
     if (options.lazy === undefined) {
       options.lazy = true;
     }
-    if (typeof parameterIndex === 'undefined') {
-      // annotated property
-      // console.log(`@Inject ${(target.constructor as any).name}#${propertyKey}`);
-      const type: Constructable<any> = Reflect.getMetadata('design:type', target, propertyKey);
-      let injects: InjectMetadata[] = Reflect.getMetadata('component:injects', target);
-      if (!injects) {
-        injects = [];
-        Reflect.defineMetadata('component:injects', injects, target);
-      }
-      injects.push({
-        target,
-        property: propertyKey,
-        options,
-        type
-      });
+    return options;
+  };
+  const decorateProperty = (target: Object, propertyKey: string,
+      options: IInjectOptions) => {
+    // console.log(`@Inject ${(target.constructor as any).name}#${propertyKey}`);
+    const type: Constructable<any> = Reflect.getMetadata('design:type', target, propertyKey);
+    let injects: InjectMetadata[] = Reflect.getMetadata('component:injects', target);
+    if (!injects) {
+      injects = [];
+      Reflect.defineMetadata('component:injects', injects, target);
+    }
+    injects.push({
+      target,
+      property: propertyKey,
+      options,
+      type
+    });
+  };
+  const decorateParameter = (target: Object, propertyKey: string | symbol, parameterIndex: number,
+      options: IInjectOptions) => {
+    // console.log(`@Inject ${propertyKey}`);
+    let parameters: ParameterMetadata[] = Reflect.getMetadata('component:parameters', target);
+    if (!parameters) {
+      parameters = [];
+      Reflect.defineMetadata('component:parameters', parameters, target);
+    }
+    parameters.push({
+      options,
+      index: parameterIndex,
+      rtti: Reflect.getMetadata('design:paramtypes', target)[parameterIndex]
+    });
+  };
+
+  if (args.length > 1) {
+    const options = defaultOptions({});
+    if (typeof args[2] === 'undefined') {
+      decorateProperty(args[0], args[1], options);
     } else {
-      // annotated parameter
-      // console.log(`@Inject ${propertyKey}`);
-      let parameters: ParameterMetadata[] = Reflect.getMetadata('component:parameters', target);
-      if (!parameters) {
-        parameters = [];
-        Reflect.defineMetadata('component:parameters', parameters, target);
-      }
-      parameters.push({
-        options,
-        index: parameterIndex,
-        rtti: Reflect.getMetadata('design:paramtypes', target, propertyKey)[parameterIndex]
-      });
+      decorateParameter(args[0], args[1], args[2], options);
+    }
+    return;
+  }
+  return function(target: Object, propertyKey: string, parameterIndex?: number): void {
+    const options = defaultOptions(args[0] || {});
+    if (typeof parameterIndex === 'undefined') {
+      return decorateProperty(target, propertyKey, options);
+    } else {
+      return decorateParameter(target, propertyKey, parameterIndex, options);
     }
   };
 }
+export const inject = Inject;
 
-export function Initialize(): MethodDecorator {
-  return function(target: Object, propertyKey: string): void {
+export function Initialize(target: Object, propertyKey: string): void;
+export function Initialize(): MethodDecorator;
+export function Initialize(...args: any[]): MethodDecorator | void {
+  const decorate = (target: Object, propertyKey: string) => {
     // console.log(`@Initialize ${(target as any)[propertyKey].name}`);
     Reflect.defineMetadata('component:init', propertyKey, target);
   };
+  if (args.length > 0) {
+    return decorate(args[0], args[1]);
+  }
+  return function(target: Object, propertyKey: string): void {
+    decorate(target, propertyKey);
+  };
 }
+export const initialize = Initialize;
 
-export function Factory(options: IFactoryOptions = {}): MethodDecorator {
+export function Factory(target: Object, propertyKey: string): void;
+export function Factory(options?: IFactoryOptions): MethodDecorator;
+export function Factory(...args: any[]): MethodDecorator | void {
+  const decorate = (target: Object, propertyKey: string, options: IFactoryOptions) => {
+    // console.log(`@Factory ${(target as any)[propertyKey].name}`);
+    addKnownComponent({
+      target,
+      property: propertyKey,
+      options,
+      rtti: Reflect.getMetadata('design:returntype', target, propertyKey)
+    });
+  };
+
+  if (args.length > 1) {
+    return decorate(args[0], args[1], {});
+  }
+  const options = args[0] || {};
   return function(target: Object, propertyKey: string): void {
     // console.log(`@Factory ${(target as any)[propertyKey].name}`);
     addKnownComponent({
@@ -420,3 +488,4 @@ export function Factory(options: IFactoryOptions = {}): MethodDecorator {
     });
   };
 }
+export const factory = Factory;
