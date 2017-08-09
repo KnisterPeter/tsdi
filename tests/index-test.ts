@@ -257,11 +257,6 @@ describe('TSDI', () => {
       assert.strictEqual(tsdi.get(ComponentWithNonNamedInject).comp, tsdi.get(InjectedComponent));
     });
 
-    it('should report an error for a probable cyclic dependency', () => {
-      tsdi.enableComponentScanner();
-      assert.throws(() => tsdi.get(Cyclic1), /Probably a cyclic dependency/);
-    });
-
     it('should report an error if named injection could not resolve to a component', () => {
       tsdi.enableComponentScanner();
 
@@ -278,7 +273,7 @@ describe('TSDI', () => {
         }
       }
 
-      assert.throws(() => tsdi.get(ComponentWithNamedInject), "Component named 'unknown' not found");
+      assert.throws(() => tsdi.get(ComponentWithNamedInject).comp, "Component named 'unknown' not found");
     });
 
     it('should lazy create an inject dependencies', () => {
