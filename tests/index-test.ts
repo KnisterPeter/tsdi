@@ -281,6 +281,29 @@ describe('TSDI', () => {
       assert.throws(() => tsdi.get(ComponentWithNamedInject), "Component named 'unknown' not found");
     });
 
+    it('should lazy create an inject dependencies', () => {
+      tsdi.enableComponentScanner();
+
+      @Component()
+      class Injected {
+      }
+
+      @Component()
+      class ComponentWithLazyInjection {
+        @Inject({lazy: true})
+        public dependency: Injected;
+      }
+
+      const component = tsdi.get(ComponentWithLazyInjection);
+      const instances = (tsdi as any).instances;
+      const injected = Object
+        .keys(instances)
+        .map((key: string) => instances[key])
+        .filter(instance => instance instanceof Injected);
+      assert.lengthOf(injected, 0);
+      assert.isDefined(component.dependency);
+    });
+
     describe('with external classes', () => {
       it('should inject dependencies', () => {
         tsdi.enableComponentScanner();

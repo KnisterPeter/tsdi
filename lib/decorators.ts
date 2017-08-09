@@ -11,6 +11,7 @@ export interface ComponentOptions {
 export type IInjectOptions = InjectOptions;
 export interface InjectOptions {
   name?: string;
+  lazy?: boolean;
 }
 
 export type IFactoryOptions = FactoryOptions;
@@ -260,7 +261,23 @@ export class TSDI {
         if (inject.options.name && typeof this.properties[inject.options.name] !== 'undefined') {
           instance[inject.property] = this.properties[inject.options.name];
         } else {
-          instance[inject.property] = this.getComponentDependency(inject);
+          if (inject.options.lazy) {
+            const tsdi = this;
+            Object.defineProperty(instance, inject.property, {
+              configurable: true,
+              enumerable: true,
+              get(): any {
+                let value = instance[`tsdi$${inject.property}`];
+                if (!value) {
+                  value = tsdi.get(inject.type);
+                  instance[`tsdi$${inject.property}`] = value;
+                }
+                return value;
+              }
+            });
+          } else {
+            instance[inject.property] = this.getComponentDependency(inject);
+          }
         }
       }
     }
@@ -350,6 +367,9 @@ export function External(): ClassDecorator {
 export function Inject(optionsOrString: IInjectOptions | string = {}): PropertyDecorator & ParameterDecorator {
   return function(target: Object, propertyKey: string, parameterIndex?: number): void {
     const options = getNamedOptions<IInjectOptions>(optionsOrString);
+    if (options.lazy === undefined) {
+      options.lazy = false;
+    }
     if (typeof parameterIndex === 'undefined') {
       // annotated property
       // console.log(`@Inject ${(target.constructor as any).name}#${propertyKey}`);
