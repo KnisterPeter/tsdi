@@ -22,6 +22,7 @@ Dependency Injection container (IoC) for TypeScript.
 * Singletons vs Instances
 * Factories
 * External components (components where the constructor could not be called by tsdi)
+* Lazy dependency injection
 
 # Usage
 
@@ -234,8 +235,24 @@ const c = new C();
 console.log(c.a);
 ```
 
+### Lazy injection
+
+```js
+import { TSDI, Component, Inject } from 'tsdi';
+
+@Component()
+class A {
+  @Inject({lazy: true})
+  public some: Dependency;
+}
+
+const tsdi: TSDI = new TSDI();
+tsdi.register(A);
+const a = tsdi.get(A); // <-- at this point a.some is still undefined (not created and not injected)
+console.log(a.some); // <-- at this point some is created and return (on first property access)
+```
+
 ## Future ideas / Roadmap
 
-* Lazy dependency injection
 * Static factories
 * Factories for non classes/types
