@@ -22,7 +22,7 @@ Dependency Injection container (IoC) for TypeScript.
 * Singletons vs Instances
 * Factories
 * External components (components where the constructor could not be called by tsdi)
-* Lazy dependency injection
+* Lazy dependency injection (default)
 
 # Usage
 
