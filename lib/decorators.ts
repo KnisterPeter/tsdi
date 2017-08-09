@@ -269,7 +269,7 @@ export class TSDI {
               get(): any {
                 let value = instance[`tsdi$${inject.property}`];
                 if (!value) {
-                  value = tsdi.get(inject.type);
+                  value = tsdi.getComponentDependency(inject);
                   instance[`tsdi$${inject.property}`] = value;
                 }
                 return value;
@@ -368,7 +368,7 @@ export function Inject(optionsOrString: IInjectOptions | string = {}): PropertyD
   return function(target: Object, propertyKey: string, parameterIndex?: number): void {
     const options = getNamedOptions<IInjectOptions>(optionsOrString);
     if (options.lazy === undefined) {
-      options.lazy = false;
+      options.lazy = true;
     }
     if (typeof parameterIndex === 'undefined') {
       // annotated property
