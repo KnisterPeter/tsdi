@@ -276,6 +276,36 @@ describe('TSDI', () => {
       assert.throws(() => tsdi.get(ComponentWithNamedInject).comp, "Component named 'unknown' not found");
     });
 
+    it('should report an error for a probable cyclic dependency', () => {
+      tsdi.enableComponentScanner();
+      assert.throws(() => tsdi.get(Cyclic1), /Probably a cyclic dependency/);
+    });
+
+    it('should get a component by hint/name only', () => {
+      tsdi.enableComponentScanner();
+
+      @Component('Component')
+      class NamedComponent {}
+
+      assert.instanceOf(tsdi.get('Component'), NamedComponent);
+    });
+
+    it('should report an error duplicate named component', () => {
+      tsdi.enableComponentScanner();
+
+      try {
+        @Component('Component')
+        class NamedComponent1 {}
+
+        @Component('Component')
+        class NamedComponent2 {}
+
+        assert.fail('Should throw error');
+      } catch (e) {
+        assert.match(e.message, /Duplicate name 'Component' for known Components/);
+      }
+    });
+
     it('should lazy create an inject dependencies', () => {
       tsdi.enableComponentScanner();
 
