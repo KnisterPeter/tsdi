@@ -1,7 +1,19 @@
 import { assert } from 'chai';
 import 'source-map-support/register';
 
-import { TSDI, Component, Inject, Factory, External, Initialize } from '../lib/decorators';
+import {
+  TSDI,
+  Component,
+  component,
+  Inject,
+  inject,
+  Factory,
+  factory,
+  External,
+  external,
+  Initialize,
+  initialize
+} from '../lib/decorators';
 import { Cyclic1 } from './cyclic1';
 import { Cyclic2 } from './cyclic2';
 import { Dependency } from './dependency';
@@ -59,7 +71,7 @@ describe('TSDI', () => {
     it('a container with enabled componentScanner should lazy register components', () => {
       tsdi.enableComponentScanner();
 
-      @Component()
+      @component()
       class Late {
       }
 
@@ -108,7 +120,7 @@ describe('TSDI', () => {
       @Component({name: 'Bar'})
       class DExtendsA extends A {
 
-        @Inject({name: 'Foo'})
+        @inject({name: 'Foo'})
         private a: A;
 
         public m(): string {
@@ -165,7 +177,7 @@ describe('TSDI', () => {
 
       @Component()
       class ComponentWithContainerDependency {
-        @Inject()
+        @Inject
         private _tsdi: TSDI;
 
         public get prop(): TSDI { return this._tsdi; }
@@ -173,17 +185,34 @@ describe('TSDI', () => {
       assert.strictEqual(tsdi.get(ComponentWithContainerDependency).prop, tsdi);
     });
 
+    it('should call the initalizer', () => {
+      tsdi.enableComponentScanner();
+
+      let called = false;
+
+      @Component()
+      class ComponentWithInitializer {
+        @Initialize
+        protected init(): void {
+          called = true;
+        }
+      }
+      tsdi.get(ComponentWithInitializer);
+
+      assert.isTrue(called);
+    });
+
     it('should inject annotated constructor parameters', () => {
       tsdi.enableComponentScanner();
 
-      @Component()
+      @Component
       class ConstructorParameterComponent {}
 
-      @Component()
+      @Component
       class ComponentWithConstructor {
         private _tsdi: TSDI;
 
-        constructor(@Inject() container: TSDI, @Inject() b: ConstructorParameterComponent) {
+        constructor(@Inject() container: TSDI, @Inject b: ConstructorParameterComponent) {
           this._tsdi = container;
         }
 
@@ -208,7 +237,7 @@ describe('TSDI', () => {
 
       @Component()
       class FactoryComponentWithSingletonFactory {
-        @Factory()
+        @factory
         public someFactory(): NonSingletonObject {
           return new NonSingletonObject();
         }
@@ -257,11 +286,6 @@ describe('TSDI', () => {
       assert.strictEqual(tsdi.get(ComponentWithNonNamedInject).comp, tsdi.get(InjectedComponent));
     });
 
-    it('should report an error for a probable cyclic dependency', () => {
-      tsdi.enableComponentScanner();
-      assert.throws(() => tsdi.get(Cyclic1), /Probably a cyclic dependency/);
-    });
-
     it('should report an error if named injection could not resolve to a component', () => {
       tsdi.enableComponentScanner();
 
@@ -278,7 +302,60 @@ describe('TSDI', () => {
         }
       }
 
-      assert.throws(() => tsdi.get(ComponentWithNamedInject), "Component named 'unknown' not found");
+      assert.throws(() => tsdi.get(ComponentWithNamedInject).comp, "Component named 'unknown' not found");
+    });
+
+    it('should report an error for a probable cyclic dependency', () => {
+      tsdi.enableComponentScanner();
+      assert.throws(() => tsdi.get(Cyclic1), /Probably a cyclic dependency/);
+    });
+
+    it('should get a component by hint/name only', () => {
+      tsdi.enableComponentScanner();
+
+      @Component('Component')
+      class NamedComponent {}
+
+      assert.instanceOf(tsdi.get('Component'), NamedComponent);
+    });
+
+    it('should report an error duplicate named component', () => {
+      tsdi.enableComponentScanner();
+
+      try {
+        @Component('Component')
+        class NamedComponent1 {}
+
+        @Component('Component')
+        class NamedComponent2 {}
+
+        assert.fail('Should throw error');
+      } catch (e) {
+        assert.match(e.message, /Duplicate name 'Component' for known Components/);
+      }
+    });
+
+    it('should lazy create an inject dependencies', () => {
+      tsdi.enableComponentScanner();
+
+      @Component()
+      class Injected {
+      }
+
+      @Component()
+      class ComponentWithLazyInjection {
+        @Inject({lazy: true})
+        public dependency: Injected;
+      }
+
+      const component = tsdi.get(ComponentWithLazyInjection);
+      const instances = (tsdi as any).instances;
+      const injected = Object
+        .keys(instances)
+        .map((key: string) => instances[key])
+        .filter(instance => instance instanceof Injected);
+      assert.lengthOf(injected, 0);
+      assert.isDefined(component.dependency);
     });
 
     describe('with external classes', () => {
@@ -289,7 +366,7 @@ describe('TSDI', () => {
         class User2 extends User {
         }
 
-        @External()
+        @external
         class ExternalClass {
           @Inject()
           public user: User;
@@ -297,9 +374,9 @@ describe('TSDI', () => {
           public user2: User;
         }
 
-        const external = new ExternalClass();
-        assert.strictEqual(external.user, tsdi.get(User));
-        assert.strictEqual(external.user2, tsdi.get(User2));
+        const test = new ExternalClass();
+        assert.strictEqual(test.user, tsdi.get(User));
+        assert.strictEqual(test.user2, tsdi.get(User2));
       });
 
       it('should call the initializer', () => {
@@ -310,7 +387,7 @@ describe('TSDI', () => {
 
         @External()
         class ExternalClass {
-          @Initialize()
+          @initialize()
           public init(): void {
             fn();
           }
