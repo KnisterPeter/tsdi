@@ -342,7 +342,10 @@ export function External(): ClassDecorator {
       return (target as any).__tsdi__.configureExternal(args, target);
     };
     (constructor as any).displayName = (target as any).name;
-    constructor.prototype = target.prototype;
+
+    Object.getOwnPropertyNames(target)
+      .filter(prop => prop !== '__tsdi__' && prop !== 'name' && prop !== 'length')
+      .forEach(prop => (constructor as any)[prop] = (target as any)[prop]);
     return constructor as any;
   };
 }
