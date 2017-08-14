@@ -426,6 +426,20 @@ describe('TSDI', () => {
 
         assert.equal(new ExternalClass('value').injected, tsdi.get(User));
       });
+
+      it('should keep static methods and properties', () => {
+        tsdi.enableComponentScanner();
+        const noop = () => console.log('noop');
+
+        @External()
+        class ExternalClass {
+          public static user = 'test';
+          public static noop = noop;
+        }
+
+        assert.strictEqual(ExternalClass.user, 'test');
+        assert.strictEqual(ExternalClass.noop, noop);
+      });
     });
   });
 
