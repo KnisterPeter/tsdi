@@ -373,7 +373,7 @@ export function External<TFunction extends Function>(...args: any[]): ClassDecor
     (constructor as any).displayName = (target as any).name;
 
     Object.getOwnPropertyNames(target)
-      .filter(prop => prop !== '__tsdi__' && prop !== 'name' && prop !== 'length')
+      .filter(prop => !(constructor as any)[prop] && prop !== 'length')
       .forEach(prop => (constructor as any)[prop] = (target as any)[prop]);
     return constructor as any;
   };
