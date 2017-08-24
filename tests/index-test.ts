@@ -440,6 +440,38 @@ describe('TSDI', () => {
         assert.strictEqual(ExternalClass.user, 'test');
         assert.strictEqual(ExternalClass.noop, noop);
       });
+
+      it('should create eager components as soon as possible', () => {
+        tsdi.enableComponentScanner();
+        let count = 0;
+
+        @component({eager: true})
+        class EagerComponent {
+          @initialize
+          public init(): void {
+            count++;
+          }
+        }
+
+        assert.equal(count, 1);
+      });
+
+      it('should call lifecycle listener on component creation', () => {
+        tsdi.enableComponentScanner();
+        let count = 0;
+
+        @component
+        class Component {
+        }
+        tsdi.addLifecycleListener({
+          onCreate(component: any): void {
+            count++;
+          }
+        });
+        tsdi.get(Component);
+
+        assert.equal(count, 1);
+      });
     });
   });
 

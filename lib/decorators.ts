@@ -6,6 +6,7 @@ export type IComponentOptions = ComponentOptions;
 export interface ComponentOptions {
   name?: string;
   singleton?: boolean;
+  eager?: boolean;
 }
 
 export type IInjectOptions = InjectOptions;
@@ -18,6 +19,7 @@ export type IFactoryOptions = FactoryOptions;
 export interface FactoryOptions {
   name?: string;
   singleton?: boolean;
+  eager?: boolean;
 }
 
 type InjectMetadata = {
@@ -47,6 +49,10 @@ type FactoryMetadata = {
 
 type ComponentOrFactoryMetadata = ComponentMetadata | FactoryMetadata;
 type ComponentListener = (metadataOrExternal: ComponentOrFactoryMetadata | Function) => void;
+
+export interface LifecycleListener {
+  onCreate?(component: any): void;
+}
 
 function isFactoryMetadata(metadata: ComponentOrFactoryMetadata): metadata is FactoryMetadata {
   return Boolean((metadata as FactoryMetadata).rtti);
@@ -109,12 +115,26 @@ export class TSDI {
 
   private properties: {[key: string]: any} = {};
 
+  private lifecycleListeners: LifecycleListener[] = [];
+
   constructor() {
     this.registerComponent({
       fn: TSDI,
       options: {}
     });
     this.instances[0] = this;
+  }
+
+  public addLifecycleListener(lifecycleListener: LifecycleListener): void {
+    this.lifecycleListeners.push(lifecycleListener);
+  }
+
+  private notifyOnCreate(component: any): void {
+    this.lifecycleListeners.forEach(l => {
+      if (l.onCreate) {
+        l.onCreate(component);
+      }
+    });
   }
 
   public addProperty(key: string, value: any): void {
@@ -151,21 +171,19 @@ export class TSDI {
       }
 
       this.components.push(componentMetadata);
+      if (componentMetadata.options.eager) {
+        this.getOrCreate(componentMetadata, this.components.length - 1);
+      }
     }
   }
 
   public register(component: Constructable<any>, name?: string): void {
-    let componentName = name;
-    if (!componentName) {
-      const options: IComponentOptions =  Reflect.getMetadata('component:options', component);
-      if (options) {
-        componentName = options.name;
-      }
-    }
+    const options: IComponentOptions =  Reflect.getMetadata('component:options', component) || {};
     this.registerComponent({
       fn: component,
       options: {
-        name: componentName
+        ...options,
+        name: name || options.name
       }
     });
   }
@@ -239,6 +257,7 @@ export class TSDI {
           (instance[init] as Function).call(instance);
         }
       }
+      this.notifyOnCreate(instance);
     }
     return instance;
   }
