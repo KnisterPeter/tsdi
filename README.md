@@ -16,13 +16,15 @@ Dependency Injection container (IoC) for TypeScript.
 * Type auto registration
 * Lifecycle methods
 * Interface based injection
-* Name based injection (hints)
-* Property value injection
-* Constructor injection (parameters)
-* Singletons vs Instances
-* Factories
-* External components (components where the constructor could not be called by tsdi)
-* Lazy dependency injection (default)
+* [Name based injection (hints)](#name-based-injection-hints)
+* [Property value injection](#property-value-injection-configuration)
+* [Constructor injection (parameters)](#constructor-parameter-injection)
+* [Singletons vs Instances](#singletons-vs-instances)
+* [Factories](#factories)
+* [External components (components where the constructor could not be called by tsdi)](#externals)
+* [Lazy dependency injection (default)](#lazy-injection)
+* [Lifecycle listeners](#lifecycle-listeners)
+* [Eager components](#eager-components)
 
 # Usage
 
@@ -250,6 +252,38 @@ const tsdi: TSDI = new TSDI();
 tsdi.register(A);
 const a = tsdi.get(A); // <-- at this point a.some is still undefined (not created and not injected)
 console.log(a.some); // <-- at this point some is created and return (on first property access)
+```
+
+### Lifecycle listeners
+
+```js
+import { TSDI, Component, Inject } from 'tsdi';
+
+@component
+class A {
+}
+
+const tsdi: TSDI = new TSDI();
+tsdi.register(A);
+tsdi.addLifecycleListener({
+  onCreate(component: any): void {
+    console.log(component); // <-- this line is executed the first time a component is created
+  }
+});
+const a = tsdi.get(A);
+```
+
+### Eager components
+
+```js
+import { TSDI, Component, Inject } from 'tsdi';
+
+@component({eager: true})
+class A {
+}
+
+const tsdi: TSDI = new TSDI();
+tsdi.register(A); // <-- here the class A is instantiated
 ```
 
 ## Future ideas / Roadmap
