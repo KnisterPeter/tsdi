@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.12.0"></a>
+# [0.12.0](https://github.com/KnisterPeter/tsdi/compare/v0.11.1...v0.12.0) (2017-08-24)
+
+
+### Features
+
+* add [@external](https://github.com/external)-test ([c8f7c8d](https://github.com/KnisterPeter/tsdi/commit/c8f7c8d))
+* add lifecycle listeners ([6c553bc](https://github.com/KnisterPeter/tsdi/commit/6c553bc))
+
+
+
 <a name="0.11.1"></a>
 ## [0.11.1](https://github.com/KnisterPeter/tsdi/compare/v0.11.0...v0.11.1) (2017-08-09)
 
