@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.12.1"></a>
+## [0.12.1](https://github.com/KnisterPeter/tsdi/compare/v0.12.0...v0.12.1) (2017-08-25)
+
+
+### Bug Fixes
+
+* eager components are always notified about ([8cbaf8c](https://github.com/KnisterPeter/tsdi/commit/8cbaf8c))
+* notify about instances on listener subscription ([1441ca6](https://github.com/KnisterPeter/tsdi/commit/1441ca6))
+
+
+
 <a name="0.12.0"></a>
 # [0.12.0](https://github.com/KnisterPeter/tsdi/compare/v0.11.1...v0.12.0) (2017-08-24)
 
