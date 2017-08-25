@@ -127,6 +127,9 @@ export class TSDI {
 
   public addLifecycleListener(lifecycleListener: LifecycleListener): void {
     this.lifecycleListeners.push(lifecycleListener);
+    Object.keys(this.instances).forEach(idx => {
+      this.notifyOnCreate(this.instances[parseInt(idx, 10)]);
+    });
   }
 
   private notifyOnCreate(component: any): void {

@@ -470,7 +470,7 @@ describe('TSDI', () => {
         });
         tsdi.get(Component);
 
-        assert.equal(count, 1);
+        assert.equal(count, 2);
       });
     });
   });
