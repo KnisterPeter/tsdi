@@ -465,12 +465,14 @@ describe('TSDI', () => {
         }
         tsdi.addLifecycleListener({
           onCreate(component: any): void {
-            count++;
+            if (component instanceof Component) {
+              count++;
+            }
           }
         });
         tsdi.get(Component);
 
-        assert.equal(count, 3);
+        assert.equal(count, 1);
       });
     });
   });
