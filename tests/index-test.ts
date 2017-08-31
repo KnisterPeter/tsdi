@@ -17,6 +17,8 @@ import {
 import { Cyclic1 } from './cyclic1';
 import { Cyclic2 } from './cyclic2';
 import { Dependency } from './dependency';
+import { EagerComponent1 } from './eager1';
+import { EagerComponent2 } from './eager2';
 import { User } from './user';
 
 describe('TSDI', () => {
@@ -358,6 +360,48 @@ describe('TSDI', () => {
       assert.isDefined(component.dependency);
     });
 
+    it('should create eager components as soon as possible', () => {
+      tsdi.enableComponentScanner();
+      let count = 0;
+
+      @component({eager: true})
+      class EagerComponent {
+        @initialize
+        public init(): void {
+          count++;
+        }
+      }
+
+      assert.equal(count, 1);
+    });
+
+    it('should respect dependency tree for eager creation', () => {
+      tsdi.enableComponentScanner();
+
+      const eager1 = tsdi.get(EagerComponent1);
+      const eager2 = tsdi.get(EagerComponent2);
+      assert.strictEqual(eager1.dependency, eager2);
+    });
+
+    it('should call lifecycle listener on component creation', () => {
+      tsdi.enableComponentScanner();
+      let count = 0;
+
+      @component
+      class Component {
+      }
+      tsdi.addLifecycleListener({
+        onCreate(component: any): void {
+          if (component instanceof Component) {
+            count++;
+          }
+        }
+      });
+      tsdi.get(Component);
+
+      assert.equal(count, 1);
+    });
+
     describe('with external classes', () => {
       it('should inject dependencies', () => {
         tsdi.enableComponentScanner();
@@ -451,40 +495,6 @@ describe('TSDI', () => {
         }
 
         assert.instanceOf(new ExternalClass(), Base);
-      });
-
-      it('should create eager components as soon as possible', () => {
-        tsdi.enableComponentScanner();
-        let count = 0;
-
-        @component({eager: true})
-        class EagerComponent {
-          @initialize
-          public init(): void {
-            count++;
-          }
-        }
-
-        assert.equal(count, 1);
-      });
-
-      it('should call lifecycle listener on component creation', () => {
-        tsdi.enableComponentScanner();
-        let count = 0;
-
-        @component
-        class Component {
-        }
-        tsdi.addLifecycleListener({
-          onCreate(component: any): void {
-            if (component instanceof Component) {
-              count++;
-            }
-          }
-        });
-        tsdi.get(Component);
-
-        assert.equal(count, 1);
       });
     });
   });
