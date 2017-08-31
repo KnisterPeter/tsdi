@@ -1,4 +1,14 @@
 import 'reflect-metadata';
+import {
+  ComponentListener,
+  addListener,
+  removeListener
+} from './global-state';
+import {
+  isFactoryMetadata,
+  findIndexOf,
+  removeElement
+} from './helper';
 
 export type Constructable<T> = { new(...args: any[]): T; };
 
@@ -22,87 +32,40 @@ export interface FactoryOptions {
   eager?: boolean;
 }
 
-type InjectMetadata = {
+/** @internal */
+export type InjectMetadata = {
   target: Object;
   property: string;
   options: IInjectOptions;
   type: Constructable<any>;
 };
 
-type ParameterMetadata = {
+/** @internal */
+export type ParameterMetadata = {
   index: number;
   rtti: Constructable<any>;
   options: IInjectOptions;
 };
 
-type ComponentMetadata = {
+/** @internal */
+export type ComponentMetadata = {
   fn: Constructable<any>;
   options: IComponentOptions;
 };
 
-type FactoryMetadata = {
+/** @internal */
+export type FactoryMetadata = {
   target: Object;
   property: string;
   options: IFactoryOptions;
   rtti: Constructable<any>;
 };
 
-type ComponentOrFactoryMetadata = ComponentMetadata | FactoryMetadata;
-type ComponentListener = (metadataOrExternal: ComponentOrFactoryMetadata | Function) => void;
+/** @internal */
+export type ComponentOrFactoryMetadata = ComponentMetadata | FactoryMetadata;
 
 export interface LifecycleListener {
   onCreate?(component: any): void;
-}
-
-function isFactoryMetadata(metadata: ComponentOrFactoryMetadata): metadata is FactoryMetadata {
-  return Boolean((metadata as FactoryMetadata).rtti);
-}
-
-function findIndexOf<T>(list: T[], test: (element: T) => boolean): number {
-  let idx = -1;
-  for (let i = 0, n = list.length; i < n; i++) {
-    if (test(list[i])) {
-      idx = i;
-    }
-  }
-  return idx;
-}
-
-function removeElement<T>(list: T[], test: (element: T) => boolean): T[] {
-  const idx = findIndexOf(list, test);
-  if (idx > -1) {
-    return [...list.slice(0, idx), ...list.slice(idx + 1)];
-  }
-  return list;
-}
-
-let listeners: ComponentListener[] = [];
-const knownComponents: ComponentOrFactoryMetadata[] = [];
-const knownExternals: Function[] = [];
-
-function addKnownComponent(metadata: ComponentOrFactoryMetadata): void {
-  if (metadata.options.name && findIndexOf(knownComponents, meta => meta.options.name === metadata.options.name) > -1) {
-    throw new Error(`Duplicate name '${metadata.options.name}' for known Components.`);
-  }
-  knownComponents.push(metadata);
-  listeners.forEach(listener => listener(metadata));
-}
-
-function addKnownExternal(external: Function): void {
-  if (findIndexOf(knownExternals, fn => fn === external) === -1) {
-    knownExternals.push(external);
-    listeners.forEach(listener => listener(external));
-  }
-}
-
-function addListener(listener: ComponentListener): void {
-  listeners.push(listener);
-  knownComponents.forEach(metadata => listener(metadata));
-  knownExternals.forEach(external => listener(external));
-}
-
-function removeListener(listener: ComponentListener): void {
-  listeners = removeElement(listeners, l => l === listener);
 }
 
 export class TSDI {
@@ -350,167 +313,8 @@ export class TSDI {
 
 }
 
-function getNamedOptions<T extends {name?: string}>(optionOrString: T | string): T {
-  if (typeof optionOrString === 'string') {
-    const named = {
-      name: optionOrString
-    };
-    return named as T;
-  }
-  return optionOrString;
-}
-
-export function Component<TFunction extends Function>(target: TFunction): TFunction;
-export function Component(optionsOrString?: IComponentOptions | string): ClassDecorator;
-export function Component<TFunction extends Function>(...args: any[]): ClassDecorator| TFunction {
-  const decorate = (target: TFunction, optionsOrString: IComponentOptions | string = {}) => {
-    // console.log(`@Component ${(target as any).name}`);
-    const options = getNamedOptions<IComponentOptions>(optionsOrString);
-    addKnownComponent({
-      fn: target as any,
-      options
-    });
-    Reflect.defineMetadata('component:options', options, target);
-    return target;
-  };
-
-  if (args.length === 1 && typeof args[0] === 'function') {
-    return decorate(args[0], {});
-  }
-  return function(target: TFunction): TFunction {
-    return decorate(target, args[0] || {});
-  } as ClassDecorator;
-}
-export const component = Component;
-
-export function External<TFunction extends Function>(target: TFunction): TFunction;
-export function External(): ClassDecorator;
-export function External<TFunction extends Function>(...args: any[]): ClassDecorator | TFunction {
-  const decorate = (target: TFunction) => {
-    // console.log(`@External ${(target as any).name}`);
-    addKnownExternal(target);
-    const constructor = function InjectedConstructor(this: any, ...args: any[]): any {
-      return (target as any).__tsdi__.configureExternal(args, target);
-    };
-    (constructor as any).displayName = (target as any).name;
-    Object.getOwnPropertyNames(target)
-      .filter(prop => !(constructor as any)[prop] && prop !== 'length')
-      .forEach(prop => (constructor as any)[prop] = (target as any)[prop]);
-    constructor.prototype = target.prototype;
-    return constructor as any;
-  };
-
-  if (args.length > 0) {
-    return decorate(args[0]);
-  }
-  return function(target: TFunction): TFunction {
-    return decorate(target);
-  } as ClassDecorator;
-}
-export const external = External;
-
-export function Inject(target: Object, propertyKey: string | symbol, parameterIndex?: number): void;
-export function Inject(optionsOrString?: IInjectOptions | string): PropertyDecorator & ParameterDecorator;
-export function Inject(...args: any[]): PropertyDecorator & ParameterDecorator | void {
-  const defaultOptions = (optionsOrString?: IInjectOptions | string) => {
-    const options = getNamedOptions<IInjectOptions>(optionsOrString || {});
-    if (options.lazy === undefined) {
-      options.lazy = true;
-    }
-    return options;
-  };
-  const decorateProperty = (target: Object, propertyKey: string,
-      options: IInjectOptions) => {
-    // console.log(`@Inject ${(target.constructor as any).name}#${propertyKey}`);
-    const type: Constructable<any> = Reflect.getMetadata('design:type', target, propertyKey);
-    let injects: InjectMetadata[] = Reflect.getMetadata('component:injects', target);
-    if (!injects) {
-      injects = [];
-      Reflect.defineMetadata('component:injects', injects, target);
-    }
-    injects.push({
-      target,
-      property: propertyKey,
-      options,
-      type
-    });
-  };
-  const decorateParameter = (target: Object, propertyKey: string | symbol, parameterIndex: number,
-      options: IInjectOptions) => {
-    // console.log(`@Inject ${propertyKey}`);
-    let parameters: ParameterMetadata[] = Reflect.getMetadata('component:parameters', target);
-    if (!parameters) {
-      parameters = [];
-      Reflect.defineMetadata('component:parameters', parameters, target);
-    }
-    parameters.push({
-      options,
-      index: parameterIndex,
-      rtti: Reflect.getMetadata('design:paramtypes', target)[parameterIndex]
-    });
-  };
-
-  if (args.length > 1) {
-    const options = defaultOptions({});
-    if (typeof args[2] === 'undefined') {
-      decorateProperty(args[0], args[1], options);
-    } else {
-      decorateParameter(args[0], args[1], args[2], options);
-    }
-    return;
-  }
-  return function(target: Object, propertyKey: string, parameterIndex?: number): void {
-    const options = defaultOptions(args[0] || {});
-    if (typeof parameterIndex === 'undefined') {
-      return decorateProperty(target, propertyKey, options);
-    } else {
-      return decorateParameter(target, propertyKey, parameterIndex, options);
-    }
-  };
-}
-export const inject = Inject;
-
-export function Initialize(target: Object, propertyKey: string): void;
-export function Initialize(): MethodDecorator;
-export function Initialize(...args: any[]): MethodDecorator | void {
-  const decorate = (target: Object, propertyKey: string) => {
-    // console.log(`@Initialize ${(target as any)[propertyKey].name}`);
-    Reflect.defineMetadata('component:init', propertyKey, target);
-  };
-  if (args.length > 0) {
-    return decorate(args[0], args[1]);
-  }
-  return function(target: Object, propertyKey: string): void {
-    decorate(target, propertyKey);
-  };
-}
-export const initialize = Initialize;
-
-export function Factory(target: Object, propertyKey: string): void;
-export function Factory(options?: IFactoryOptions): MethodDecorator;
-export function Factory(...args: any[]): MethodDecorator | void {
-  const decorate = (target: Object, propertyKey: string, options: IFactoryOptions) => {
-    // console.log(`@Factory ${(target as any)[propertyKey].name}`);
-    addKnownComponent({
-      target,
-      property: propertyKey,
-      options,
-      rtti: Reflect.getMetadata('design:returntype', target, propertyKey)
-    });
-  };
-
-  if (args.length > 1) {
-    return decorate(args[0], args[1], {});
-  }
-  const options = args[0] || {};
-  return function(target: Object, propertyKey: string): void {
-    // console.log(`@Factory ${(target as any)[propertyKey].name}`);
-    addKnownComponent({
-      target,
-      property: propertyKey,
-      options,
-      rtti: Reflect.getMetadata('design:returntype', target, propertyKey)
-    });
-  };
-}
-export const factory = Factory;
+export { component, Component } from './component';
+export { external, External } from './external';
+export { inject, Inject } from './inject';
+export { initialize, Initialize } from './initialize';
+export { factory, Factory } from './factory';
