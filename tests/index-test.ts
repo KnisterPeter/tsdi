@@ -441,6 +441,18 @@ describe('TSDI', () => {
         assert.strictEqual(ExternalClass.noop, noop);
       });
 
+      it('should keep prototype chain correct', () => {
+        tsdi.enableComponentScanner();
+
+        class Base {}
+
+        @External()
+        class ExternalClass extends Base {
+        }
+
+        assert.instanceOf(new ExternalClass(), Base);
+      });
+
       it('should create eager components as soon as possible', () => {
         tsdi.enableComponentScanner();
         let count = 0;
