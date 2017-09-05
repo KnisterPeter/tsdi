@@ -270,7 +270,7 @@ export class TSDI {
                   log('lazy-resolve injected property %s.%s', instance.constructor.name, inject.property);
                   value = tsdi.getComponentDependency(inject);
                   instance[`tsdi$${inject.property}`] = value;
-                  log('lazy-resolved to %o', value);
+                  log('lazy-resolved injected property %s.%s <- %o', instance.constructor.name, inject.property, value);
                 }
                 return value;
               }
