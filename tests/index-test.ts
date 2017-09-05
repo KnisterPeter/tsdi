@@ -360,7 +360,7 @@ describe('TSDI', () => {
       assert.isDefined(component.dependency);
     });
 
-    it('should create eager components as soon as possible', () => {
+    it('should create eager components as soon as possible', (done: MochaDone) => {
       tsdi.enableComponentScanner();
       let count = 0;
 
@@ -372,15 +372,22 @@ describe('TSDI', () => {
         }
       }
 
-      assert.equal(count, 1);
+      setTimeout(() => {
+        assert.equal(count, 1);
+        done();
+      }, 1);
     });
 
-    it('should respect dependency tree for eager creation', () => {
+    it('should respect dependency tree for eager creation', (done: MochaDone) => {
       tsdi.enableComponentScanner();
 
       const eager1 = tsdi.get(EagerComponent1);
       const eager2 = tsdi.get(EagerComponent2);
-      assert.strictEqual(eager1.dependency, eager2);
+
+      setTimeout(() => {
+        assert.strictEqual(eager1.dependency, eager2);
+        done();
+      }, 1);
     });
 
     it('should call lifecycle listener on component creation', () => {

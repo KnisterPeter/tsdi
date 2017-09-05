@@ -1,11 +1,17 @@
 import { IFactoryOptions } from './decorators';
 import { addKnownComponent } from './global-state';
 
+import * as debug from 'debug';
+const log = debug('tsdi');
+
 export function Factory(target: Object, propertyKey: string): void;
 export function Factory(options?: IFactoryOptions): MethodDecorator;
 export function Factory(...args: any[]): MethodDecorator | void {
   const decorate = (target: Object, propertyKey: string, options: IFactoryOptions) => {
-    // console.log(`@Factory ${(target as any)[propertyKey].name}`);
+    if (log.enabled) {
+      log('@Factory %s#%s({name: "%s"})', (target.constructor as any).name, propertyKey,
+        (target as any)[propertyKey].name);
+    }
     addKnownComponent({
       target,
       property: propertyKey,
@@ -19,13 +25,7 @@ export function Factory(...args: any[]): MethodDecorator | void {
   }
   const options = args[0] || {};
   return function(target: Object, propertyKey: string): void {
-    // console.log(`@Factory ${(target as any)[propertyKey].name}`);
-    addKnownComponent({
-      target,
-      property: propertyKey,
-      options,
-      rtti: Reflect.getMetadata('design:returntype', target, propertyKey)
-    });
+    decorate(target, propertyKey, options);
   };
 }
 export const factory = Factory;

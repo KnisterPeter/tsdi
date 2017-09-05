@@ -10,6 +10,9 @@ import {
   removeElement
 } from './helper';
 
+import * as debug from 'debug';
+const log = debug('tsdi');
+
 export type Constructable<T> = { new(...args: any[]): T; };
 
 export type IComponentOptions = ComponentOptions;
@@ -136,9 +139,14 @@ export class TSDI {
         console.warn(`Component with name '${componentMetadata.options.name}' already registered.`);
       }
 
+      log('registerComponent %o', isFactoryMetadata(componentMetadata) ?
+        (componentMetadata.rtti as any).name : (componentMetadata.fn as any).name);
       this.components.push(componentMetadata);
       if (componentMetadata.options.eager) {
-        this.getOrCreate(componentMetadata, this.components.length - 1);
+        const idx = this.components.length - 1;
+        setTimeout(() => {
+          this.getOrCreate(componentMetadata, idx);
+        }, 0);
       }
     }
   }
@@ -204,13 +212,16 @@ export class TSDI {
   }
 
   private getOrCreate<T>(metadata: ComponentOrFactoryMetadata, idx: number): T {
+    log('> getOrCreate %o', metadata);
     // todo: Use T here
     let instance: any = this.instances[idx];
     if (!instance || !this.isSingleton(metadata)) {
       if (isFactoryMetadata(metadata)) {
+        log('create %o from factory with %o', (metadata.rtti as any).name, metadata.options);
         instance = this.get(metadata.target.constructor as Constructable<any>)[metadata.property]();
         this.instances[idx] = instance;
       } else {
+        log('create %o with %o', (metadata.fn as any).name, metadata.options);
         const constructor: Constructable<T> =  metadata.fn as any;
         const parameters = this.getConstructorParameters(metadata);
         instance = new constructor(...parameters);
@@ -225,6 +236,7 @@ export class TSDI {
       }
       this.notifyOnCreate(instance);
     }
+    log('< getOrCreate %o -> %o', metadata, instance);
     return instance;
   }
 
@@ -243,6 +255,7 @@ export class TSDI {
     const injects: InjectMetadata[] = Reflect.getMetadata('component:injects', componentMetadata.fn.prototype);
     if (injects) {
       for (const inject of injects) {
+        log('injecting %s.%s', instance.constructor.name, inject.property);
         if (inject.options.name && typeof this.properties[inject.options.name] !== 'undefined') {
           instance[inject.property] = this.properties[inject.options.name];
         } else {
@@ -254,8 +267,10 @@ export class TSDI {
               get(): any {
                 let value = instance[`tsdi$${inject.property}`];
                 if (!value) {
+                  log('lazy-resolve injected property %s.%s', instance.constructor.name, inject.property);
                   value = tsdi.getComponentDependency(inject);
                   instance[`tsdi$${inject.property}`] = value;
+                  log('lazy-resolved to %o', value);
                 }
                 return value;
               }
@@ -284,12 +299,18 @@ export class TSDI {
 
   private checkAndThrowDependencyError(inject: InjectMetadata): void {
     if (inject.type && inject.options.name) {
-      throw new Error(`Injecting undefined type on ${(inject.target.constructor as any).name}`
+      const e = new Error(`Injecting undefined type on ${(inject.target.constructor as any).name}`
         + `#${inject.property}: Component named '${inject.options.name}' not found`);
+      log(e);
+      log('Known Components: %o', this.components.map(component =>
+        isFactoryMetadata(component) ? (component.rtti as any).name : (component.fn as any).name));
+      throw e;
     }
     if (!inject.type || inject.options.name) {
-      throw new Error(`Injecting undefined type on ${(inject.target.constructor as any).name}`
+      const e = new Error(`Injecting undefined type on ${(inject.target.constructor as any).name}`
         + `#${inject.property}: Probably a cyclic dependency, switch to name based injection`);
+      log(e);
+      throw e;
     }
   }
 

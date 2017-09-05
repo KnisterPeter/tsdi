@@ -25,6 +25,7 @@ Dependency Injection container (IoC) for TypeScript.
 * [Lazy dependency injection (default)](#lazy-injection)
 * [Lifecycle listeners](#lifecycle-listeners)
 * [Eager components](#eager-components)
+* [Debug logging](#debug-logging)
 
 # Usage
 
@@ -285,6 +286,11 @@ class A {
 const tsdi: TSDI = new TSDI();
 tsdi.register(A); // <-- here the class A is instantiated
 ```
+
+### Debug logging
+
+To inspect which component is created when and injected where one can enable debug logging by either
+set the environment variable `DEBUG` (node) or a localStorage key (browser) `debug` to `tsdi`.
 
 ## Future ideas / Roadmap
 

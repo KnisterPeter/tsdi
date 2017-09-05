@@ -1,17 +1,20 @@
 import { addKnownExternal } from './global-state';
 
+import * as debug from 'debug';
+const log = debug('tsdi');
+
 export function External<TFunction extends Function>(target: TFunction): TFunction;
 export function External(): ClassDecorator;
 export function External<TFunction extends Function>(...args: any[]): ClassDecorator | TFunction {
   const decorate = (target: TFunction) => {
-    // console.log(`@External ${(target as any).name}`);
+    log(`@External ${(target as any).name}`);
     addKnownExternal(target);
     const constructor = function InjectedConstructor(this: any, ...args: any[]): any {
       return (target as any).__tsdi__.configureExternal(args, target);
     };
     (constructor as any).displayName = (target as any).name;
     Object.getOwnPropertyNames(target)
-      .filter(prop => !(constructor as any)[prop] && prop !== 'length')
+      .filter(prop => !(constructor as any)[prop] && prop !== 'name' && prop !== 'length')
       .forEach(prop => (constructor as any)[prop] = (target as any)[prop]);
     constructor.prototype = target.prototype;
     return constructor as any;
