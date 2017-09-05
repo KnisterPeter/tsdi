@@ -6,6 +6,9 @@ import {
 } from './decorators';
 import { getNamedOptions } from './helper';
 
+import * as debug from 'debug';
+const log = debug('tsdi');
+
 export function Inject(target: Object, propertyKey: string | symbol, parameterIndex?: number): void;
 export function Inject(optionsOrString?: IInjectOptions | string): PropertyDecorator & ParameterDecorator;
 export function Inject(...args: any[]): PropertyDecorator & ParameterDecorator | void {
@@ -18,7 +21,7 @@ export function Inject(...args: any[]): PropertyDecorator & ParameterDecorator |
   };
   const decorateProperty = (target: Object, propertyKey: string,
       options: IInjectOptions) => {
-    // console.log(`@Inject ${(target.constructor as any).name}#${propertyKey}`);
+    log(`@Inject ${(target.constructor as any).name}#${propertyKey}`);
     const type: Constructable<any> = Reflect.getMetadata('design:type', target, propertyKey);
     let injects: InjectMetadata[] = Reflect.getMetadata('component:injects', target);
     if (!injects) {
@@ -34,7 +37,7 @@ export function Inject(...args: any[]): PropertyDecorator & ParameterDecorator |
   };
   const decorateParameter = (target: Object, propertyKey: string | symbol, parameterIndex: number,
       options: IInjectOptions) => {
-    // console.log(`@Inject ${propertyKey}`);
+    log(`@Inject ${propertyKey}`);
     let parameters: ParameterMetadata[] = Reflect.getMetadata('component:parameters', target);
     if (!parameters) {
       parameters = [];

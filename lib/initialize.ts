@@ -1,8 +1,11 @@
+import * as debug from 'debug';
+const log = debug('tsdi');
+
 export function Initialize(target: Object, propertyKey: string): void;
 export function Initialize(): MethodDecorator;
 export function Initialize(...args: any[]): MethodDecorator | void {
   const decorate = (target: Object, propertyKey: string) => {
-    // console.log(`@Initialize ${(target as any)[propertyKey].name}`);
+    log('@Initialize %s#%s', (target.constructor as any).name, propertyKey);
     Reflect.defineMetadata('component:init', propertyKey, target);
   };
   if (args.length > 0) {
