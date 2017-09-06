@@ -26,6 +26,7 @@ Dependency Injection container (IoC) for TypeScript.
 * [Lifecycle listeners](#lifecycle-listeners)
 * [Eager components](#eager-components)
 * [Debug logging](#debug-logging)
+* [Automocks](#automocks)
 
 # Usage
 
@@ -291,6 +292,43 @@ tsdi.register(A); // <-- here the class A is instantiated
 
 To inspect which component is created when and injected where one can enable debug logging by either
 set the environment variable `DEBUG` (node) or a localStorage key (browser) `debug` to `tsdi`.
+
+### Automocks
+
+```js
+import { TSDI, component, inject, initialize } from 'tsdi';
+
+@component
+class Foo {
+  public foo(): void {
+  }
+}
+
+@component
+class Bar {
+  public bar(): string {
+    return 'bar';
+  }
+}
+
+@component
+class Baz {
+  @inject
+  public foo: Foo;
+  @inject
+  public bar: Bar;
+
+  @initialize
+  protected init(): void {
+    this.foo.foo();
+    console.log(this.bar.bar()); // <-- logs 'bar' since this.bar is not mocked
+  }
+}
+
+// This means: create mocks for all inject but 'Bar'
+tsdi.enableAutomock(Bar);
+tsdi.get(Baz);
+```
 
 ## Future ideas / Roadmap
 
