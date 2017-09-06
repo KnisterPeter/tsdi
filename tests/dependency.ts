@@ -1,4 +1,4 @@
-import { Component } from '../lib/decorators';
+import { Component } from '../lib/';
 
 @Component()
 export class Dependency {

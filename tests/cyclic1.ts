@@ -1,4 +1,4 @@
-import { Component, Inject } from '../lib/decorators';
+import { Component, Inject } from '../lib/index';
 import { Cyclic2 } from './cyclic2';
 
 @Component()

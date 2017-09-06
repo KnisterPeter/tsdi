@@ -1,5 +1,5 @@
-import { IFactoryOptions } from './decorators';
 import { addKnownComponent } from './global-state';
+import { IFactoryOptions } from './tsdi';
 
 import * as debug from 'debug';
 const log = debug('tsdi');

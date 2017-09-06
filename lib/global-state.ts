@@ -1,5 +1,5 @@
-import { ComponentOrFactoryMetadata } from './decorators';
 import { findIndexOf, removeElement } from './helper';
+import { ComponentOrFactoryMetadata } from './tsdi';
 
 export type ComponentListener = (metadataOrExternal: ComponentOrFactoryMetadata | Function) => void;
 

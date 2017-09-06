@@ -1,7 +1,7 @@
 import {
   ComponentOrFactoryMetadata,
   FactoryMetadata
-} from './decorators';
+} from './tsdi';
 
 export function isFactoryMetadata(metadata: ComponentOrFactoryMetadata): metadata is FactoryMetadata {
   return Boolean((metadata as FactoryMetadata).rtti);
