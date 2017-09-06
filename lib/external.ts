@@ -14,7 +14,13 @@ export function External<TFunction extends Function>(...args: any[]): ClassDecor
     };
     (constructor as any).displayName = (target as any).name;
     Object.getOwnPropertyNames(target)
-      .filter(prop => !(constructor as any)[prop] && prop !== 'name' && prop !== 'length')
+      .filter(prop =>
+        prop !== 'name' &&
+        prop !== 'length' &&
+        prop !== 'caller' &&
+        prop !== 'callee' &&
+        prop !== 'arguments' &&
+        !(constructor as any)[prop])
       .forEach(prop => (constructor as any)[prop] = (target as any)[prop]);
     constructor.prototype = target.prototype;
     return constructor as any;
