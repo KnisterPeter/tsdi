@@ -1,4 +1,4 @@
-import { component } from '../lib/decorators';
+import { component } from '../lib/';
 
 @component({eager: true})
 export class EagerComponent2 {

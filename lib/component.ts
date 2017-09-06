@@ -1,6 +1,6 @@
-import { IComponentOptions } from './decorators';
 import { addKnownComponent } from './global-state';
 import { getNamedOptions } from './helper';
+import { IComponentOptions } from './tsdi';
 
 import * as debug from 'debug';
 const log = debug('tsdi');

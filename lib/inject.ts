@@ -1,10 +1,10 @@
+import { getNamedOptions } from './helper';
 import {
   IInjectOptions,
   Constructable,
   InjectMetadata,
   ParameterMetadata
-} from './decorators';
-import { getNamedOptions } from './helper';
+} from './tsdi';
 
 import * as debug from 'debug';
 const log = debug('tsdi');

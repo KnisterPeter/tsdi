@@ -1,1 +1,1 @@
-export * from './dist/lib/decorators';
+export * from './dist/lib/index';

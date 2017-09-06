@@ -13,7 +13,7 @@ import {
   external,
   Initialize,
   initialize
-} from '../lib/decorators';
+} from '../lib/tsdi';
 import { Cyclic1 } from './cyclic1';
 import { Cyclic2 } from './cyclic2';
 import { Dependency } from './dependency';
