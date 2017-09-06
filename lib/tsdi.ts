@@ -311,7 +311,7 @@ export class TSDI {
       }
       const proto = constructor.prototype;
       Object.keys(proto).forEach(property => {
-          if (typeof (proto as any)[property] === 'function') {
+          if (typeof proto[property] === 'function') {
             (automock as any)[property] = function(...args: any[]): any {
               return args;
             };
