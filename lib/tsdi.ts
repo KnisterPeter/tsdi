@@ -73,6 +73,8 @@ export interface LifecycleListener {
 
 export class TSDI {
 
+  private autoMock: any[] | undefined = undefined;
+
   private components: ComponentOrFactoryMetadata[] = [];
 
   private instances: {[idx: number]: Object} = {};
@@ -130,6 +132,10 @@ export class TSDI {
         addListener(this.listener);
       }
     }
+  }
+
+  public enableAutomock(...allowedDependencies: any[]): void {
+    this.autoMock = allowedDependencies;
   }
 
   private registerComponent(componentMetadata: ComponentOrFactoryMetadata): void {
@@ -259,31 +265,67 @@ export class TSDI {
         if (inject.options.name && typeof this.properties[inject.options.name] !== 'undefined') {
           instance[inject.property] = this.properties[inject.options.name];
         } else {
-          if (inject.options.lazy) {
-            const tsdi = this;
-            Object.defineProperty(instance, inject.property, {
-              configurable: true,
-              enumerable: true,
-              get(): any {
-                let value = instance[`tsdi$${inject.property}`];
-                if (!value) {
-                  log('lazy-resolve injected property %s.%s', instance.constructor.name, inject.property);
-                  value = tsdi.getComponentDependency(inject);
-                  instance[`tsdi$${inject.property}`] = value;
-                  log('lazy-resolved injected property %s.%s <- %o', instance.constructor.name, inject.property, value);
-                }
-                return value;
-              }
-            });
-          } else {
-            instance[inject.property] = this.getComponentDependency(inject);
-          }
+          this.injectDependency(instance, inject);
         }
       }
     }
   }
 
-  private getComponentDependency(inject: InjectMetadata): any {
+  private injectDependency(instance: any, inject: InjectMetadata): void {
+    if (this.createAutoMock(instance, inject)) {
+      return;
+    }
+    if (inject.options.lazy) {
+      const tsdi = this;
+      Object.defineProperty(instance, inject.property, {
+        configurable: true,
+        enumerable: true,
+        get(): any {
+          let value = instance[`tsdi$${inject.property}`];
+          if (!value) {
+            log('lazy-resolve injected property %s.%s', instance.constructor.name, inject.property);
+            value = tsdi.getComponentDependency(inject);
+            instance[`tsdi$${inject.property}`] = value;
+            log('lazy-resolved injected property %s.%s <- %o', instance.constructor.name, inject.property, value);
+          }
+          return value;
+        }
+      });
+    } else {
+      instance[inject.property] = this.getComponentDependency(inject);
+    }
+  }
+
+  private createAutoMock(instance: any, inject: InjectMetadata): boolean {
+    if (!this.autoMock) {
+      return false;
+    }
+    const [injectMetadata, injectIdx] = this.getInjectComponentMetadata(inject);
+    const automock = {
+      __tsdi__mock__: 'This is a TSDI automock'
+    };
+    if (injectMetadata) {
+      const constructor = isFactoryMetadata(injectMetadata) ? injectMetadata.rtti : injectMetadata.fn;
+      if (this.autoMock.indexOf(constructor) > -1) {
+        return false;
+      }
+      const proto = constructor.prototype;
+      Object.keys(proto).forEach(property => {
+          if (typeof (proto as any)[property] === 'function') {
+            (automock as any)[property] = function(...args: any[]): any {
+              return args;
+            };
+          }
+        });
+    }
+    if (automock) {
+      instance[inject.property] = automock;
+      return true;
+    }
+    return false;
+  }
+
+  private getInjectComponentMetadata(inject: InjectMetadata): [ComponentOrFactoryMetadata, number] {
     let injectIdx = this.getComponentMetadataIndex(inject.type, inject.options.name);
     if (injectIdx === -1) {
       this.checkAndThrowDependencyError(inject);
@@ -294,6 +336,11 @@ export class TSDI {
       throw new Error(`Failed to get inject '${inject.options.name}' for `
         + `'${(inject.target.constructor as any).name}#${inject.property}'`);
     }
+    return [injectMetadata, injectIdx];
+  }
+
+  private getComponentDependency(inject: InjectMetadata): any {
+    const [injectMetadata, injectIdx] = this.getInjectComponentMetadata(inject);
     return this.getOrCreate(injectMetadata, injectIdx);
   }
 
