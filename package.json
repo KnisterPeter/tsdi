@@ -43,7 +43,7 @@
     "chai": "^4.1.0",
     "coveralls": "^2.13.1",
     "cz-conventional-changelog": "^2.0.0",
-    "exorcist": "^0.4.0",
+    "exorcist": "^1.0.0",
     "mocha": "^3.3.0",
     "nyc": "^11.1.0",
     "rimraf": "^2.6.1",
