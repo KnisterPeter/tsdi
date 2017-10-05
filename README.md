@@ -37,12 +37,6 @@ Install as npm package:
 npm install tsdi --save
 ```
 
-Install latest development version:
-
-```sh
-npm install tsdi@next --save
-```
-
 You need to enable decorator metadata in your `tsconfig.json`, which is done by adding the following line:
 
 ```
