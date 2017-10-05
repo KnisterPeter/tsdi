@@ -129,7 +129,7 @@ console.log(user.method()); // outputs 'hello'
 
 ### Name based injection (hints)
 
-Instead of using the type of the component (the name of the class) as identifier for injection it is also possible to
+Instead of using the type of the component (the type of the class) as identifier for injection it is also possible to
 specify the name as a custom string as depicted in the following example:
 
 ```js
@@ -154,7 +154,8 @@ tsdi.enableComponentScanner();
 const a: A = tsdi.get(A, 'Foo');
 ```
 
-This can be particularly useful if you have circular dependencies which can not be expressed without name based injection.
+This can be particularly useful if you have certain circular dependencies which can not be expressed without
+name based injection.
 
 ### Constructor parameter injection
 
