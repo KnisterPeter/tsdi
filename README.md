@@ -43,7 +43,23 @@ Install latest development version:
 npm install tsdi@next --save
 ```
 
+You need to enable decorator metadata in your `tsconfig.json`, which is done by adding the following line:
+
+```
+"emitDecoratorMetadata": true
+```
+
+Otherwise TSDI will not be able to infer the types of some factories and components.
+
 ## API
+
+TSDI will keep and inject dependencies for you which would otherwise need to be handed down manually
+or kept as singleton.
+
+Classes of which instances should be kept and injectable have to be marked with the `@Component()` decorator.
+
+Each class marked with `@Component()` will be tracked by TSDI as well as instanced together with the container
+instance.
 
 
 ```js
@@ -58,6 +74,9 @@ export class Dependency {
 
 }
 ```
+
+In order to later use the dependencies somewhere simply define a property with the same type and add the `@Inject`
+decorator to it.
 
 ```js
 import { Component, Inject, Initialize } from 'tsdi';
@@ -87,6 +106,15 @@ export class User {
 }
 ```
 
+You need to create an instance of the TSDI container somewhere in your code,
+for example with `const tsdi = new TSDI()`.
+
+For now let us register all components manually to this container by calling `tsdi.register` with the class,
+but it is also possible have them discovered automatically by doing: `tsdi.enableComponentScanner()`.
+
+Please note that when using `enableComponentScanner()` all `@Component()`s have to be imported. Make sure that
+your bundler (such as webpack) did not optimize the `import` statement away.
+
 ```js
 import { TSDI } from 'tsdi';
 import { User } from './user';
@@ -100,6 +128,9 @@ console.log(user.method()); // outputs 'hello'
 ```
 
 ### Name based injection (hints)
+
+Instead of using the type of the component (the name of the class) as identifier for injection it is also possible to
+specify the name as a custom string as depicted in the following example:
 
 ```js
 import { TSDI, Component, Inject } from 'tsdi';
@@ -123,7 +154,11 @@ tsdi.enableComponentScanner();
 const a: A = tsdi.get(A, 'Foo');
 ```
 
+This can be particularly useful if you have circular dependencies which can not be expressed without name based injection.
+
 ### Constructor parameter injection
+
+
 
 ```js
 import { TSDI, Component, Inject } from 'tsdi';
@@ -145,6 +180,10 @@ tsdi.get(C);
 ```
 
 ### Singletons vs. Instances
+
+Sometimes it can be useful to inject a new instance of a Component everytime it is injected. In order to achieve this
+you can configure the component to not be singleton `{ singleton: false }` and a new instance will be created everytime
+it is retrieved or injected.
 
 ```js
 import { TSDI, Component } from 'tsdi';
@@ -169,6 +208,10 @@ const b1: B = tsdi.get(B);
 
 ### Factories
 
+In cases in which you need to be able to inject dependencies which are not just classes but objects (interfaces) or
+simply not maintained by you it is possible to define a `@Factory()` which creates these dependencies and makes them
+injectable:
+
 ```js
 import { TSDI, Component, Factory } from 'tsdi';
 
@@ -188,7 +231,13 @@ tsdi.enableComponentScanner();
 tsdi.get(A);
 ```
 
+Please note that the return-type of the factory needs to be deductable by the `Reflection` api and if it is not you
+will need to use name based injection.
+
 ### Property value injection (configuration)
+
+In cases in which it is necessary to simply inject a single atomic value, as for example a config value, it is possible
+to define a property using `tsdi.addProperty(...)`. it can then be injected normally using name based injection.
 
 ```js
 import { TSDI, Component, Inject } from 'tsdi';
@@ -205,7 +254,15 @@ tsdi.register(A);
 console.log(tsdi.get(A).some); // 'config-value'
 ```
 
+You should not use property value injection to inject complex structures, objects or instances of classes. Consider
+using a `@Factory()` instead.
+
 ### Externals
+
+Sometimes (for example when dealing with React) it is necessary to inject dependencies into classes which are not
+`@Components()` themself and which should not be augmented by TSDI. As TSDI overrides the `constructor()` of all
+classes which use TSDI it is necessary to mark these classes (for example every React component) using the
+`@External()` decorator.
 
 ```js
 import { TSDI, Component, External } from 'tsdi';
@@ -240,6 +297,9 @@ console.log(c.a);
 ```
 
 ### Lazy injection
+
+You can mark individual injections as `{ lazy: true }`, which will lead to the injected `@Component()`s being
+created only when they are first touched.
 
 ```js
 import { TSDI, Component, Inject } from 'tsdi';
@@ -276,6 +336,9 @@ const a = tsdi.get(A);
 ```
 
 ### Eager components
+
+You can mark an individual `@Component()` as `{ eager: true }` which will make sure that this component
+is instanced as soon as it is discovered by TSDI.
 
 ```js
 import { TSDI, Component, Inject } from 'tsdi';
@@ -329,6 +392,12 @@ class Baz {
 tsdi.enableAutomock(Bar);
 tsdi.get(Baz);
 ```
+
+### Alternative Syntax
+
+Each decorator can be written in uppercase: `@Component()` as well as lowercase: `@component()` in order
+to stay more consistent with the rest of the Typescript ecosystem. Empty parens can be omitted, so
+`@component()` can be written as `@component`.
 
 ## Future ideas / Roadmap
 
