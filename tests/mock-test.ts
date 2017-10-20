@@ -69,7 +69,35 @@ describe('TSDI', () => {
       }
 
       tsdi.enableAutomock(Foo);
-      const target = tsdi.get(Bar);
+      tsdi.get(Bar);
+
+      assert.isTrue(created);
+    });
+
+    it('should return a mock', () => {
+      let created = false;
+
+      @component
+      class Foo {
+        public foo(): void {
+          //
+        }
+      }
+
+      @component
+      class Bar {
+        @inject
+        public foo: Foo;
+
+        @initialize
+        protected init(): void {
+          this.foo.foo();
+        }
+      }
+
+      tsdi.enableAutomock();
+      tsdi.mock(Foo).foo = () => created = true;
+      tsdi.get(Bar);
 
       assert.isTrue(created);
     });
