@@ -12,7 +12,8 @@ import {
   External,
   external,
   Initialize,
-  initialize
+  initialize,
+  destroy
 } from '../lib/tsdi';
 import { Cyclic1 } from './cyclic1';
 import { Cyclic2 } from './cyclic2';
@@ -409,6 +410,26 @@ describe('TSDI', () => {
       assert.equal(count, 1);
     });
 
+    it('should call lifecycle listener on component destruction', () => {
+      tsdi.enableComponentScanner();
+      let count = 0;
+
+      @component
+      class Component {
+      }
+      tsdi.addLifecycleListener({
+        onDestroy(component: any): void {
+          if (component instanceof Component) {
+            count++;
+          }
+        }
+      });
+      tsdi.get(Component);
+      tsdi.close();
+
+      assert.equal(count, 1);
+    });
+
     it('should allow overriding a dependency', () => {
       tsdi.enableComponentScanner();
 
@@ -427,6 +448,24 @@ describe('TSDI', () => {
       tsdi.override(Component, new ComponentOverride());
 
       assert.equal(tsdi.get(Component).foo(), 'foo-override');
+    });
+
+    it('should call destructor on container close', () => {
+      let calledDestructor = false;
+
+      @component
+      class ComponentWithDestructor {
+        @destroy
+        public foo(): void {
+          calledDestructor = true;
+        }
+      }
+
+      tsdi.enableComponentScanner();
+      tsdi.get(ComponentWithDestructor);
+      tsdi.close();
+
+      assert.isTrue(calledDestructor);
     });
 
     describe('with external classes', () => {
