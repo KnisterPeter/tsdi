@@ -14,7 +14,7 @@ Dependency Injection container (IoC) for TypeScript.
 
 * Type based dependency injetion
 * Type auto registration
-* Lifecycle methods
+* [Lifecycle methods](#lifecycle-methods)
 * Interface based injection
 * [Name based injection (hints)](#name-based-injection-hints)
 * [Property value injection](#property-value-injection-configuration)
@@ -174,6 +174,35 @@ tsdi.enableComponentScanner();
 tsdi.get(C);
 ```
 
+### Lifecycle methods
+
+To hook into component creation and destruction there are two
+decorators available. `@initialize` and `@destroy`.
+They are call on the respective lifecycle event.
+
+```js
+import { component, initialize, destroy } from 'tsdi';
+
+@component
+export class User {
+
+  private timer: NodeJS.Timer;
+
+  @initialize
+  public init(): void {
+    this.timer = setInterval(() => {
+      // do someting ...
+    }, 100);
+  }
+
+  @destroy
+  public destroy(): void {
+    clearInterval(this.timer);
+  }
+
+}
+```
+
 ### Singletons vs. Instances
 
 Sometimes it can be useful to inject a new instance of a Component everytime it is injected. In order to achieve this
@@ -326,8 +355,12 @@ tsdi.addLifecycleListener({
   onCreate(component: any): void {
     console.log(component); // <-- this line is executed the first time a component is created
   }
+  onDestroy(component: any): void {
+    console.log(component); // <-- this line is executed a component is destroyed (e.g. container close)
+  }
 });
 const a = tsdi.get(A);
+tsdi.close();
 ```
 
 ### Eager components
