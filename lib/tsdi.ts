@@ -408,6 +408,12 @@ export class TSDI {
     return this.getOrCreate<T>(metadata, idx);
   }
 
+  public override(component: Constructable<any>, override: any): void {
+    const idx = this.getComponentMetadataIndex(component);
+    this.instances[idx] = override;
+    log('Override %o with %o', component, override);
+  }
+
 }
 
 export { component, Component } from './component';
