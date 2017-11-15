@@ -409,6 +409,26 @@ describe('TSDI', () => {
       assert.equal(count, 1);
     });
 
+    it('should allow overriding a dependency', () => {
+      tsdi.enableComponentScanner();
+
+      @component
+      class Component {
+        public foo(): string {
+          return 'foo';
+        }
+      }
+
+      class ComponentOverride {
+        public foo(): string {
+          return 'foo-override';
+        }
+      }
+      tsdi.override(Component, new ComponentOverride());
+
+      assert.equal(tsdi.get(Component).foo(), 'foo-override');
+    });
+
     describe('with external classes', () => {
       it('should inject dependencies', () => {
         tsdi.enableComponentScanner();
