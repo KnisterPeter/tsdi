@@ -75,6 +75,7 @@ export type Mock<T> = Mutable<T, keyof T>;
 
 export interface LifecycleListener {
   onCreate?(component: any): void;
+  onDestroy?(component: any): void;
 }
 
 export class TSDI {
@@ -114,11 +115,35 @@ export class TSDI {
     });
   }
 
+  private notifyOnDestroy(component: any): void {
+    this.lifecycleListeners.forEach(l => {
+      if (l.onDestroy) {
+        l.onDestroy(component);
+      }
+    });
+  }
+
   public addProperty(key: string, value: any): void {
     this.properties[key] = value;
   }
 
   public close(): void {
+    Object.keys(this.instances).forEach(key => {
+      const idx = parseInt(key, 10);
+      const metadata = this.components[idx];
+      if (!isFactoryMetadata(metadata)) {
+        const instance = this.instances[idx];
+        this.notifyOnDestroy(instance);
+
+        const destroy = Reflect.getMetadata('component:destroy',
+        isFactoryMetadata(metadata) ? metadata.rtti : metadata.fn.prototype);
+        if (destroy) {
+          (instance as any)[destroy].call(instance);
+        }
+      }
+    });
+    this.instances = [];
+
     if (this.listener) {
       removeListener(this.listener);
       this.listener = undefined;
@@ -420,4 +445,5 @@ export { component, Component } from './component';
 export { external, External } from './external';
 export { inject, Inject } from './inject';
 export { initialize, Initialize } from './initialize';
+export { destroy, Destroy } from './destroy';
 export { factory, Factory } from './factory';
