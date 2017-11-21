@@ -11,6 +11,7 @@ import {
 } from './helper';
 
 import * as debug from 'debug';
+import { component } from './component';
 const log = debug('tsdi');
 
 export type Constructable<T> = { new(...args: any[]): T; };
@@ -20,6 +21,7 @@ export interface ComponentOptions {
   name?: string;
   singleton?: boolean;
   eager?: boolean;
+  scope?: string;
 }
 
 export type IInjectOptions = InjectOptions;
@@ -92,6 +94,8 @@ export class TSDI {
 
   private lifecycleListeners: LifecycleListener[] = [];
 
+  private scopes: {[name: string]: boolean} = {};
+
   constructor() {
     this.registerComponent({
       fn: TSDI,
@@ -132,14 +136,7 @@ export class TSDI {
       const idx = parseInt(key, 10);
       const metadata = this.components[idx];
       if (!isFactoryMetadata(metadata)) {
-        const instance = this.instances[idx];
-        this.notifyOnDestroy(instance);
-
-        const destroy = Reflect.getMetadata('component:destroy',
-        isFactoryMetadata(metadata) ? metadata.rtti : metadata.fn.prototype);
-        if (destroy) {
-          (instance as any)[destroy].call(instance);
-        }
+        this.destroyInstance(idx, metadata);
       }
     });
     this.instances = [];
@@ -147,6 +144,20 @@ export class TSDI {
     if (this.listener) {
       removeListener(this.listener);
       this.listener = undefined;
+    }
+  }
+
+  private destroyInstance(idx: number, metadata: ComponentOrFactoryMetadata): void {
+    const instance = this.instances[idx];
+    if (instance) {
+      this.notifyOnDestroy(instance);
+
+      const destroy = Reflect.getMetadata('component:destroy',
+        isFactoryMetadata(metadata) ? metadata.rtti : metadata.fn.prototype);
+      if (destroy) {
+        (instance as any)[destroy].call(instance);
+      }
+      (this.instances[idx] as any) = undefined;
     }
   }
 
@@ -222,7 +233,7 @@ export class TSDI {
               && metadata.rtti === component);
   }
 
-  private throwComponentNotFoundError(component: Constructable<any> | undefined, name: string | undefined): void {
+  private throwComponentNotFoundError(component?: Constructable<any>, name?: string): void {
     if (component && !name) {
       name = (component as any).name;
     }
@@ -258,23 +269,35 @@ export class TSDI {
         instance = this.get(metadata.target.constructor as Constructable<any>)[metadata.property]();
         this.instances[idx] = instance;
       } else {
-        log('create %o with %o', (metadata.fn as any).name, metadata.options);
-        const constructor: Constructable<T> =  metadata.fn as any;
-        const parameters = this.getConstructorParameters(metadata);
-        instance = new constructor(...parameters);
-        // note: This stores an incomplete instance (injects/properties/...)
-        // but it allows recursive use of injects
-        this.instances[idx] = instance;
-        this.injectIntoInstance(instance, metadata);
-        const init: string = Reflect.getMetadata('component:init', metadata.fn.prototype);
-        if (init) {
-          (instance as any)[init].call(instance);
-        }
+        instance = this.createComponent(metadata, idx);
       }
       this.notifyOnCreate(instance);
     }
     log('< getOrCreate %o -> %o', metadata, instance);
     return instance;
+  }
+
+  private createComponent<T>(metadata: ComponentMetadata, idx: number): T {
+    if (!this.hasEnteredScope(metadata)) {
+      this.throwComponentNotFoundError(metadata.fn);
+    }
+    log('create %o with %o', (metadata.fn as any).name, metadata.options);
+    const constructor: Constructable<T> =  metadata.fn as any;
+    const parameters = this.getConstructorParameters(metadata);
+    const instance = new constructor(...parameters);
+    // note: This stores an incomplete instance (injects/properties/...)
+    // but it allows recursive use of injects
+    this.instances[idx] = instance;
+    this.injectIntoInstance(instance, metadata);
+    const init: string = Reflect.getMetadata('component:init', metadata.fn.prototype);
+    if (init) {
+      (instance as any)[init].call(instance);
+    }
+    return instance;
+  }
+
+  private hasEnteredScope(metadata: ComponentMetadata): boolean {
+    return !metadata.options.scope || Boolean(metadata.options.scope && this.scopes[metadata.options.scope]);
   }
 
   public configureExternal<T>(args: any[], target: any): T {
@@ -437,6 +460,24 @@ export class TSDI {
     const idx = this.getComponentMetadataIndex(component);
     this.instances[idx] = override;
     log('Override %o with %o', component, override);
+  }
+
+  public getScope(name: string): { enter(): void; leave(): void } {
+    const self = this;
+    return {
+      enter(): void {
+        self.scopes[name] = true;
+      },
+      leave(): void {
+        delete self.scopes[name];
+        self.components
+          .filter(metadata => !isFactoryMetadata(metadata) && metadata.options.scope)
+          .forEach(metadata => {
+            const idx = self.getComponentMetadataIndex(isFactoryMetadata(metadata) ? metadata.rtti : metadata.fn);
+            self.destroyInstance(idx, metadata);
+          });
+      }
+    };
   }
 
 }
