@@ -27,6 +27,7 @@ Dependency Injection container (IoC) for TypeScript.
 * [Eager components](#eager-components)
 * [Debug logging](#debug-logging)
 * [Automocks](#automocks)
+* [Scopes](#scopes)
 
 # Usage
 
@@ -420,6 +421,40 @@ class Baz {
 tsdi.enableAutomock(Bar);
 tsdi.get(Baz);
 ```
+
+### Scopes
+
+Scopes could be seen as lifecycle bounds for a managed dependency.
+By that it is meant that components with a defined scope are only as long as
+the scope is entered/valid.
+
+```js
+import { TSDI, component, destroy } from 'tsdi';
+
+@component({scope: 'some-scope'})
+class Foo {
+  @destroy
+  private close(): void {
+    // free resources...
+  }
+}
+
+tsdi.get(Foo); // <-- will throw since the scope was not entered
+tsdi.getScope('some-scope').enter();
+tsdi.get(Foo); // <-- will return a new Foo
+tsdi.getScope('some-scope').leave();
+// Foo is destructed
+tsdi.getScope('some-scope').enter();
+tsdi.get(Foo); // <-- will return a new Foo
+
+```
+
+Whenever a scope is left, the lifecycle callbacks are executed. In the above
+example the `close` method is invoked.
+
+__Note__: Currently it is valid to inject scoped components into unscoped
+components which will lead to stale dependencies, since TSDI does not clear out
+injected dependencies as components are destructed.
 
 ### Alternative Syntax
 

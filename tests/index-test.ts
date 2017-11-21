@@ -563,6 +563,73 @@ describe('TSDI', () => {
         assert.instanceOf(new ExternalClass(), Base);
       });
     });
+
+    describe('and scope', () => {
+
+      it('should create components for that scopes', () => {
+        tsdi.enableComponentScanner();
+
+        @component({scope: 'scope'})
+        class ComponentWithScope {
+        }
+
+        tsdi.getScope('scope').enter();
+        const instance = tsdi.get(ComponentWithScope);
+
+        assert.isDefined(instance);
+      });
+
+      it('should throw if scope is not enabled', () => {
+        tsdi.enableComponentScanner();
+
+        @component({scope: 'scope'})
+        class ComponentWithScope {
+        }
+
+        assert.throws(() => tsdi.get(ComponentWithScope));
+      });
+
+      it('should destroy instances when their scope was left', () => {
+        tsdi.enableComponentScanner();
+
+        let destructorCalled = false;
+
+        @component({scope: 'scope'})
+        class ComponentWithScope {
+          @destroy
+          private destroy(): void {
+            destructorCalled = true;
+          }
+        }
+
+        tsdi.getScope('scope').enter();
+        tsdi.get(ComponentWithScope);
+        tsdi.getScope('scope').leave();
+
+        assert.isTrue(destructorCalled);
+      });
+
+      it('should keep instances which are out of left scope', () => {
+        tsdi.enableComponentScanner();
+
+        let destructorCalled = false;
+
+        @component
+        class ComponentWithoutScope {
+          @destroy
+          private destroy(): void {
+            destructorCalled = true;
+          }
+        }
+
+        tsdi.getScope('scope').enter();
+        tsdi.get(ComponentWithoutScope);
+        tsdi.getScope('scope').leave();
+
+        assert.isFalse(destructorCalled);
+      });
+
+    });
   });
 
   describe('without container instance', () => {
