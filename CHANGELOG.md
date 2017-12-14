@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.18.1"></a>
+## [0.18.1](https://github.com/KnisterPeter/tsdi/compare/v0.18.0...v0.18.1) (2017-12-14)
+
+
+### Bug Fixes
+
+* do not destroy components of other scopes ([c6f34fe](https://github.com/KnisterPeter/tsdi/commit/c6f34fe))
+
+
+
 <a name="0.18.0"></a>
 # [0.18.0](https://github.com/KnisterPeter/tsdi/compare/v0.17.0...v0.18.0) (2017-11-21)
 
