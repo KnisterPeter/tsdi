@@ -471,7 +471,7 @@ export class TSDI {
       leave(): void {
         delete self.scopes[name];
         self.components
-          .filter(metadata => !isFactoryMetadata(metadata) && metadata.options.scope)
+          .filter(metadata => !isFactoryMetadata(metadata) && metadata.options.scope === name)
           .forEach(metadata => {
             const idx = self.getComponentMetadataIndex(isFactoryMetadata(metadata) ? metadata.rtti : metadata.fn);
             self.destroyInstance(idx, metadata);

@@ -622,8 +622,18 @@ describe('TSDI', () => {
           }
         }
 
+        @component({scope: 'other'})
+        class ComponentWithOtherScope {
+          @destroy
+          private destroy(): void {
+            destructorCalled = true;
+          }
+        }
+
+        tsdi.getScope('other').enter();
         tsdi.getScope('scope').enter();
         tsdi.get(ComponentWithoutScope);
+        tsdi.get(ComponentWithOtherScope);
         tsdi.getScope('scope').leave();
 
         assert.isFalse(destructorCalled);
