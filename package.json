@@ -39,7 +39,7 @@
     "@types/chai": "^4.0.2",
     "@types/debug": "0.0.30",
     "@types/mocha": "^2.2.41",
-    "@types/node": "^8.0.19",
+    "@types/node": "^9.3.0",
     "chai": "^4.1.0",
     "coveralls": "^3.0.0",
     "cz-conventional-changelog": "^2.0.0",
