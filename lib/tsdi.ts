@@ -335,14 +335,14 @@ export class TSDI {
         configurable: true,
         enumerable: true,
         get(): any {
-          let value = instance[`tsdi$${inject.property}`];
-          if (!value) {
-            log('lazy-resolve injected property %s.%s', instance.constructor.name, inject.property);
-            value = tsdi.getComponentDependency(inject);
-            instance[`tsdi$${inject.property}`] = value;
-            log('lazy-resolved injected property %s.%s <- %o', instance.constructor.name, inject.property, value);
-          }
-          return value;
+          log('lazy-resolve injected property %s.%s', instance.constructor.name, inject.property);
+          Object.defineProperty(instance, inject.property, {
+            enumerable: true,
+            value: tsdi.getComponentDependency(inject)
+          });
+          log('lazy-resolved injected property %s.%s <- %o', instance.constructor.name,
+            inject.property, instance[inject.property]);
+          return instance[inject.property];
         }
       });
     } else {
