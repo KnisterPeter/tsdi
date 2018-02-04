@@ -19,7 +19,7 @@ export function Inject(...args: any[]): PropertyDecorator & ParameterDecorator |
     }
     return options;
   };
-  const decorateProperty = (target: Object, propertyKey: string,
+  const decorateProperty = (target: Object, propertyKey: string | symbol,
       options: IInjectOptions) => {
     log(`@Inject ${(target.constructor as any).name}#${propertyKey}`);
     const type: Constructable<any> = Reflect.getMetadata('design:type', target, propertyKey);
@@ -30,7 +30,7 @@ export function Inject(...args: any[]): PropertyDecorator & ParameterDecorator |
     }
     injects.push({
       target,
-      property: propertyKey,
+      property: propertyKey.toString(),
       options,
       type
     });
@@ -59,7 +59,7 @@ export function Inject(...args: any[]): PropertyDecorator & ParameterDecorator |
     }
     return;
   }
-  return function(target: Object, propertyKey: string, parameterIndex?: number): void {
+  return function(target: Object, propertyKey: string | symbol, parameterIndex?: number): void {
     const options = defaultOptions(args[0] || {});
     if (typeof parameterIndex === 'undefined') {
       return decorateProperty(target, propertyKey, options);

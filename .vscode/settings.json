@@ -1,3 +1,4 @@
 {
-  "github.autoPublish": true
+  "github.autoPublish": true,
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

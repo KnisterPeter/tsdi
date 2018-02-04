@@ -468,6 +468,55 @@ describe('TSDI', () => {
       assert.isTrue(calledDestructor);
     });
 
+    it('should re-resolve dependency if injected as dynamic  one', () => {
+      @component({scope: 're-resolve'})
+      class Dependency {
+        public value = 1;
+      }
+
+      @component
+      class Dependent {
+        @inject({dynamic: true})
+        public dependency: Dependency;
+
+        // lazy=false is ignored here, proxy is always lazy
+        @inject({lazy: false, dynamic: true})
+        public eagerDependency: Dependency;
+      }
+
+      tsdi.enableComponentScanner();
+      tsdi.getScope('re-resolve').enter();
+      const dependent = tsdi.get(Dependent);
+      const dependency1 = dependent.dependency;
+      const eagerDependency1 = dependent.eagerDependency;
+
+      tsdi.getScope('re-resolve').leave();
+      tsdi.getScope('re-resolve').enter();
+      const dependency2 = dependent.dependency;
+      const eagerDependency2 = dependent.eagerDependency;
+
+      assert.notEqual(dependency1, dependency2);
+      assert.notEqual(eagerDependency1, eagerDependency2);
+    });
+
+    it('should throw if use unavailable dependency injected as dynamic one', () => {
+      @component({scope: 'scope'})
+      class Dependency {
+        public value = 1;
+      }
+
+      @component
+      class Dependent {
+        @inject({dynamic: true})
+        public dependency: Dependency;
+      }
+
+      tsdi.enableComponentScanner();
+      const dependent = tsdi.get(Dependent);
+
+      assert.throws(() => dependent.dependency.value, "Component 'Dependency' not found");
+    });
+
     describe('with external classes', () => {
       it('should inject dependencies', () => {
         tsdi.enableComponentScanner();
