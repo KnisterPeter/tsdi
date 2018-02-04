@@ -5,9 +5,9 @@ import { Dependency } from './dependency';
 export class User {
 
   @Inject()
-  private dependency: Dependency;
+  private dependency!: Dependency;
 
-  private initMessage: string;
+  private initMessage!: string;
 
   public getDep(): Dependency {
     return this.dependency;

@@ -5,6 +5,6 @@ import { Cyclic1 } from './cyclic1';
 export class Cyclic2 {
 
   @Inject({lazy: false})
-  public cyclic1: Cyclic1;
+  public cyclic1!: Cyclic1;
 
 }
