@@ -28,6 +28,7 @@ export type IInjectOptions = InjectOptions;
 export interface InjectOptions {
   name?: string;
   lazy?: boolean;
+  dynamic?: boolean;
 }
 
 export type IFactoryOptions = FactoryOptions;
@@ -88,7 +89,7 @@ export class TSDI {
 
   private instances: {[idx: number]: Object} = {};
 
-  private listener: ComponentListener|undefined;
+  private listener: ComponentListener | undefined;
 
   private properties: {[key: string]: any} = {};
 
@@ -97,10 +98,12 @@ export class TSDI {
   private scopes: {[name: string]: boolean} = {};
 
   constructor() {
-    this.registerComponent({
-      fn: TSDI,
-      options: {}
-    });
+    this.registerComponent(
+      {
+        fn: TSDI,
+        options: {}
+      }
+    );
     this.instances[0] = this;
   }
 
@@ -201,13 +204,15 @@ export class TSDI {
 
   public register(component: Constructable<any>, name?: string): void {
     const options: IComponentOptions =  Reflect.getMetadata('component:options', component) || {};
-    this.registerComponent({
-      fn: component,
-      options: {
-        ...options,
-        name: name || options.name
+    this.registerComponent(
+      {
+        fn: component,
+        options: {
+          ...options,
+          name: name || options.name
+        }
       }
-    });
+    );
   }
 
   private getComponentMetadataIndex(component: Constructable<any> | undefined, name?: string): number {
@@ -329,16 +334,20 @@ export class TSDI {
     if (this.injectAutoMock(instance, inject)) {
       return;
     }
-    if (inject.options.lazy) {
+    if (inject.options.lazy || inject.options.dynamic) {
       const tsdi = this;
       Object.defineProperty(instance, inject.property, {
         configurable: true,
         enumerable: true,
         get(): any {
           log('lazy-resolve injected property %s.%s', instance.constructor.name, inject.property);
+          const value = tsdi.getComponentDependency(inject);
+          if (inject.options.dynamic) {
+            return value;
+          }
           Object.defineProperty(instance, inject.property, {
             enumerable: true,
-            value: tsdi.getComponentDependency(inject)
+            value
           });
           log('lazy-resolved injected property %s.%s <- %o', instance.constructor.name,
             inject.property, instance[inject.property]);

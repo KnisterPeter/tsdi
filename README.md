@@ -28,6 +28,7 @@ Dependency Injection container (IoC) for TypeScript.
 * [Debug logging](#debug-logging)
 * [Automocks](#automocks)
 * [Scopes](#scopes)
+* [Dynamic Injections](#dynamic-injections)
 
 # Usage
 
@@ -456,6 +457,45 @@ __Note__: Currently it is valid to inject scoped components into unscoped
 components which will lead to stale dependencies, since TSDI does not clear out
 injected dependencies as components are destructed.
 
+### Dynamic Injections
+
+The dynamic setting on an injected dependency marks it as dependency to
+be reevaluated on every access.  
+This means it is a dependency which could be come and go every moment and prior
+to access an application should check the availability.  
+This also means it could be dynamic dependencies which could could be injected
+in more static ones.
+
+```js
+import { TSDI, component, inject } from 'tsdi';
+
+@component({scope: 'some-scope'})
+class Foo {
+  public foo(): void {
+    // do something
+  }
+}
+
+@component
+class Bar {
+  @inject({dynamic: true})
+  private foo: Foo;
+
+  public bar(): void {
+    this.foo.foo();
+  }
+}
+
+const bar = tsdi.get(Bar); // <-- bar is constructed without a foo
+bar.bar() // <-- this will throw, since foo is not available
+tsdi.getScope('some-scope').enter();
+bar.bar() // <-- this will be okay, since foo is available here
+tsdi.getScope('some-scope').leave();
+bar.bar() // <-- this will throw, since foo is not available
+tsdi.getScope('some-scope').enter();
+bar.bar() // <-- this will be okay, since a new foo is available here
+```
+ 
 ### Alternative Syntax
 
 Each decorator can be written in uppercase: `@Component()` as well as lowercase: `@component()` in order
