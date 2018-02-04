@@ -124,7 +124,7 @@ describe('TSDI', () => {
       class DExtendsA extends A {
 
         @inject({name: 'Foo'})
-        private a: A;
+        private a!: A;
 
         public m(): string {
           return this.a.m();
@@ -155,7 +155,7 @@ describe('TSDI', () => {
       @Component()
       class ComponentWithProperties {
         @Inject({name: 'prop'})
-        private _prop: boolean;
+        private _prop!: boolean;
 
         public get prop(): boolean { return this._prop; }
       }
@@ -181,7 +181,7 @@ describe('TSDI', () => {
       @Component()
       class ComponentWithContainerDependency {
         @Inject
-        private _tsdi: TSDI;
+        private _tsdi!: TSDI;
 
         public get prop(): TSDI { return this._tsdi; }
       }
@@ -280,7 +280,7 @@ describe('TSDI', () => {
       @Component()
       class ComponentWithNonNamedInject {
         @Inject()
-        private _comp: InjectedComponent;
+        private _comp!: InjectedComponent;
         get comp(): InjectedComponent {
           return this._comp;
         }
@@ -299,7 +299,7 @@ describe('TSDI', () => {
       @Component()
       class ComponentWithNamedInject {
         @Inject('unknown')
-        private _comp: UnknownComponent;
+        private _comp!: UnknownComponent;
         get comp(): UnknownComponent {
           return this._comp;
         }
@@ -348,7 +348,7 @@ describe('TSDI', () => {
       @Component()
       class ComponentWithLazyInjection {
         @Inject({lazy: true})
-        public dependency: Injected;
+        public dependency!: Injected;
       }
 
       const component = tsdi.get(ComponentWithLazyInjection);
@@ -477,11 +477,11 @@ describe('TSDI', () => {
       @component
       class Dependent {
         @inject({dynamic: true})
-        public dependency: Dependency;
+        public dependency!: Dependency;
 
         // lazy=false is ignored here, proxy is always lazy
         @inject({lazy: false, dynamic: true})
-        public eagerDependency: Dependency;
+        public eagerDependency!: Dependency;
       }
 
       tsdi.enableComponentScanner();
@@ -508,7 +508,7 @@ describe('TSDI', () => {
       @component
       class Dependent {
         @inject({dynamic: true})
-        public dependency: Dependency;
+        public dependency!: Dependency;
       }
 
       tsdi.enableComponentScanner();
@@ -528,9 +528,9 @@ describe('TSDI', () => {
         @external
         class ExternalClass {
           @Inject()
-          public user: User;
+          public user!: User;
           @Inject('user2')
-          public user2: User;
+          public user2!: User;
         }
 
         const test = new ExternalClass();
@@ -562,7 +562,7 @@ describe('TSDI', () => {
         @External()
         class ExternalClass {
           @Inject('prop')
-          private _prop: boolean;
+          private _prop!: boolean;
 
           public get prop(): boolean { return this._prop; }
         }

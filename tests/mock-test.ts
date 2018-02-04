@@ -33,7 +33,7 @@ describe('TSDI', () => {
       @component
       class Bar {
         @inject
-        public foo: Foo;
+        public foo!: Foo;
 
         @initialize
         protected init(): void {
@@ -60,7 +60,7 @@ describe('TSDI', () => {
       @component
       class Bar {
         @inject
-        public foo: Foo;
+        public foo!: Foo;
 
         @initialize
         protected init(): void {
@@ -87,7 +87,7 @@ describe('TSDI', () => {
       @component
       class Bar {
         @inject
-        public foo: Foo;
+        public foo!: Foo;
 
         @initialize
         protected init(): void {
