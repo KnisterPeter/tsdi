@@ -29,6 +29,7 @@ Dependency Injection container (IoC) for TypeScript.
 * [Automocks](#automocks)
 * [Scopes](#scopes)
 * [Dynamic Injections](#dynamic-injections)
+* [StrictPropertyInitialization](#strictpropertyinitialization)
 
 # Usage
 
@@ -495,7 +496,26 @@ bar.bar() // <-- this will throw, since foo is not available
 tsdi.getScope('some-scope').enter();
 bar.bar() // <-- this will be okay, since a new foo is available here
 ```
- 
+
+### StrictPropertyInitialization
+
+The new `--strictPropertyInitialization` in TypeScript 2.7 could be used with TSDI by
+using the *definite assignment assertion modifiers*.
+
+```js
+import { component, inject } from 'tsdi';
+
+@component
+class Foo {
+}
+
+@component
+class Bar {
+  @inject
+  private foo!: Foo; // note the ! here. It will supress the initialization error
+}
+```
+
 ### Alternative Syntax
 
 Each decorator can be written in uppercase: `@Component()` as well as lowercase: `@component()` in order
