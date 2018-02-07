@@ -6,12 +6,10 @@ import {
 } from './global-state';
 import {
   isFactoryMetadata,
-  findIndexOf,
-  removeElement
+  findIndexOf
 } from './helper';
 
 import * as debug from 'debug';
-import { component } from './component';
 const log = debug('tsdi');
 
 export type Constructable<T> = { new(...args: any[]): T; };
@@ -254,8 +252,8 @@ export class TSDI {
     if (parameterMetadata) {
       return parameterMetadata
         .sort((a, b) => a.index - b.index)
-        .map(parameter => ({index: this.getComponentMetadataIndex(parameter.rtti, parameter.options.name), parameter}))
-        .map(({index, parameter}) => this.getOrCreate(this.components[index], index));
+        .map(parameter => ({index: this.getComponentMetadataIndex(parameter.rtti, parameter.options.name)}))
+        .map(({index}) => this.getOrCreate(this.components[index], index));
     }
     return [];
   }

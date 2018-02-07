@@ -42,7 +42,7 @@ describe('TSDI', () => {
       }
 
       tsdi.enableAutomock();
-      const target = tsdi.get(Bar);
+      tsdi.get(Bar);
 
       assert.isFalse(created);
     });

@@ -3,9 +3,10 @@
   "version": "0.19.0",
   "description": "Dependency Injection container (IoC) for TypeScript",
   "main": "dist/lib/index.js",
+  "module": "dist/esm/lib/index.js",
+  "type": "dist/esm/lib/index.d.ts",
   "files": [
     "dist",
-    "index.d.ts",
     "lib"
   ],
   "engines": {
@@ -15,7 +16,9 @@
     "linter": "tslint --project ./tsconfig.json",
     "clean": "rimraf dist",
     "prebuild": "npm run clean",
-    "build": "tsc --sourceMap",
+    "build": "npm run build:cjs && npm run build:esm",
+    "build:cjs": "tsc --sourceMap --module commonjs --outDir dist",
+    "build:esm": "tsc --sourceMap --module es2015 --outDir dist/esm",
     "pretest": "npm run build",
     "test": "nyc mocha -r source-map-support/register dist/tests/",
     "prerelease": "git checkout master && git pull origin master && npm test && npm run build",
@@ -23,7 +26,7 @@
     "postrelease": "git push --follow-tags origin master && npm publish",
     "precoverage": "npm run clean && tsc --inlineSourceMap",
     "coverage": "nyc report --reporter=lcov && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
-    "build:watch": "npm run build -- --watch"
+    "build:watch": "npm run build:esm -- --watch"
   },
   "author": {
     "name": "Markus Wolf",
@@ -54,7 +57,7 @@
   },
   "dependencies": {
     "debug": "^3.0.1",
-    "reflect-metadata": "^0.1.10"
+    "reflect-metadata": "^0.1.12"
   },
   "config": {
     "commitizen": {
