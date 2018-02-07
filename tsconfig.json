@@ -2,8 +2,8 @@
   "compilerOptions": {
     "declaration": true,
     "target": "es5",
-    "module": "commonjs",
-    "outDir": "dist",
+    "module": "es2015",
+    "outDir": "dist/esm",
     "lib": [
       "es2015",
       "es2016",
@@ -12,7 +12,15 @@
     "strict": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "stripInternal": true
+    "stripInternal": true,
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "pretty": true
   },
   "exclude": [
     "node_modules",

@@ -16,7 +16,6 @@ import {
   destroy
 } from '../lib/tsdi';
 import { Cyclic1 } from './cyclic1';
-import { Cyclic2 } from './cyclic2';
 import { Dependency } from './dependency';
 import { EagerComponent1 } from './eager1';
 import { EagerComponent2 } from './eager2';
@@ -111,16 +110,19 @@ describe('TSDI', () => {
       }
 
       @Component()
+      // @ts-ignore // ignore unused warning
       class BExtendsA extends A {
         public m(): string { return 'b'; }
       }
 
       @Component({name: 'Foo'})
+      // @ts-ignore // ignore unused warning
       class CExtendsA extends A {
         public m(): string { return 'c'; }
       }
 
       @Component({name: 'Bar'})
+      // @ts-ignore // ignore unused warning
       class DExtendsA extends A {
 
         @inject({name: 'Foo'})
@@ -214,14 +216,18 @@ describe('TSDI', () => {
       @Component
       class ComponentWithConstructor {
         private _tsdi: TSDI;
+        public b: ConstructorParameterComponent;
 
         constructor(@Inject() container: TSDI, @Inject b: ConstructorParameterComponent) {
           this._tsdi = container;
+          this.b = b;
         }
 
         public get prop(): TSDI { return this._tsdi; }
       }
+
       assert.strictEqual(tsdi.get(ComponentWithConstructor).prop, tsdi);
+      assert.instanceOf(tsdi.get(ComponentWithConstructor).b, ConstructorParameterComponent);
     });
 
     it('should create a new instance for non-singletons', () => {
@@ -239,6 +245,7 @@ describe('TSDI', () => {
       class NonSingletonObject {}
 
       @Component()
+      // @ts-ignore // ignore unused warning
       class FactoryComponentWithSingletonFactory {
         @factory
         public someFactory(): NonSingletonObject {
@@ -246,8 +253,8 @@ describe('TSDI', () => {
         }
       }
 
-      @Component()
-      class C {}
+      // @Component()
+      // class C {}
 
       assert.instanceOf(tsdi.get(NonSingletonObject), NonSingletonObject);
       assert.strictEqual(tsdi.get(NonSingletonObject), tsdi.get(NonSingletonObject));
@@ -259,6 +266,7 @@ describe('TSDI', () => {
       class NonSingletonObject {}
 
       @Component()
+      // @ts-ignore // ignore unused warning
       class FactoryComponentWithNonSingletonFactory {
         @Factory({singleton: false})
         public someFactory(): NonSingletonObject {
@@ -327,9 +335,11 @@ describe('TSDI', () => {
 
       try {
         @Component('Component')
+        // @ts-ignore // ignore unused warning
         class NamedComponent1 {}
 
         @Component('Component')
+        // @ts-ignore // ignore unused warning
         class NamedComponent2 {}
 
         assert.fail('Should throw error');
@@ -366,6 +376,7 @@ describe('TSDI', () => {
       let count = 0;
 
       @component({eager: true})
+      // @ts-ignore // ignore unused warning
       class EagerComponent {
         @initialize
         public init(): void {
@@ -552,7 +563,8 @@ describe('TSDI', () => {
           }
         }
 
-        const external = new ExternalClass();
+        // tslint:disable-next-line:no-unused-expression
+        new ExternalClass();
         assert.isTrue(called);
       });
 
@@ -578,7 +590,7 @@ describe('TSDI', () => {
         class ExternalClass {
           public injected: User;
 
-          constructor(value: string, @Inject() user?: User) {
+          constructor(_value: string, @Inject() user?: User) {
             this.injected = user!;
           }
         }
@@ -646,7 +658,7 @@ describe('TSDI', () => {
         @component({scope: 'scope'})
         class ComponentWithScope {
           @destroy
-          private destroy(): void {
+          protected destroy(): void {
             destructorCalled = true;
           }
         }
@@ -666,7 +678,7 @@ describe('TSDI', () => {
         @component
         class ComponentWithoutScope {
           @destroy
-          private destroy(): void {
+          protected destroy(): void {
             destructorCalled = true;
           }
         }
@@ -674,7 +686,7 @@ describe('TSDI', () => {
         @component({scope: 'other'})
         class ComponentWithOtherScope {
           @destroy
-          private destroy(): void {
+          protected destroy(): void {
             destructorCalled = true;
           }
         }
