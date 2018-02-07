@@ -4,7 +4,7 @@
   "description": "Dependency Injection container (IoC) for TypeScript",
   "main": "dist/lib/index.js",
   "module": "dist/esm/lib/index.js",
-  "type": "dist/esm/lib/index.d.ts",
+  "types": "dist/esm/lib/index.d.ts",
   "files": [
     "dist",
     "lib"
