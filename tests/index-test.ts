@@ -700,6 +700,21 @@ describe('TSDI', () => {
         assert.isFalse(destructorCalled);
       });
 
+      it('should allow multiple scopes in one component', () => {
+        tsdi.enableComponentScanner();
+
+        let component1;
+
+        @component({scope: ['scope1', 'scope2']})
+        class ComponentWithScope {}
+
+        tsdi.getScope('scope2').enter();
+        component1 = tsdi.get(ComponentWithScope);
+        tsdi.getScope('scope2').leave();
+
+        assert.isDefined(component1);
+      });
+
     });
   });
 
