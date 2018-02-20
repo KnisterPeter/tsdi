@@ -19,7 +19,7 @@ export interface ComponentOptions {
   name?: string;
   singleton?: boolean;
   eager?: boolean;
-  scope?: string;
+  scope?: string | string[];
 }
 
 export type IInjectOptions = InjectOptions;
@@ -300,7 +300,21 @@ export class TSDI {
   }
 
   private hasEnteredScope(metadata: ComponentMetadata): boolean {
-    return !metadata.options.scope || Boolean(metadata.options.scope && this.scopes[metadata.options.scope]);
+    const { scope } = metadata.options;
+
+    if (!scope) {
+      return true;
+    }
+
+    if (Boolean(scope)) {
+      if(typeof scope === 'string') {
+        return Boolean(this.scopes[scope]);
+      } else if(Array.isArray(scope)) {
+        return scope.some(item => Boolean(this.scopes[item]))
+      }
+    }
+
+    return false;
   }
 
   public configureExternal<T>(args: any[], target: any): T {
