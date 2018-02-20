@@ -307,10 +307,10 @@ export class TSDI {
     }
 
     if (Boolean(scope)) {
-      if(typeof scope === 'string') {
+      if (typeof scope === 'string') {
         return Boolean(this.scopes[scope]);
-      } else if(Array.isArray(scope)) {
-        return scope.some(item => Boolean(this.scopes[item]))
+      } else if (Array.isArray(scope)) {
+        return scope.some(item => Boolean(this.scopes[item]));
       }
     }
 
