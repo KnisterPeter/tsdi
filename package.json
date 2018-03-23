@@ -41,7 +41,7 @@
     "@knisterpeter/standard-tslint": "^1.5.1",
     "@types/chai": "^4.0.2",
     "@types/debug": "0.0.30",
-    "@types/mocha": "^2.2.41",
+    "@types/mocha": "^5.0.0",
     "@types/node": "^9.3.0",
     "chai": "^4.1.0",
     "coveralls": "^3.0.0",
