@@ -109,20 +109,20 @@ describe('TSDI', () => {
         public m(): string { return 'a'; }
       }
 
+      // @ts-ignore
       @Component()
-      // @ts-ignore // ignore unused warning
       class BExtendsA extends A {
         public m(): string { return 'b'; }
       }
 
+      // @ts-ignore
       @Component({name: 'Foo'})
-      // @ts-ignore // ignore unused warning
       class CExtendsA extends A {
         public m(): string { return 'c'; }
       }
 
+      // @ts-ignore
       @Component({name: 'Bar'})
-      // @ts-ignore // ignore unused warning
       class DExtendsA extends A {
 
         @inject({name: 'Foo'})
@@ -244,8 +244,9 @@ describe('TSDI', () => {
 
       class NonSingletonObject {}
 
+      // @ts-ignore
       @Component()
-      // @ts-ignore // ignore unused warning
+      // @ts-ignore
       class FactoryComponentWithSingletonFactory {
         @factory
         public someFactory(): NonSingletonObject {
@@ -265,8 +266,9 @@ describe('TSDI', () => {
 
       class NonSingletonObject {}
 
+      // @ts-ignore
       @Component()
-      // @ts-ignore // ignore unused warning
+      // @ts-ignore
       class FactoryComponentWithNonSingletonFactory {
         @Factory({singleton: false})
         public someFactory(): NonSingletonObject {
@@ -334,12 +336,12 @@ describe('TSDI', () => {
       tsdi.enableComponentScanner();
 
       try {
+        // @ts-ignore
         @Component('Component')
-        // @ts-ignore // ignore unused warning
         class NamedComponent1 {}
 
+        // @ts-ignore
         @Component('Component')
-        // @ts-ignore // ignore unused warning
         class NamedComponent2 {}
 
         assert.fail('Should throw error');
@@ -375,8 +377,8 @@ describe('TSDI', () => {
       tsdi.enableComponentScanner();
       let count = 0;
 
+      // @ts-ignore
       @component({eager: true})
-      // @ts-ignore // ignore unused warning
       class EagerComponent {
         @initialize
         public init(): void {
