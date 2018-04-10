@@ -292,7 +292,7 @@ export class TSDI {
     // note: This stores an incomplete instance (injects/properties/...)
     // but it allows recursive use of injects
     this.instances[idx] = instance;
-    this.injectIntoInstance(instance, metadata);
+    this.injectIntoInstance(instance, false, metadata);
     const init: string = Reflect.getMetadata('component:init', metadata.fn.prototype);
     if (init) {
       (instance as any)[init].call(instance);
@@ -307,7 +307,7 @@ export class TSDI {
   public configureExternal<T>(args: any[], target: any): T {
     const parameters = this.getConstructorParameters({fn: target, options: {}});
     const instance = new target(...args, ...parameters);
-    this.injectIntoInstance(instance, {fn: target, options: {}});
+    this.injectIntoInstance(instance, true, {fn: target, options: {}});
     const init: string = Reflect.getMetadata('component:init', target.prototype);
     if (init) {
       instance[init].call(instance);
@@ -315,7 +315,7 @@ export class TSDI {
     return instance;
   }
 
-  private injectIntoInstance(instance: any, componentMetadata: ComponentMetadata): void {
+  private injectIntoInstance(instance: any, externalInstance: boolean, componentMetadata: ComponentMetadata): void {
     const injects: InjectMetadata[] = Reflect.getMetadata('component:injects', componentMetadata.fn.prototype);
     if (injects) {
       for (const inject of injects) {
@@ -323,13 +323,14 @@ export class TSDI {
         if (inject.options.name && typeof this.properties[inject.options.name] !== 'undefined') {
           instance[inject.property] = this.properties[inject.options.name];
         } else {
-          this.injectDependency(instance, inject, componentMetadata);
+          this.injectDependency(instance, externalInstance, inject, componentMetadata);
         }
       }
     }
   }
 
-  private injectDependency(instance: any, inject: InjectMetadata, componentMetadata: ComponentMetadata): void {
+  private injectDependency(instance: any, externalInstance: boolean, inject: InjectMetadata,
+      componentMetadata: ComponentMetadata): void {
     if (this.injectAutoMock(instance, inject)) {
       return;
     }
@@ -340,7 +341,7 @@ export class TSDI {
         enumerable: true,
         get(): any {
           log('lazy-resolve injected property %s.%s', instance.constructor.name, inject.property);
-          const value = tsdi.getComponentDependency(inject, componentMetadata);
+          const value = tsdi.getComponentDependency(inject, componentMetadata, externalInstance);
           if (inject.options.dynamic) {
             return value;
           }
@@ -354,7 +355,7 @@ export class TSDI {
         }
       });
     } else {
-      instance[inject.property] = this.getComponentDependency(inject, componentMetadata);
+      instance[inject.property] = this.getComponentDependency(inject, componentMetadata, externalInstance);
     }
   }
 
@@ -424,9 +425,10 @@ export class TSDI {
     return [injectMetadata, injectIdx];
   }
 
-  private getComponentDependency(inject: InjectMetadata, dependentMetadata: ComponentMetadata): any {
+  private getComponentDependency(inject: InjectMetadata, dependentMetadata: ComponentMetadata,
+      noScopeWarning: boolean): any {
     const [metadata, injectIdx] = this.getInjectComponentMetadata(inject);
-    if (!inject.options.dynamic && !isFactoryMetadata(metadata)
+    if (!noScopeWarning && !inject.options.dynamic && !isFactoryMetadata(metadata)
         && metadata.options.scope && !dependentMetadata.options.scope) {
       // tslint:disable-next-line:prefer-template
       console.warn(`Component '${metadata.fn.name}' is scoped to '${metadata.options.scope}' `
