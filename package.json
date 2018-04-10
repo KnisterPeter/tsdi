@@ -38,7 +38,7 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@knisterpeter/standard-tslint": "1.5.1",
+    "@knisterpeter/standard-tslint": "1.6.0",
     "@types/chai": "4.0.2",
     "@types/debug": "0.0.30",
     "@types/mocha": "5.0.0",

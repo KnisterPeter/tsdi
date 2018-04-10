@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-"@knisterpeter/standard-tslint@1.5.1":
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/@knisterpeter/standard-tslint/-/standard-tslint-1.5.1.tgz#d6796e8307474a9525c82f0a9d79a9610d43714e"
+"@knisterpeter/standard-tslint@1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@knisterpeter/standard-tslint/-/standard-tslint-1.6.0.tgz#697f52eb20a284b1115c36ac672171ad357e82dc"
 
 "@types/chai@4.0.2":
   version "4.0.2"
