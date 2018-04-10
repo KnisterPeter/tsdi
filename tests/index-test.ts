@@ -527,7 +527,8 @@ describe('TSDI', () => {
       tsdi.enableComponentScanner();
       const dependent = tsdi.get(Dependent);
 
-      assert.throws(() => dependent.dependency.value, "Component 'Dependency' not found");
+      assert.throws(() => dependent.dependency.value,
+        "Component 'Dependency' not found: required scope 'scope' is not enabled");
     });
 
     describe('with external classes', () => {
@@ -649,7 +650,8 @@ describe('TSDI', () => {
         class ComponentWithScope {
         }
 
-        assert.throws(() => tsdi.get(ComponentWithScope));
+        assert.throws(() => tsdi.get(ComponentWithScope),
+          "Component 'ComponentWithScope' not found: required scope 'scope' is not enabled");
       });
 
       it('should destroy instances when their scope was left', () => {
