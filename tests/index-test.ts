@@ -728,8 +728,38 @@ describe('TSDI', () => {
               + "'ComponentToInjectTo' as well or make the inject dynamic.");
             done();
           };
+          tsdi.getScope('scope').enter();
           // tslint:disable-next-line:no-unused-expression
           tsdi.get(ComponentToInjectTo).dependency;
+          tsdi.getScope('scope').leave();
+        } finally {
+          console.warn = consoleWarn;
+        }
+      });
+
+      it('should not warn about scope issues for external components', () => {
+        tsdi.enableComponentScanner();
+
+        // @ts-ignore
+        @component({scope: 'scope'})
+        class ComponentToBeInjected {}
+
+        // @ts-ignore
+        @external
+        class ComponentToInjectTo {
+          @inject
+          public dependency!: ComponentToBeInjected;
+        }
+
+        const consoleWarn = console.warn;
+        try {
+          console.warn = function(): void {
+            assert.fail();
+          };
+          tsdi.getScope('scope').enter();
+          // tslint:disable-next-line:no-unused-expression
+          new ComponentToInjectTo().dependency;
+          tsdi.getScope('scope').leave();
         } finally {
           console.warn = consoleWarn;
         }
