@@ -26,7 +26,7 @@
     "postrelease": "git push --follow-tags origin master && npm publish",
     "precoverage": "npm run clean && tsc --inlineSourceMap",
     "coverage": "nyc report --reporter=lcov && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
-    "build:watch": "npm run build:esm -- --watch"
+    "build:watch": "npm run build:cjs -- --watch"
   },
   "author": {
     "name": "Markus Wolf",
