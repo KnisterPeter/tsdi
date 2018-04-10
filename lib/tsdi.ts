@@ -323,13 +323,13 @@ export class TSDI {
         if (inject.options.name && typeof this.properties[inject.options.name] !== 'undefined') {
           instance[inject.property] = this.properties[inject.options.name];
         } else {
-          this.injectDependency(instance, inject);
+          this.injectDependency(instance, inject, componentMetadata);
         }
       }
     }
   }
 
-  private injectDependency(instance: any, inject: InjectMetadata): void {
+  private injectDependency(instance: any, inject: InjectMetadata, componentMetadata: ComponentMetadata): void {
     if (this.injectAutoMock(instance, inject)) {
       return;
     }
@@ -340,7 +340,7 @@ export class TSDI {
         enumerable: true,
         get(): any {
           log('lazy-resolve injected property %s.%s', instance.constructor.name, inject.property);
-          const value = tsdi.getComponentDependency(inject);
+          const value = tsdi.getComponentDependency(inject, componentMetadata);
           if (inject.options.dynamic) {
             return value;
           }
@@ -354,7 +354,7 @@ export class TSDI {
         }
       });
     } else {
-      instance[inject.property] = this.getComponentDependency(inject);
+      instance[inject.property] = this.getComponentDependency(inject, componentMetadata);
     }
   }
 
@@ -424,9 +424,17 @@ export class TSDI {
     return [injectMetadata, injectIdx];
   }
 
-  private getComponentDependency(inject: InjectMetadata): any {
-    const [injectMetadata, injectIdx] = this.getInjectComponentMetadata(inject);
-    return this.getOrCreate(injectMetadata, injectIdx);
+  private getComponentDependency(inject: InjectMetadata, dependentMetadata: ComponentMetadata): any {
+    const [metadata, injectIdx] = this.getInjectComponentMetadata(inject);
+    if (!inject.options.dynamic && !isFactoryMetadata(metadata)
+        && metadata.options.scope && !dependentMetadata.options.scope) {
+      // tslint:disable-next-line:prefer-template
+      console.warn(`Component '${metadata.fn.name}' is scoped to '${metadata.options.scope}' `
+        + `and injected into '${dependentMetadata.fn.name}' without scope. This could easily `
+        + `lead to stale references. Consider to add the scope '${metadata.options.scope}' to `
+        + `'${dependentMetadata.fn.name}' as well or make the inject dynamic.`);
+    }
+    return this.getOrCreate(metadata, injectIdx);
   }
 
   private checkAndThrowDependencyError(inject: InjectMetadata): void {

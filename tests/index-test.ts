@@ -704,6 +704,36 @@ describe('TSDI', () => {
         assert.isFalse(destructorCalled);
       });
 
+      it('should warn user if statically injecting scoped component into unscoped component', done => {
+        tsdi.enableComponentScanner();
+
+        // @ts-ignore
+        @component({scope: 'scope'})
+        class ComponentToBeInjected {}
+
+        // @ts-ignore
+        @component
+        class ComponentToInjectTo {
+          @inject
+          public dependency!: ComponentToBeInjected;
+        }
+
+        const consoleWarn = console.warn;
+        try {
+          console.warn = function(msg: string): void {
+            // tslint:disable-next-line:prefer-template
+            assert.equal(msg, "Component 'ComponentToBeInjected' is scoped to 'scope' "
+              + "and injected into 'ComponentToInjectTo' without scope. This could easily "
+              + "lead to stale references. Consider to add the scope 'scope' to "
+              + "'ComponentToInjectTo' as well or make the inject dynamic.");
+            done();
+          };
+          // tslint:disable-next-line:no-unused-expression
+          tsdi.get(ComponentToInjectTo).dependency;
+        } finally {
+          console.warn = consoleWarn;
+        }
+      });
     });
   });
 
