@@ -236,14 +236,14 @@ export class TSDI {
               && metadata.rtti === component);
   }
 
-  private throwComponentNotFoundError(component?: Constructable<any>, name?: string): void {
+  private throwComponentNotFoundError(component?: Constructable<any>, name?: string, additionalInfo?: string): void {
     if (component && !name) {
       name = (component as any).name;
     }
     if (!name) {
       name = 'unknown';
     }
-    throw new Error(`Component '${name}' not found`);
+    throw new Error(`Component '${name}' not found${additionalInfo ? `: ${additionalInfo}` : ''}`);
   }
 
   private getConstructorParameters(metadata: ComponentOrFactoryMetadata): any[] {
@@ -282,7 +282,8 @@ export class TSDI {
 
   private createComponent<T>(metadata: ComponentMetadata, idx: number): T {
     if (!this.hasEnteredScope(metadata)) {
-      this.throwComponentNotFoundError(metadata.fn);
+      this.throwComponentNotFoundError(metadata.fn, undefined,
+        `required scope '${metadata.options.scope}' is not enabled`);
     }
     log('create %o with %o', (metadata.fn as any).name, metadata.options);
     const constructor: Constructable<T> =  metadata.fn as any;
