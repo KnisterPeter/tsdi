@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.20.2"></a>
+## [0.20.2](https://github.com/KnisterPeter/tsdi/compare/v0.20.1...v0.20.2) (2018-04-20)
+
+
+### Bug Fixes
+
+* **deps:** update dependency debug to v3.1.0 ([718e955](https://github.com/KnisterPeter/tsdi/commit/718e955))
+* do not call destroy method if mock does not implement it ([5bcccc6](https://github.com/KnisterPeter/tsdi/commit/5bcccc6))
+
+
+
 <a name="0.20.1"></a>
 ## [0.20.1](https://github.com/KnisterPeter/tsdi/compare/v0.20.0...v0.20.1) (2018-04-10)
 
