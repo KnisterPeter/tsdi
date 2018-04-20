@@ -481,6 +481,25 @@ describe('TSDI', () => {
       assert.isTrue(calledDestructor);
     });
 
+    it('should not fail if destructor is removed', () => {
+      let destructorCalled = false;
+
+      @component
+      class ComponentWithDestructor {
+        @destroy
+        public foo(): void {
+          destructorCalled = true;
+        }
+      }
+
+      tsdi.enableComponentScanner();
+      tsdi.override(ComponentWithDestructor, {});
+      tsdi.get(ComponentWithDestructor);
+      tsdi.close();
+
+      assert.isFalse(destructorCalled);
+    });
+
     it('should re-resolve dependency if injected as dynamic  one', () => {
       @component({scope: 're-resolve'})
       class Dependency {

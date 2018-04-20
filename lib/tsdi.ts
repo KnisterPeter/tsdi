@@ -155,7 +155,7 @@ export class TSDI {
 
       const destroy = Reflect.getMetadata('component:destroy',
         isFactoryMetadata(metadata) ? metadata.rtti : metadata.fn.prototype);
-      if (destroy) {
+      if (destroy && (instance as any)[destroy]) {
         (instance as any)[destroy].call(instance);
       }
       (this.instances[idx] as any) = undefined;
