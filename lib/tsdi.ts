@@ -325,6 +325,16 @@ export class TSDI {
     return instance;
   }
 
+  private addInitializerPromise(instance: any, value: Promise<void> | undefined): void {
+    if (value) {
+      Reflect.defineMetadata('tsdi:initialize:promise', value, instance);
+    }
+  }
+
+  private getInitializerPromise(instance: any): Promise<void> | undefined {
+    return Reflect.getMetadata('tsdi:initialize:promise', instance);
+  }
+
   private createComponent<T>(metadata: ComponentMetadata, idx: number): T {
     if (!this.hasEnteredScope(metadata)) {
       this.throwComponentNotFoundError(
@@ -346,9 +356,30 @@ export class TSDI {
       metadata.fn.prototype
     );
     if (init) {
-      (instance as any)[init].call(instance);
+      const awaiter = this.waitForInjectInitializers(metadata);
+      if (awaiter) {
+        awaiter.then(() => {
+          this.addInitializerPromise(instance, (instance as any)[init].call(instance));
+        });
+      } else {
+        this.addInitializerPromise(instance, (instance as any)[init].call(instance));
+      }
     }
     return instance;
+  }
+
+  private waitForInjectInitializers(metadata: ComponentMetadata): Promise<void[]> | undefined {
+    const injects: InjectMetadata[] = Reflect.getMetadata('component:injects', metadata.fn.prototype);
+    if (injects) {
+      const initializers = injects.map(inject => {
+        const [metadata, idx] = this.getInjectComponentMetadata(inject);
+        const injectedComponent = this.getOrCreate(metadata, idx);
+        return this.getInitializerPromise(injectedComponent);
+      });
+      if (initializers.some(initializer => Boolean(initializer))) {
+        return Promise.all(initializers);
+      }
+    }
   }
 
   private hasEnteredScope(metadata: ComponentMetadata): boolean {
@@ -413,7 +444,10 @@ export class TSDI {
     if (this.injectAutoMock(instance, inject)) {
       return;
     }
-    if (inject.options.lazy || inject.options.dynamic) {
+
+    const isAsyncInjection = this.isAsyncInitializerDependency(inject);
+
+    if (!isAsyncInjection && (inject.options.lazy || inject.options.dynamic)) {
       const tsdi = this;
       Object.defineProperty(instance, inject.property, {
         configurable: true,
@@ -452,6 +486,17 @@ export class TSDI {
         externalInstance
       );
     }
+  }
+
+  private isAsyncInitializerDependency(inject: InjectMetadata): boolean {
+    const [metadata] = this.getInjectComponentMetadata(inject);
+    const async = isFactoryMetadata(metadata)
+      ? false
+      : Reflect.getMetadata('component:init:async', metadata.fn.prototype) as boolean;
+    if (async && inject.options.dynamic) {
+      throw new Error(`Components with async initializer could not be injected dynamically`);
+    }
+    return async;
   }
 
   private injectAutoMock(instance: any, inject: InjectMetadata): boolean {
