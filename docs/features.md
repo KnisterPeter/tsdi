@@ -359,20 +359,20 @@ class Bar {
 
 ## Async Dependencies
 
-Components can have `@initialize` methods which are typed `async` or delcare `Promise` as return type.  
+Components can have `@initialize` methods which are typed `async` or declare `Promise` as return type.  
 **note**: It is not sufficient to just return a `Promise` since then the typescript compiler _may_
 not detect the async nature of the method.
 
 When injected into another component the depending component's `@initialize` method will be called
-after the dependencies initializer has resolved. This is for example usefull when injecting a
-something like a database connecti#on which needs asynchroneous setup code:
+after the dependencies initializer has resolved. This is for example useful when injecting a
+something like a database connection which needs asynchronous setup code:
 
 ```js
 import { component, inject } from 'tsdi';
 
 @component
 class DatabaseConnection {
-  public connection?:
+  public connection?;
 
   @initialize
   private async initialize() {
