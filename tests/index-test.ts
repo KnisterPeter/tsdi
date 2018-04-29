@@ -207,6 +207,54 @@ describe('TSDI', () => {
       assert.isTrue(called);
     });
 
+    it('should call the initializer of an async dependency with a factory', done => {
+      tsdi.enableComponentScanner();
+
+      class Instanced {
+        public value?: number;
+
+        constructor(value: number) {
+          this.value = value;
+        }
+      }
+
+      // @ts-ignore
+      @component
+      // @ts-ignore
+      class AsyncFactory {
+        private instance!: Instanced;
+
+        @initialize
+        protected async init(): Promise<void> {
+          return new Promise<void>(resolve => {
+            setTimeout(() => {
+              this.instance = new Instanced(10);
+              resolve();
+            }, 10);
+          });
+        }
+
+        @factory
+        public getInstance(): Instanced {
+          return this.instance;
+        }
+      }
+
+      @component
+      class Dependent {
+        @inject public instance!: Instanced;
+
+        @initialize
+        protected init(): void {
+          assert.equal(this.instance.value, 10);
+          done();
+        }
+      }
+
+      // todo: this must throw because Dependent is async
+      tsdi.get(Dependent);
+    });
+
     it('should call the initializer after multiple async dependencies are initialized', done => {
       tsdi.enableComponentScanner();
 
