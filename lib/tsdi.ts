@@ -359,7 +359,7 @@ export class TSDI {
       const awaiter = this.waitForInjectInitializers(metadata);
       if (awaiter) {
         awaiter.then(() => {
-          this.addInitializerPromise(instance, (instance as any)[init].call(instance));
+          this.addInitializerPromise(instance, (instance as any)[init].call(instance) || Promise.resolve());
         });
       } else {
         this.addInitializerPromise(instance, (instance as any)[init].call(instance));
@@ -380,6 +380,7 @@ export class TSDI {
         return Promise.all(initializers);
       }
     }
+    return undefined;
   }
 
   private hasEnteredScope(metadata: ComponentMetadata): boolean {
@@ -494,6 +495,7 @@ export class TSDI {
       ? false
       : Reflect.getMetadata('component:init:async', metadata.fn.prototype) as boolean;
     if (async && inject.options.dynamic) {
+      // todo: message + test
       throw new Error(`Components with async initializer could not be injected dynamically`);
     }
     return async;
