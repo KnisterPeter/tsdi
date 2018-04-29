@@ -220,7 +220,7 @@ describe('TSDI', () => {
             setTimeout(() => {
               this.value = 10;
               resolve();
-            }, 100);
+            }, 10);
           });
         }
       }
@@ -238,6 +238,40 @@ describe('TSDI', () => {
 
       // todo: this must throw because Dependent is async
       tsdi.get(Dependent);
+    });
+
+    it('should throw if async initializer dependency is injected dynamically', () => {
+      // this case test the case with async initializers
+      tsdi.enableComponentScanner();
+
+      @component
+      class Dependency {
+        public value?: number;
+        @initialize
+        protected async init(): Promise<void> {
+          return new Promise<void>(resolve => {
+            setTimeout(() => {
+              this.value = 10;
+              resolve();
+            }, 10);
+          });
+        }
+      }
+
+      @component
+      class Dependent {
+        @inject({dynamic: true}) private dependency!: Dependency;
+
+        @initialize
+        protected init(): void {
+          assert.fail('Must not be called');
+          // tslint:disable-next-line:no-unused-expression
+          this.dependency;
+        }
+      }
+
+      assert.throws(() => tsdi.get(Dependent),
+        'Injecting Dependency into Dependent#dependency must not be dynamic since Dependency has an async initializer');
     });
 
     it('should inject annotated constructor parameters', () => {

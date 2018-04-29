@@ -264,7 +264,6 @@ export class TSDI {
 
   private getOrCreate<T>(metadata: ComponentOrFactoryMetadata, idx: number): T {
     log('> getOrCreate %o', metadata);
-    // todo: Use T here
     let instance = this.instances[idx] as T;
     if (!instance || !this.isSingleton(metadata)) {
       if (isFactoryMetadata(metadata)) {
@@ -322,6 +321,7 @@ export class TSDI {
     if (injects) {
       const initializers = injects.map(inject => {
         const [metadata, idx] = this.getInjectComponentMetadata(inject);
+        // todo: check if injected component has async initializer
         const injectedComponent = this.getOrCreate(metadata, idx);
         return this.getInitializerPromise(injectedComponent);
       });
@@ -400,8 +400,8 @@ export class TSDI {
       ? false
       : Reflect.getMetadata('component:init:async', metadata.fn.prototype) as boolean;
     if (async && inject.options.dynamic) {
-      // todo: message + test
-      throw new Error(`Components with async initializer could not be injected dynamically`);
+      throw new Error(`Injecting ${inject.type.name} into ${inject.target.constructor.name}#${inject.property
+        } must not be dynamic since ${inject.type.name} has an async initializer`);
     }
     return async;
   }
