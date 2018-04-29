@@ -260,6 +260,44 @@ describe('TSDI', () => {
       tsdi.get(Dependent);
     });
 
+    it('should call the initializer after  async dependencies w/o initializers are initialized', done => {
+      tsdi.enableComponentScanner();
+
+      @component
+      class DeepNestedAsyncDependency {
+        public value?: number;
+
+        @initialize
+        protected async init(): Promise<void> {
+          return new Promise<void>(resolve => {
+            setTimeout(() => {
+              this.value = 10;
+              resolve();
+            }, 10);
+          });
+        }
+      }
+
+      @component
+      class SyncDependency {
+        @inject public dependency!: DeepNestedAsyncDependency;
+      }
+
+      @component
+      class Dependent {
+        @inject public dependency!: SyncDependency;
+
+        @initialize
+        protected init(): void {
+          assert.equal(this.dependency.dependency.value, 10);
+          done();
+        }
+      }
+
+      // todo: this must throw because Dependent is async
+      tsdi.get(Dependent);
+    });
+
     it('should call the initalizer if all injections are itself initialized', done => {
       // this case test the case with async initializers
 
