@@ -319,14 +319,14 @@ export class TSDI {
   private waitForInjectInitializers(metadata: ComponentMetadata): Promise<void[]> | undefined {
     const injects: InjectMetadata[] = Reflect.getMetadata('component:injects', metadata.fn.prototype);
     if (injects) {
-      const initializers = injects.map(inject => {
-        const [metadata, idx] = this.getInjectComponentMetadata(inject);
-        // todo: check if injected component has async initializer
-        const injectedComponent = this.getOrCreate(metadata, idx);
-        return this.getInitializerPromise(injectedComponent);
-      });
-      if (initializers.some(initializer => Boolean(initializer))) {
-        return Promise.all(initializers);
+      const hasAsyncInitializers = injects.some(inject =>
+          Reflect.getMetadata('component:init:async', inject.type.prototype) as boolean);
+      if (hasAsyncInitializers) {
+        return Promise.all(injects.map(inject => {
+          const [metadata, idx] = this.getInjectComponentMetadata(inject);
+          const injectedComponent = this.getOrCreate(metadata, idx);
+          return this.getInitializerPromise(injectedComponent);
+        }));
       }
     }
     return undefined;
@@ -390,6 +390,9 @@ export class TSDI {
         }
       });
     } else {
+      if (isAsyncInjection) {
+        Reflect.defineMetadata('component:init:async', true, instance.constructor.prototype);
+      }
       instance[inject.property] = this.getComponentDependency(inject, componentMetadata, externalInstance);
     }
   }
