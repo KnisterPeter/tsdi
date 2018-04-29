@@ -10,7 +10,7 @@ Easy dependency injection for TypeScript.
 
 # Features
 
-- Type based dependency injetion
+- Type based dependency injection
 - Type auto registration
 - Lifecycle methods
 - Constructor parameters injection
