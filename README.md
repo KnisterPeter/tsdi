@@ -30,6 +30,7 @@ Dependency Injection container (IoC) for TypeScript.
 * [Scopes](#scopes)
 * [Dynamic Injections](#dynamic-injections)
 * [StrictPropertyInitialization](#strictpropertyinitialization)
+* [Async Dependencies](#async-dependencies)
 
 # Usage
 
@@ -521,6 +522,41 @@ class Bar {
 Each decorator can be written in uppercase: `@Component()` as well as lowercase: `@component()` in order
 to stay more consistent with the rest of the Typescript ecosystem. Empty parens can be omitted, so
 `@component()` can be written as `@component`.
+
+### Async Dependencies
+
+Components can have `@initialize` methods which return a `Promise` (and hence are async).
+When injected into another component the depending component's `@initialize` method will be called
+after the dependencies initializer has resolved. This is for example usefull when injecting a
+something like a Database connection which needs asynchroneous setup code:
+
+```js
+import { component, inject } from 'tsdi';
+
+@component
+class DatabaseConnection {
+  public connection?:
+
+  @initialize
+  private async initialize() {
+    this.connection = await connectToDatabase();
+  }
+}
+
+@component
+class RestApi {
+  @inject private db!: DatabaseConnection;
+
+  @initialize
+  private initialize() {
+    // This initializer will be called after the database was injected.
+    console.log(this.db.connection.query('SELECT * FROM user'));
+  }
+}
+```
+
+This does not work with dynamic injections and will throw an error. Please note that async injections can not
+be lazy and will not be lazy by default.
 
 ## Future ideas / Roadmap
 
