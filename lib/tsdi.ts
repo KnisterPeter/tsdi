@@ -318,19 +318,21 @@ export class TSDI {
     this.instances[idx] = instance;
     this.injectIntoInstance(instance, false, metadata);
     const init: string = Reflect.getMetadata('component:init', metadata.fn.prototype);
+    const awaiter = this.waitForInjectInitializers(metadata);
     if (init) {
-      const awaiter = this.waitForInjectInitializers(metadata);
       if (awaiter) {
         this.addInitializerPromise(instance, awaiter.then(() =>
           (instance as any)[init].call(instance) || Promise.resolve()));
       } else {
         this.addInitializerPromise(instance, (instance as any)[init].call(instance));
       }
+    } else if (awaiter) {
+      this.addInitializerPromise(instance, awaiter);
     }
     return instance;
   }
 
-  private waitForInjectInitializers(metadata: ComponentMetadata): Promise<void[]> | undefined {
+  private waitForInjectInitializers(metadata: ComponentMetadata): Promise<any> | undefined {
     const injects: InjectMetadata[] = Reflect.getMetadata('component:injects', metadata.fn.prototype);
     if (injects) {
       const hasAsyncInitializers = injects.some(inject =>
