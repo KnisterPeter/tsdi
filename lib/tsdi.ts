@@ -390,8 +390,8 @@ export class TSDI {
       'component:init',
       metadata.fn.prototype
     );
+    const awaiter = this.waitForInjectInitializers(metadata);
     if (init) {
-      const awaiter = this.waitForInjectInitializers(metadata);
       if (awaiter) {
         this.addInitializerPromise(
           instance,
@@ -405,13 +405,15 @@ export class TSDI {
           (instance as any)[init].call(instance)
         );
       }
+    } else if (awaiter) {
+      this.addInitializerPromise(instance, awaiter);
     }
     return instance;
   }
 
   private waitForInjectInitializers(
     metadata: ComponentMetadata
-  ): Promise<void[]> | undefined {
+  ): Promise<any> | undefined {
     const injects: InjectMetadata[] = Reflect.getMetadata(
       'component:injects',
       metadata.fn.prototype
