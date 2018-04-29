@@ -215,6 +215,39 @@ describe('TSDI', () => {
       assert.isTrue(called);
     });
 
+    it('should call the initalizer if all injections are itself initialized', done => {
+      // this case test the case with async initializers
+      tsdi.enableComponentScanner();
+
+      @component
+      class Dependency {
+        public value?: number;
+        @initialize
+        protected async init(): Promise<void> {
+          return new Promise<void>(resolve => {
+            setTimeout(() => {
+              this.value = 10;
+              resolve();
+            }, 100);
+          });
+        }
+      }
+
+      @component
+      class Dependent {
+        @inject private dependency!: Dependency;
+
+        @initialize
+        protected init(): void {
+          assert.equal(this.dependency.value, 10);
+          done();
+        }
+      }
+
+      // todo: this must throw because Dependent is async
+      tsdi.get(Dependent);
+    });
+
     it('should inject annotated constructor parameters', () => {
       tsdi.enableComponentScanner();
 
