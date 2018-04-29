@@ -188,6 +188,8 @@ export class TSDI {
         console.warn(`Component with name '${componentMetadata.options.name}' already registered.`);
       }
 
+      this.markAsyncInitializer(componentMetadata);
+
       log('registerComponent %o', isFactoryMetadata(componentMetadata) ?
         (componentMetadata.rtti as any).name : (componentMetadata.fn as any).name);
       this.components.push(componentMetadata);
@@ -196,6 +198,19 @@ export class TSDI {
         setTimeout(() => {
           this.getOrCreate(componentMetadata, idx);
         }, 0);
+      }
+    }
+  }
+
+  private markAsyncInitializer(componentMetadata: ComponentOrFactoryMetadata): void {
+    if (!isFactoryMetadata(componentMetadata)) {
+      const isAsync = Reflect.getMetadata('component:init:async', componentMetadata.fn.prototype) as boolean;
+      const injects: InjectMetadata[] =
+        Reflect.getMetadata('component:injects', componentMetadata.fn.prototype) || [];
+      const hasAsyncInitializers = injects.some(inject =>
+        inject.type && Reflect.getMetadata('component:init:async', inject.type.prototype) as boolean);
+      if (!isAsync && hasAsyncInitializers) {
+        Reflect.defineMetadata('component:init:async', true, componentMetadata.fn.prototype);
       }
     }
   }
@@ -306,9 +321,8 @@ export class TSDI {
     if (init) {
       const awaiter = this.waitForInjectInitializers(metadata);
       if (awaiter) {
-        awaiter.then(() => {
-          this.addInitializerPromise(instance, (instance as any)[init].call(instance) || Promise.resolve());
-        });
+        this.addInitializerPromise(instance, awaiter.then(() =>
+          (instance as any)[init].call(instance) || Promise.resolve()));
       } else {
         this.addInitializerPromise(instance, (instance as any)[init].call(instance));
       }
@@ -390,9 +404,6 @@ export class TSDI {
         }
       });
     } else {
-      if (isAsyncInjection) {
-        Reflect.defineMetadata('component:init:async', true, instance.constructor.prototype);
-      }
       instance[inject.property] = this.getComponentDependency(inject, componentMetadata, externalInstance);
     }
   }
