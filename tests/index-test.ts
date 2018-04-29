@@ -262,7 +262,8 @@ describe('TSDI', () => {
 
     it('should call the initalizer if all injections are itself initialized', done => {
       // this case test the case with async initializers
-      tsdi.enableComponentScanner();
+
+      let testValue: number | undefined;
 
       @component
       class Dependency {
@@ -277,20 +278,23 @@ describe('TSDI', () => {
           });
         }
       }
+      tsdi.register(Dependency);
 
-      @component
+      @component({eager: true})
       class Dependent {
         @inject private dependency!: Dependency;
 
         @initialize
         protected init(): void {
-          assert.equal(this.dependency.value, 10);
-          done();
+          testValue = this.dependency.value;
         }
       }
+      tsdi.register(Dependent);
 
-      // todo: this must throw because Dependent is async
-      tsdi.get(Dependent);
+      setTimeout(() => {
+        assert.equal(testValue, 10);
+        done();
+      }, 15);
     });
 
     it('should throw if async initializer dependency is injected dynamically', () => {
