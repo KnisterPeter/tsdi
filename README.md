@@ -517,18 +517,15 @@ class Bar {
 }
 ```
 
-### Alternative Syntax
-
-Each decorator can be written in uppercase: `@Component()` as well as lowercase: `@component()` in order
-to stay more consistent with the rest of the Typescript ecosystem. Empty parens can be omitted, so
-`@component()` can be written as `@component`.
-
 ### Async Dependencies
 
-Components can have `@initialize` methods which return a `Promise` (and hence are async).
+Components can have `@initialize` methods which are typed `async` or delcare `Promise` as return type.  
+**note**: It is not sufficient to just return a `Promise` since then the typescript compiler _may_
+not detect the async nature of the method.
+
 When injected into another component the depending component's `@initialize` method will be called
 after the dependencies initializer has resolved. This is for example usefull when injecting a
-something like a Database connection which needs asynchroneous setup code:
+something like a database connecti#on which needs asynchroneous setup code:
 
 ```js
 import { component, inject } from 'tsdi';
@@ -555,8 +552,14 @@ class RestApi {
 }
 ```
 
-This does not work with dynamic injections and will throw an error. Please note that async injections can not
+**note:** This does not work with dynamic injections and will throw an error. Please note that async injections can not
 be lazy and will not be lazy by default.
+
+### Alternative Syntax
+
+Each decorator can be written in uppercase: `@Component()` as well as lowercase: `@component()` in order
+to stay more consistent with the rest of the Typescript ecosystem. Empty parens can be omitted, so
+`@component()` can be written as `@component`.
 
 ## Future ideas / Roadmap
 
