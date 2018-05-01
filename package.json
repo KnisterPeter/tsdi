@@ -40,9 +40,9 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@commitlint/cli": "6.1.3",
+    "@commitlint/cli": "6.2.0",
     "@commitlint/config-conventional": "6.1.3",
-    "@commitlint/travis-cli": "6.1.3",
+    "@commitlint/travis-cli": "6.2.0",
     "@knisterpeter/standard-tslint": "1.6.0",
     "@types/chai": "4.1.3",
     "@types/debug": "0.0.30",
