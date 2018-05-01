@@ -551,9 +551,8 @@ describe('TSDI', () => {
     });
 
     describe('with asynchronous initializers', () => {
-
       it('should call the initializer after multiple async dependencies are initialized', done => {
-        tsdi.enableComponentScanner();
+        let testValue: number | undefined;
 
         @component
         class DeepNestedAsyncDependency {
@@ -569,6 +568,7 @@ describe('TSDI', () => {
             });
           }
         }
+        tsdi.register(DeepNestedAsyncDependency);
 
         @component
         class SyncDependency {
@@ -581,24 +581,27 @@ describe('TSDI', () => {
             this.value = 10;
           }
         }
+        tsdi.register(SyncDependency);
 
-        @component
+        @component({eager: true})
         class Dependent {
           @inject public dependency!: SyncDependency;
 
           @initialize
           protected init(): void {
-            assert.equal(this.dependency.value, 10);
-            done();
+            testValue = 10;
           }
         }
+        tsdi.register(Dependent);
 
-        // todo: this must throw because Dependent is async
-        tsdi.get(Dependent);
+        setTimeout(() => {
+          assert.equal(testValue, 10);
+          done();
+        }, 20);
       });
 
       it('should call the initializer after  async dependencies w/o initializers are initialized', done => {
-        tsdi.enableComponentScanner();
+        let testValue: number | undefined;
 
         @component
         class DeepNestedAsyncDependency {
@@ -614,30 +617,32 @@ describe('TSDI', () => {
             });
           }
         }
+        tsdi.register(DeepNestedAsyncDependency);
 
         @component
         class SyncDependency {
           @inject public dependency!: DeepNestedAsyncDependency;
         }
+        tsdi.register(SyncDependency);
 
-        @component
+        @component({eager: true})
         class Dependent {
           @inject public dependency!: SyncDependency;
 
           @initialize
           protected init(): void {
-            assert.equal(this.dependency.dependency.value, 10);
-            done();
+            testValue = 10;
           }
         }
+        tsdi.register(Dependent);
 
-        // todo: this must throw because Dependent is async
-        tsdi.get(Dependent);
+        setTimeout(() => {
+          assert.equal(testValue, 10);
+          done();
+        }, 20);
       });
 
       it('should call the initalizer if all injections are itself initialized', done => {
-        // this case test the case with async initializers
-
         let testValue: number | undefined;
 
         @component
@@ -673,7 +678,6 @@ describe('TSDI', () => {
       });
 
       it('should throw if async initializer dependency is injected dynamically', () => {
-        // this case test the case with async initializers
         tsdi.enableComponentScanner();
 
         @component
@@ -705,6 +709,32 @@ describe('TSDI', () => {
         assert.throws(() => tsdi.get(Dependent),
           'Injecting Dependency into Dependent#dependency must not '
             + 'be dynamic since Dependency has an async initializer');
+      });
+
+      it('should log warning if get used with async component', done => {
+        tsdi.enableComponentScanner();
+
+        @component
+        class Component {
+          @initialize
+          protected async init(): Promise<void> {
+            //
+          }
+        }
+
+        const consoleWarn = console.warn;
+        try {
+          console.warn = function(msg: string): void {
+            // tslint:disable-next-line:prefer-template
+            assert.equal(msg, "Component 'Component' is marked as asynchronous. "
+              + 'It may not be proper initialized when accessed via get()');
+            done();
+          };
+
+          tsdi.get(Component);
+        } finally {
+          console.warn = consoleWarn;
+        }
       });
     });
 

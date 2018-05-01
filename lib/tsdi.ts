@@ -534,7 +534,15 @@ export class TSDI {
     if (!metadata) {
       this.throwComponentNotFoundError(component, hint);
     }
-    return this.getOrCreate<T>(metadata, idx);
+    const instance = this.getOrCreate<T>(metadata, idx);
+    if (!isFactoryMetadata(metadata)) {
+      const isAsync = Reflect.getMetadata('component:init:async', metadata.fn.prototype) as boolean;
+      if (isAsync) {
+        console.warn(`Component '${metadata.fn.name}' is marked as asynchronous. `
+          + `It may not be proper initialized when accessed via get()`);
+      }
+    }
+    return instance;
   }
 
   public override(component: Constructable<any>, override: any): void {
