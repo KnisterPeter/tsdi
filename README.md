@@ -32,9 +32,7 @@ Dependency Injection container (IoC) for TypeScript.
 * [StrictPropertyInitialization](#strictpropertyinitialization)
 * [Async Dependencies](#async-dependencies)
 
-# Usage
-
-## Installation
+# Installation
 Install as npm package:
 
 ```sh
@@ -49,7 +47,9 @@ You need to enable decorator metadata in your `tsconfig.json`, which is done by 
 
 Otherwise TSDI will not be able to infer the types of some factories and components.
 
-## API
+# Usage
+
+## General
 
 TSDI will keep and inject dependencies for you which would otherwise need to be handed down manually
 or kept as singleton.
