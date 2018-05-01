@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.0.0-alpha.0"></a>
+# [1.0.0-alpha.0](https://github.com/KnisterPeter/tsdi/compare/v0.20.2...v1.0.0-alpha.0) (2018-05-01)
+
+
+### Bug Fixes
+
+* add missing return ([a79a230](https://github.com/KnisterPeter/tsdi/commit/a79a230))
+* handle deeper async structures ([2bbf85a](https://github.com/KnisterPeter/tsdi/commit/2bbf85a))
+* mark components as async during registration phase ([483a5fa](https://github.com/KnisterPeter/tsdi/commit/483a5fa))
+
+
+### Documentation
+
+* update async paragraph ([d649f23](https://github.com/KnisterPeter/tsdi/commit/d649f23))
+
+
+### Features
+
+* add warning for synchronous get with async component ([ef6a916](https://github.com/KnisterPeter/tsdi/commit/ef6a916))
+* implement async component initializers ([89a8d81](https://github.com/KnisterPeter/tsdi/commit/89a8d81)), closes [#208](https://github.com/KnisterPeter/tsdi/issues/208)
+* Test for async initializers w/o intializers ([bd8304f](https://github.com/KnisterPeter/tsdi/commit/bd8304f))
+* throw if dynamic inject async component ([e2438d7](https://github.com/KnisterPeter/tsdi/commit/e2438d7))
+* wait for indirect async dependencies to settle ([4d89b43](https://github.com/KnisterPeter/tsdi/commit/4d89b43))
+
+
+### BREAKING CHANGES
+
+* async dependencies
+
+
+
 <a name="0.20.2"></a>
 ## [0.20.2](https://github.com/KnisterPeter/tsdi/compare/v0.20.1...v0.20.2) (2018-04-20)
 
