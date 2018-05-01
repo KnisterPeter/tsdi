@@ -19,6 +19,8 @@ cache:
   directories:
   - node_modules
 
-before_script: 'yarn linter'
+before_script:
+  - 'commitlint-travis'
+  - 'yarn linter'
 script: 'yarn test'
 after_script: 'yarn coverage'
