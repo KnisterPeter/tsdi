@@ -9,9 +9,17 @@ import {
 import * as debug from 'debug';
 const log = debug('tsdi');
 
-export function Inject(target: Object, propertyKey: string | symbol, parameterIndex?: number): void;
-export function Inject(optionsOrString?: IInjectOptions | string): PropertyDecorator & ParameterDecorator;
-export function Inject(...args: any[]): PropertyDecorator & ParameterDecorator | void {
+export function Inject(
+  target: Object,
+  propertyKey: string | symbol,
+  parameterIndex?: number
+): void;
+export function Inject(
+  optionsOrString?: IInjectOptions | string
+): PropertyDecorator & ParameterDecorator;
+export function Inject(
+  ...args: any[]
+): PropertyDecorator & ParameterDecorator | void {
   const defaultOptions = (optionsOrString?: IInjectOptions | string) => {
     const options = getNamedOptions<IInjectOptions>(optionsOrString || {});
     if (options.lazy === undefined) {
@@ -19,11 +27,21 @@ export function Inject(...args: any[]): PropertyDecorator & ParameterDecorator |
     }
     return options;
   };
-  const decorateProperty = (target: Object, propertyKey: string | symbol,
-      options: IInjectOptions) => {
+  const decorateProperty = (
+    target: Object,
+    propertyKey: string | symbol,
+    options: IInjectOptions
+  ) => {
     log(`@Inject ${(target.constructor as any).name}#${propertyKey}`);
-    const type: Constructable<any> = Reflect.getMetadata('design:type', target, propertyKey);
-    let injects: InjectMetadata[] = Reflect.getMetadata('component:injects', target);
+    const type: Constructable<any> = Reflect.getMetadata(
+      'design:type',
+      target,
+      propertyKey
+    );
+    let injects: InjectMetadata[] = Reflect.getMetadata(
+      'component:injects',
+      target
+    );
     if (!injects) {
       injects = [];
       Reflect.defineMetadata('component:injects', injects, target);
@@ -35,10 +53,17 @@ export function Inject(...args: any[]): PropertyDecorator & ParameterDecorator |
       type
     });
   };
-  const decorateParameter = (target: Object, propertyKey: string | symbol, parameterIndex: number,
-      options: IInjectOptions) => {
+  const decorateParameter = (
+    target: Object,
+    propertyKey: string | symbol,
+    parameterIndex: number,
+    options: IInjectOptions
+  ) => {
     log(`@Inject ${propertyKey}`);
-    let parameters: ParameterMetadata[] = Reflect.getMetadata('component:parameters', target);
+    let parameters: ParameterMetadata[] = Reflect.getMetadata(
+      'component:parameters',
+      target
+    );
     if (!parameters) {
       parameters = [];
       Reflect.defineMetadata('component:parameters', parameters, target);
@@ -59,7 +84,11 @@ export function Inject(...args: any[]): PropertyDecorator & ParameterDecorator |
     }
     return;
   }
-  return function(target: Object, propertyKey: string | symbol, parameterIndex?: number): void {
+  return function(
+    target: Object,
+    propertyKey: string | symbol,
+    parameterIndex?: number
+  ): void {
     const options = defaultOptions(args[0] || {});
     if (typeof parameterIndex === 'undefined') {
       return decorateProperty(target, propertyKey, options);

@@ -1,5 +1,4 @@
 import { component } from '../lib/';
 
-@component({eager: true})
-export class EagerComponent2 {
-}
+@component({ eager: true })
+export class EagerComponent2 {}
