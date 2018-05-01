@@ -15,7 +15,6 @@ describe('TSDI', () => {
   });
 
   describe('when in mock mode', () => {
-
     beforeEach(() => {
       tsdi.enableComponentScanner();
     });
@@ -32,8 +31,7 @@ describe('TSDI', () => {
 
       @component
       class Bar {
-        @inject
-        public foo!: Foo;
+        @inject public foo!: Foo;
 
         @initialize
         protected init(): void {
@@ -59,8 +57,7 @@ describe('TSDI', () => {
 
       @component
       class Bar {
-        @inject
-        public foo!: Foo;
+        @inject public foo!: Foo;
 
         @initialize
         protected init(): void {
@@ -86,8 +83,7 @@ describe('TSDI', () => {
 
       @component
       class Bar {
-        @inject
-        public foo!: Foo;
+        @inject public foo!: Foo;
 
         @initialize
         protected init(): void {
@@ -96,7 +92,7 @@ describe('TSDI', () => {
       }
 
       tsdi.enableAutomock();
-      tsdi.mock(Foo).foo = () => created = true;
+      tsdi.mock(Foo).foo = () => (created = true);
       tsdi.get(Bar);
 
       assert.isTrue(created);

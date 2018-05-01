@@ -8,7 +8,8 @@ export function Initialize(...args: any[]): MethodDecorator | void {
     log('@Initialize %s#%s', (target.constructor as any).name, propertyKey);
     Reflect.defineMetadata('component:init', propertyKey, target);
 
-    const isAsync = Reflect.getMetadata('design:returntype', target, propertyKey) === Promise;
+    const isAsync =
+      Reflect.getMetadata('design:returntype', target, propertyKey) === Promise;
     Reflect.defineMetadata('component:init:async', isAsync, target);
   };
   if (args.length > 0) {
