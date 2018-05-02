@@ -1,7 +1,7 @@
 # tsdi
 
 [![npm](https://img.shields.io/npm/v/tsdi.svg)](https://www.npmjs.com/package/tsdi)
-[![GitHub license](https://img.shields.io/github/license/KnisterPeter/tsdi.svg)]()
+[![GitHub license](https://img.shields.io/github/license/KnisterPeter/tsdi.svg)](https://github.com/KnisterPeter/tsdi)
 [![Travis](https://img.shields.io/travis/KnisterPeter/tsdi.svg)](https://travis-ci.org/KnisterPeter/tsdi)
 [![Coveralls branch](https://img.shields.io/coveralls/KnisterPeter/tsdi/master.svg)](https://coveralls.io/github/KnisterPeter/tsdi)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
@@ -532,7 +532,7 @@ import { component, inject } from 'tsdi';
 
 @component
 class DatabaseConnection {
-  public connection?:
+  public connection!: DatabaseImplConnection;
 
   @initialize
   private async initialize() {
