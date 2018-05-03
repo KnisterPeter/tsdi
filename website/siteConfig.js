@@ -15,6 +15,8 @@ const siteConfig = {
   url: 'https://tsdi.js.org',
   baseUrl: '/',
   repoUrl,
+  cname: 'tsdi.js.org',
+  noIndex: false,
 
   projectName: 'tsdi',
   organizationName: 'KnisterPeter',
@@ -39,10 +41,7 @@ const siteConfig = {
     secondaryColor: '#7883b4',
   },
 
-  copyright:
-    'Copyright © ' +
-    new Date().getFullYear() +
-    ' Markus Wolf',
+  copyright: `Copyright © ${new Date().getFullYear()} Markus Wolf`,
 
   highlight: {
     theme: 'default',
