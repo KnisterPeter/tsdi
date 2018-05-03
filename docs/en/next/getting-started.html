@@ -1,0 +1,108 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Getting Started · TSDI</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta property="og:title" content="Getting Started · TSDI"/><meta property="og:type" content="website"/><meta property="og:url" content="https://tsdi.js.org/index.html"/><meta property="og:description" content="Getting started with TSDI as dependency injection container in your project."/><meta property="og:image" content="https://tsdi.js.org/img/puzzle.png"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://tsdi.js.org/img/puzzle.png"/><link rel="shortcut icon" href="/img/puzzle.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><link rel="stylesheet" href="/css/main.css"/></head><body class="sideNavVisible doc separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/en"><img class="logo" src="/img/puzzle.png" alt="TSDI"/><h2 class="headerTitle">TSDI</h2></a><a href="/en/versions.html"><h3>next</h3></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive siteNavItemActive"><a href="/docs/en/next/getting-started.html" target="_self">Docs</a></li><li class=""><a href="/docs/en/next/api-tsdi.html" target="_self">API</a></li><li class=""><a href="https://github.com/KnisterPeter/tsdi" target="_self">GitHub</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="container docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><i></i></div><h2><i>›</i><span>TSDI</span></h2></div><div class="navGroups"><div class="navGroup navGroupActive"><h3>TSDI</h3><ul><li class="navListItem navListItemActive"><a class="navItem navItemActive" href="/docs/en/next/getting-started.html">Getting Started</a></li><li class="navListItem"><a class="navItem" href="/docs/en/next/features.html">Features</a></li><li class="navListItem"><a class="navItem" href="/docs/en/next/alternative-syntax.html">Alternative Syntax</a></li></ul></div></div></section></div><script>
+          var toggler = document.getElementById('navToggler');
+          var nav = document.getElementById('docsNav');
+          toggler.onclick = function() {
+            nav.classList.toggle('docsSliderActive');
+          };
+        </script></nav></div><div class="container mainContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1>Getting Started</h1></header><article><div><span><p>Getting started with TSDI as dependency injection container in your project.</p>
+<h2><a class="anchor" aria-hidden="true" id="installation"></a><a href="#installation" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Installation</h2>
+<p>Install as npm package:</p>
+<pre><code class="hljs css sh">$ yarn add tsdi
+</code></pre>
+<p>or</p>
+<pre><code class="hljs css sh">$ npm install tsdi --save
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="compiler-configuration"></a><a href="#compiler-configuration" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Compiler configuration</h2>
+<p>You need to enable decorator metadata in your <code>tsconfig.json</code>, which is done by adding the following line:</p>
+<pre><code class="hljs">{
+  <span class="hljs-string">"compilerOptions"</span>: {
+    ...
+    <span class="hljs-string">"emitDecoratorMetadata"</span>: <span class="hljs-literal">true</span>
+  }
+}
+</code></pre>
+<p>TSDI uses the metadata to build a dependency tree of your components.</p>
+<h2><a class="anchor" aria-hidden="true" id="create-the-container"></a><a href="#create-the-container" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Create the container</h2>
+<p>TSDI will keep and inject dependencies which would otherwise need to be handed down manually or kept as singleton.</p>
+<p>You need to create an instance of the TSDI container and register your
+components to it.</p>
+<pre><code class="hljs css js"><span class="hljs-keyword">import</span> { TSDI } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
+
+<span class="hljs-keyword">const</span> tsdi = <span class="hljs-keyword">new</span> TSDI();
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="decorate-your-components"></a><a href="#decorate-your-components" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Decorate your components</h2>
+<p>Classes of which instances should be kept and injectable have to be marked with the <code>@component</code> decorator.</p>
+<p>Each class marked with <code>@component</code> will be tracked by TSDI as well as instanced together with the container instance.</p>
+<pre><code class="hljs css js"><span class="hljs-comment">// ...</span>
+
+@component
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Database</span> </span>{
+  public query(statement: string): <span class="hljs-built_in">Promise</span> {
+    <span class="hljs-comment">// ...</span>
+  }
+}
+</code></pre>
+<p>In order to connect dependencies add a <code>@inject</code> decorated property with the required type to a component.</p>
+<pre><code class="hljs css js"><span class="hljs-comment">// ...</span>
+
+@component
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">User</span> </span>{
+  @inject private db!: Database;
+
+  public load(id: number): <span class="hljs-built_in">Promise</span> {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.db.query(<span class="hljs-string">'select * from ...'</span>);
+  }
+}
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="register-all-components"></a><a href="#register-all-components" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Register all components</h2>
+<p>Your components need to be registered in the TSDI instance
+so a dependency graph could be created from all parts of
+your system.</p>
+<pre><code class="hljs css js"><span class="hljs-comment">// ...</span>
+
+tsdi.register(Database);
+tsdi.register(User);
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="start-using-your-components"></a><a href="#start-using-your-components" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Start using your components</h2>
+<p>To access components use <code>TSDI#get(Component)</code>.
+TSDI will create the requested component for you and
+return it - configured with all required dependencies -
+to you.</p>
+<pre><code class="hljs css js"><span class="hljs-comment">// ...</span>
+
+<span class="hljs-keyword">const</span> user = tsdi.get(User);
+user.load(<span class="hljs-number">1</span>).then(<span class="hljs-function"><span class="hljs-params">data</span> =&gt;</span> {
+  <span class="hljs-comment">// ...</span>
+});
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="all-together"></a><a href="#all-together" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>All together</h2>
+<p>All parts together as one example.</p>
+<pre><code class="hljs css js"><span class="hljs-keyword">import</span> { TSDI } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
+
+<span class="hljs-keyword">const</span> tsdi = <span class="hljs-keyword">new</span> TSDI();
+
+@component
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Database</span> </span>{
+  public query(statement: string): <span class="hljs-built_in">Promise</span> {
+    <span class="hljs-comment">// ...</span>
+  }
+}
+
+@component
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">User</span> </span>{
+  @inject private db!: Database;
+
+  public load(id: number): <span class="hljs-built_in">Promise</span> {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.db.query(<span class="hljs-string">'select * from ...'</span>);
+  }
+}
+
+tsdi.register(Database);
+tsdi.register(User);
+
+<span class="hljs-keyword">const</span> user = tsdi.get(User);
+user.load(<span class="hljs-number">1</span>).then(<span class="hljs-function"><span class="hljs-params">data</span> =&gt;</span> {
+  <span class="hljs-comment">// ...</span>
+});
+</code></pre>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-next button" href="features.html">Features →</a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#installation">Installation</a></li><li><a href="#compiler-configuration">Compiler configuration</a></li><li><a href="#create-the-container">Create the container</a></li><li><a href="#decorate-your-components">Decorate your components</a></li><li><a href="#register-all-components">Register all components</a></li><li><a href="#start-using-your-components">Start using your components</a></li><li><a href="#all-together">All together</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/puzzle.png" alt="TSDI" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/getting-started.html">Getting Started</a><a href="/docs/en/api-tsdi.html">API Reference</a></div><div><h5>Community</h5><a href="/en/users.html">User Showcase</a><a href="http://stackoverflow.com/questions/tagged/" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://discordapp.com/">Project Chat</a><a href="https://twitter.com/" target="_blank" rel="noreferrer noopener">Twitter</a></div><div><h5>More</h5><a href="/blog">Blog</a><a href="https://github.com/KnisterPeter/tsdi">GitHub</a><a class="github-button" href="https://github.com/KnisterPeter/tsdi" data-icon="octicon-star" data-show-count="true" aria-label="Star knisterpeter/tsdi on GitHub">Star</a></div></section><section class="copyright">Copyright © 2018 Markus Wolf</section></footer></div></body></html>
