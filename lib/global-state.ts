@@ -2,12 +2,12 @@ import { findIndexOf, removeElement } from './helper';
 import { ComponentOrFactoryMetadata } from './tsdi';
 
 export type ComponentListener = (
-  metadataOrExternal: ComponentOrFactoryMetadata | Function
+  metadataOrExternal: ComponentOrFactoryMetadata | ((...args: any[]) => any)
 ) => void;
 
 let listeners: ComponentListener[] = [];
 const knownComponents: ComponentOrFactoryMetadata[] = [];
-const knownExternals: Function[] = [];
+const knownExternals: object[] = [];
 
 export function addKnownComponent(metadata: ComponentOrFactoryMetadata): void {
   if (
@@ -25,17 +25,17 @@ export function addKnownComponent(metadata: ComponentOrFactoryMetadata): void {
   listeners.forEach(listener => listener(metadata));
 }
 
-export function addKnownExternal(external: Function): void {
+export function addKnownExternal(external: object): void {
   if (findIndexOf(knownExternals, fn => fn === external) === -1) {
     knownExternals.push(external);
-    listeners.forEach(listener => listener(external));
+    listeners.forEach(listener => listener(external as any));
   }
 }
 
 export function addListener(listener: ComponentListener): void {
   listeners.push(listener);
   knownComponents.forEach(metadata => listener(metadata));
-  knownExternals.forEach(external => listener(external));
+  knownExternals.forEach(external => listener(external as any));
 }
 
 export function removeListener(listener: ComponentListener): void {

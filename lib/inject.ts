@@ -10,7 +10,7 @@ import * as debug from 'debug';
 const log = debug('tsdi');
 
 export function Inject(
-  target: Object,
+  target: object,
   propertyKey: string | symbol,
   parameterIndex?: number
 ): void;
@@ -28,7 +28,7 @@ export function Inject(
     return options;
   };
   const decorateProperty = (
-    target: Object,
+    target: object,
     propertyKey: string | symbol,
     options: IInjectOptions
   ) => {
@@ -54,7 +54,7 @@ export function Inject(
     });
   };
   const decorateParameter = (
-    target: Object,
+    target: object,
     propertyKey: string | symbol,
     parameterIndex: number,
     options: IInjectOptions
@@ -85,7 +85,7 @@ export function Inject(
     return;
   }
   return function(
-    target: Object,
+    target: object,
     propertyKey: string | symbol,
     parameterIndex?: number
   ): void {
