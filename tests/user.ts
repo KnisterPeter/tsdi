@@ -3,7 +3,7 @@ import { Dependency } from './dependency';
 
 @Component()
 export class User {
-  @Inject() private dependency!: Dependency;
+  @Inject() private readonly dependency!: Dependency;
 
   private initMessage!: string;
 

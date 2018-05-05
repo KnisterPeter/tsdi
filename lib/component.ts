@@ -5,13 +5,13 @@ import { IComponentOptions } from './tsdi';
 import * as debug from 'debug';
 const log = debug('tsdi');
 
-export function Component<TFunction extends Function>(
-  target: TFunction
-): TFunction;
 export function Component(
   optionsOrString?: IComponentOptions | string
 ): ClassDecorator;
-export function Component<TFunction extends Function>(
+export function Component<TFunction extends object>(
+  target: TFunction
+): TFunction;
+export function Component<TFunction extends object>(
   ...args: any[]
 ): ClassDecorator | TFunction {
   const decorate = (

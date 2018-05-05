@@ -3,10 +3,12 @@ import { addKnownExternal } from './global-state';
 import * as debug from 'debug';
 const log = debug('tsdi');
 
+// tslint:disable-next-line:ban-types
 export function External<TFunction extends Function>(
   target: TFunction
 ): TFunction;
 export function External(): ClassDecorator;
+// tslint:disable-next-line:ban-types
 export function External<TFunction extends Function>(
   ...args: any[]
 ): ClassDecorator | TFunction {

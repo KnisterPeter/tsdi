@@ -1,3 +1,4 @@
+// tslint:disable:no-implicit-dependencies
 import { assert } from 'chai';
 import 'source-map-support/register';
 
@@ -128,7 +129,7 @@ describe('TSDI', () => {
       @Component({ name: 'Bar' })
       class DExtendsA extends A {
         @inject({ name: 'Foo' })
-        private a!: A;
+        private readonly a!: A;
 
         public m(): string {
           return this.a.m();
@@ -162,7 +163,7 @@ describe('TSDI', () => {
       @Component()
       class ComponentWithProperties {
         @Inject({ name: 'prop' })
-        private _prop!: boolean;
+        private readonly _prop!: boolean;
 
         public get prop(): boolean {
           return this._prop;
@@ -189,7 +190,7 @@ describe('TSDI', () => {
 
       @Component()
       class ComponentWithContainerDependency {
-        @Inject private _tsdi!: TSDI;
+        @Inject private readonly _tsdi!: TSDI;
 
         public get prop(): TSDI {
           return this._tsdi;
@@ -223,7 +224,7 @@ describe('TSDI', () => {
 
       @Component
       class ComponentWithConstructor {
-        private _tsdi: TSDI;
+        private readonly _tsdi: TSDI;
         public b: ConstructorParameterComponent;
 
         constructor(
@@ -313,7 +314,7 @@ describe('TSDI', () => {
 
       @Component()
       class ComponentWithNonNamedInject {
-        @Inject() private _comp!: InjectedComponent;
+        @Inject() private readonly _comp!: InjectedComponent;
         get comp(): InjectedComponent {
           return this._comp;
         }
@@ -333,7 +334,7 @@ describe('TSDI', () => {
 
       @Component()
       class ComponentWithNamedInject {
-        @Inject('unknown') private _comp!: UnknownComponent;
+        @Inject('unknown') private readonly _comp!: UnknownComponent;
         get comp(): UnknownComponent {
           return this._comp;
         }
@@ -690,7 +691,7 @@ describe('TSDI', () => {
 
         @component({ eager: true })
         class Dependent {
-          @inject private dependency!: Dependency;
+          @inject private readonly dependency!: Dependency;
 
           @initialize
           protected init(): void {
@@ -725,7 +726,7 @@ describe('TSDI', () => {
         @component
         class Dependent {
           @inject({ dynamic: true })
-          private dependency!: Dependency;
+          private readonly dependency!: Dependency;
 
           @initialize
           protected init(): void {
@@ -814,7 +815,7 @@ describe('TSDI', () => {
 
         @External()
         class ExternalClass {
-          @Inject('prop') private _prop!: boolean;
+          @Inject('prop') private readonly _prop!: boolean;
 
           public get prop(): boolean {
             return this._prop;
@@ -1013,7 +1014,7 @@ describe('TSDI', () => {
 
     it('a created instance should have mockable dependencies', () => {
       const comp: User = new User();
-      comp['dependency'] = {
+      (comp as any)['dependency'] = {
         echo(): string {
           return 'world';
         }

@@ -31,7 +31,7 @@ export interface FactoryOptions {
 
 /** @internal */
 export type InjectMetadata = {
-  target: Object;
+  target: object;
   property: string;
   options: IInjectOptions;
   type: Constructable<any>;
@@ -52,7 +52,7 @@ export type ComponentMetadata = {
 
 /** @internal */
 export type FactoryMetadata = {
-  target: Object;
+  target: object;
   property: string;
   options: IFactoryOptions;
   rtti: Constructable<any>;
@@ -75,17 +75,17 @@ export interface LifecycleListener {
 export class TSDI {
   private autoMock: any[] | undefined = undefined;
 
-  private components: ComponentOrFactoryMetadata[] = [];
+  private readonly components: ComponentOrFactoryMetadata[] = [];
 
-  private instances: { [idx: number]: Object } = {};
+  private instances: { [idx: number]: any } = {};
 
   private listener: ComponentListener | undefined;
 
-  private properties: { [key: string]: any } = {};
+  private readonly properties: { [key: string]: any } = {};
 
-  private lifecycleListeners: LifecycleListener[] = [];
+  private readonly lifecycleListeners: LifecycleListener[] = [];
 
-  private scopes: { [name: string]: boolean } = {};
+  private readonly scopes: { [name: string]: boolean } = {};
 
   constructor() {
     this.registerComponent({
@@ -150,17 +150,19 @@ export class TSDI {
         'component:destroy',
         isFactoryMetadata(metadata) ? metadata.rtti : metadata.fn.prototype
       );
-      if (destroy && (instance as any)[destroy]) {
-        (instance as any)[destroy].call(instance);
+      if (destroy && instance[destroy]) {
+        instance[destroy].call(instance);
       }
-      (this.instances[idx] as any) = undefined;
+      this.instances[idx] = undefined;
     }
   }
 
   public enableComponentScanner(): void {
     if (!this.listener) {
       this.listener = (
-        metadataOrExternal: ComponentOrFactoryMetadata | Function
+        metadataOrExternal:
+          | ComponentOrFactoryMetadata
+          | ((...args: any[]) => any)
       ) => {
         if (typeof metadataOrExternal === 'function') {
           (metadataOrExternal as any).__tsdi__ = this;

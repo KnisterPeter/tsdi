@@ -4,11 +4,11 @@ import { IFactoryOptions } from './tsdi';
 import * as debug from 'debug';
 const log = debug('tsdi');
 
-export function Factory(target: Object, propertyKey: string): void;
+export function Factory(target: object, propertyKey: string): void;
 export function Factory(options?: IFactoryOptions): MethodDecorator;
 export function Factory(...args: any[]): MethodDecorator | void {
   const decorate = (
-    target: Object,
+    target: object,
     propertyKey: string | symbol,
     options: IFactoryOptions
   ) => {
@@ -32,7 +32,7 @@ export function Factory(...args: any[]): MethodDecorator | void {
     return decorate(args[0], args[1], {});
   }
   const options = args[0] || {};
-  return function(target: Object, propertyKey: string | symbol): void {
+  return function(target: object, propertyKey: string | symbol): void {
     decorate(target, propertyKey, options);
   };
 }
