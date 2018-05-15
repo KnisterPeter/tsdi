@@ -55,7 +55,7 @@
     "husky": "0.14.3",
     "lint-staged": "7.1.0",
     "mocha": "5.1.1",
-    "nyc": "11.7.2",
+    "nyc": "11.8.0",
     "prettier": "1.12.1",
     "rimraf": "2.6.2",
     "source-map-support": "0.5.5",
