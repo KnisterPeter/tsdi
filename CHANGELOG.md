@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.20.3"></a>
+## [0.20.3](https://github.com/KnisterPeter/tsdi/compare/v0.20.2...v0.20.3) (2018-06-04)
+
+
+### Bug Fixes
+
+* update typescript definition to conform to 2.9 ([bb01b87](https://github.com/KnisterPeter/tsdi/commit/bb01b87))
+
+
+
 <a name="0.20.2"></a>
 ## [0.20.2](https://github.com/KnisterPeter/tsdi/compare/v0.20.1...v0.20.2) (2018-04-20)
 
