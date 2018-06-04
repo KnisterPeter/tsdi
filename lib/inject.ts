@@ -32,7 +32,7 @@ export function Inject(
     propertyKey: string | symbol,
     options: IInjectOptions
   ) => {
-    log(`@Inject ${(target.constructor as any).name}#${propertyKey}`);
+    log(`@Inject ${(target.constructor as any).name}#${String(propertyKey)}`);
     const type: Constructable<any> = Reflect.getMetadata(
       'design:type',
       target,
@@ -59,7 +59,7 @@ export function Inject(
     parameterIndex: number,
     options: IInjectOptions
   ) => {
-    log(`@Inject ${propertyKey}`);
+    log(`@Inject ${String(propertyKey)}`);
     let parameters: ParameterMetadata[] = Reflect.getMetadata(
       'component:parameters',
       target

@@ -61,11 +61,7 @@ export type FactoryMetadata = {
 /** @internal */
 export type ComponentOrFactoryMetadata = ComponentMetadata | FactoryMetadata;
 
-export type Mutable<T extends { [x: string]: any }, K extends string> = {
-  [P in K]: T[P]
-};
-
-export type Mock<T> = Mutable<T, keyof T>;
+export type Mock<T> = { -readonly [P in keyof T]: T[P] };
 
 export interface LifecycleListener {
   onCreate?(component: any): void;
