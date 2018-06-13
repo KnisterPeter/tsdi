@@ -109,20 +109,20 @@ describe('TSDI', () => {
         public m(): string { return 'a'; }
       }
 
-      // @ts-ignore
       @Component()
+      // @ts-ignore
       class BExtendsA extends A {
         public m(): string { return 'b'; }
       }
 
+      @Component({ name: 'Foo' })
       // @ts-ignore
-      @Component({name: 'Foo'})
       class CExtendsA extends A {
         public m(): string { return 'c'; }
       }
 
+      @Component({ name: 'Bar' })
       // @ts-ignore
-      @Component({name: 'Bar'})
       class DExtendsA extends A {
 
         @inject({name: 'Foo'})
@@ -336,12 +336,12 @@ describe('TSDI', () => {
       tsdi.enableComponentScanner();
 
       try {
-        // @ts-ignore
         @Component('Component')
+        // @ts-ignore
         class NamedComponent1 {}
 
-        // @ts-ignore
         @Component('Component')
+        // @ts-ignore
         class NamedComponent2 {}
 
         assert.fail('Should throw error');
@@ -377,8 +377,8 @@ describe('TSDI', () => {
       tsdi.enableComponentScanner();
       let count = 0;
 
+      @component({ eager: true })
       // @ts-ignore
-      @component({eager: true})
       class EagerComponent {
         @initialize
         public init(): void {
