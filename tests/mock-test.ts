@@ -4,15 +4,30 @@ import 'source-map-support/register';
 
 import { TSDI, component, inject, initialize } from '../lib/tsdi';
 
+let origWarn: (...args: any[]) => void;
+
 describe('TSDI', () => {
   let tsdi: TSDI;
 
   beforeEach(() => {
+    // disable deprecation warning in tests
+    origWarn = console.warn;
+    console.warn = function(...args: any[]): void {
+      if (
+        args.length > 0 &&
+        typeof args[0] === 'string' &&
+        (args[0] as string).indexOf('deprecated') > -1
+      ) {
+        return;
+      }
+      origWarn(...args);
+    };
     tsdi = new TSDI();
   });
 
   afterEach(() => {
     tsdi.close();
+    console.warn = origWarn;
   });
 
   describe('when in mock mode', () => {
