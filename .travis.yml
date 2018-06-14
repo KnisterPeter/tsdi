@@ -9,8 +9,7 @@ matrix:
 branches:
   only:
     - master
-    - /^greenkeeper-.*$/
-    - /^greenkeeper/.*$/
+    - /^release\/.*$/
 notifications:
   email:
     on_success: never
