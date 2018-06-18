@@ -10,7 +10,6 @@ import {
   inject,
   Factory,
   factory,
-  External,
   external,
   Initialize,
   initialize,
@@ -100,33 +99,31 @@ describe('TSDI', () => {
     });
 
     it('components could be queried by name', () => {
-      tsdi.enableComponentScanner();
-
       @Component()
       class A {
         public m(): string {
           return 'a';
         }
       }
+      tsdi.register(A);
 
       @Component()
-      // @ts-ignore
       class BExtendsA extends A {
         public m(): string {
           return 'b';
         }
       }
+      tsdi.register(BExtendsA);
 
       @Component({ name: 'Foo' })
-      // @ts-ignore
       class CExtendsA extends A {
         public m(): string {
           return 'c';
         }
       }
+      tsdi.register(CExtendsA);
 
       @Component({ name: 'Bar' })
-      // @ts-ignore
       class DExtendsA extends A {
         @inject({ name: 'Foo' })
         private readonly a!: A;
@@ -135,6 +132,7 @@ describe('TSDI', () => {
           return this.a.m();
         }
       }
+      tsdi.register(DExtendsA);
 
       assert.equal(tsdi.get(A, 'Bar').m(), 'c');
     });
@@ -361,16 +359,14 @@ describe('TSDI', () => {
     });
 
     it('should report an error duplicate named component', () => {
-      tsdi.enableComponentScanner();
-
       try {
         @Component('Component')
-        // @ts-ignore
         class NamedComponent1 {}
+        tsdi.register(NamedComponent1);
 
         @Component('Component')
-        // @ts-ignore
         class NamedComponent2 {}
+        tsdi.register(NamedComponent2);
 
         assert.fail('Should throw error');
       } catch (e) {
@@ -403,17 +399,16 @@ describe('TSDI', () => {
     });
 
     it('should create eager components as soon as possible', (done: MochaDone) => {
-      tsdi.enableComponentScanner();
       let count = 0;
 
       @component({ eager: true })
-      // @ts-ignore
       class EagerComponent {
         @initialize
         public init(): void {
           count++;
         }
       }
+      tsdi.register(EagerComponent);
 
       setTimeout(() => {
         assert.equal(count, 1);
@@ -773,100 +768,6 @@ describe('TSDI', () => {
       });
     });
 
-    describe('with external classes', () => {
-      it('should inject dependencies', () => {
-        tsdi.enableComponentScanner();
-
-        @Component('user2')
-        class User2 extends User {}
-
-        @external
-        class ExternalClass {
-          @Inject() public user!: User;
-          @Inject('user2') public user2!: User;
-        }
-
-        const test = new ExternalClass();
-        assert.strictEqual(test.user, tsdi.get(User));
-        assert.strictEqual(test.user2, tsdi.get(User2));
-      });
-
-      it('should call the initializer', () => {
-        tsdi.enableComponentScanner();
-
-        let called = false;
-        const fn = () => (called = true);
-
-        @External()
-        class ExternalClass {
-          @initialize()
-          public init(): void {
-            fn();
-          }
-        }
-
-        // tslint:disable-next-line:no-unused-expression
-        new ExternalClass();
-        assert.isTrue(called);
-      });
-
-      it('should inject defined properties', () => {
-        tsdi.enableComponentScanner();
-
-        @External()
-        class ExternalClass {
-          @Inject('prop') private readonly _prop!: boolean;
-
-          public get prop(): boolean {
-            return this._prop;
-          }
-        }
-        tsdi.addProperty('prop', false);
-
-        assert.equal(new ExternalClass().prop, false);
-      });
-
-      it('should allow constructor injection', () => {
-        tsdi.enableComponentScanner();
-
-        @External()
-        class ExternalClass {
-          public injected: User;
-
-          constructor(_value: string, @Inject() user?: User) {
-            this.injected = user!;
-          }
-        }
-
-        assert.equal(new ExternalClass('value').injected, tsdi.get(User));
-      });
-
-      it('should keep static methods and properties', () => {
-        tsdi.enableComponentScanner();
-        const noop = () => console.log('noop');
-
-        @External()
-        class ExternalClass {
-          public static user = 'test';
-          public static noop = noop;
-        }
-
-        assert.strictEqual(ExternalClass.user, 'test');
-        assert.strictEqual(ExternalClass.noop, noop);
-      });
-
-      it('should keep prototype chain correct', () => {
-        tsdi.enableComponentScanner();
-
-        class Base {}
-
-        @External()
-        class ExternalClass extends Base {}
-
-        assert.instanceOf(new ExternalClass(), Base);
-      });
-    });
-
     describe('and scope', () => {
       it('should create components for that scopes', () => {
         tsdi.enableComponentScanner();
@@ -1008,12 +909,12 @@ describe('TSDI', () => {
 
   describe('without container instance', () => {
     it('a created instance should not have dependencies satisified', () => {
-      const comp: User = new User();
-      assert.throw(comp.method);
+      const comp = new User();
+      assert.throw(() => comp.method());
     });
 
     it('a created instance should have mockable dependencies', () => {
-      const comp: User = new User();
+      const comp = new User();
       (comp as any)['dependency'] = {
         echo(): string {
           return 'world';
