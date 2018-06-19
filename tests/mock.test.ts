@@ -1,7 +1,3 @@
-// tslint:disable:no-implicit-dependencies
-import { assert } from 'chai';
-import 'source-map-support/register';
-
 import { TSDI, component, inject, initialize } from '../lib/tsdi';
 
 let origWarn: (...args: any[]) => void;
@@ -58,7 +54,7 @@ describe('TSDI', () => {
       tsdi.enableAutomock();
       tsdi.get(Bar);
 
-      assert.isFalse(created);
+      expect(created).toBeFalsy();
     });
 
     it('should inject real instance if allowed', () => {
@@ -84,7 +80,7 @@ describe('TSDI', () => {
       tsdi.enableAutomock(Foo);
       tsdi.get(Bar);
 
-      assert.isTrue(created);
+      expect(created).toBeTruthy();
     });
 
     it('should return a mock', () => {
@@ -111,7 +107,7 @@ describe('TSDI', () => {
       tsdi.mock(Foo).foo = () => (created = true);
       tsdi.get(Bar);
 
-      assert.isTrue(created);
+      expect(created).toBeTruthy();
     });
   });
 });
