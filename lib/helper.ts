@@ -19,17 +19,6 @@ export function findIndexOf<T>(
   return idx;
 }
 
-export function removeElement<T>(
-  list: T[],
-  test: (element: T) => boolean
-): T[] {
-  const idx = findIndexOf(list, test);
-  if (idx > -1) {
-    return [...list.slice(0, idx), ...list.slice(idx + 1)];
-  }
-  return list;
-}
-
 export function getNamedOptions<T extends { name?: string }>(
   optionOrString: T | string
 ): T {

@@ -25,7 +25,7 @@
     "release": "standard-version",
     "postrelease": "git push --follow-tags origin master && npm publish",
     "precoverage": "npm run clean && tsc --inlineSourceMap",
-    "coverage": "cat ./coverage/lcov.info | npx coveralls",
+    "coverage": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
     "build:watch": "npm run build:cjs -- --watch",
     "precommit": "lint-staged",
     "commitmsg": "commitlint -e $GIT_PARAMS"
