@@ -494,7 +494,7 @@ describe('TSDI', () => {
 
       @component
       class ComponentWithDestructor {
-        @destroy
+        @destroy()
         public foo(): void {
           destructorCalled = true;
         }

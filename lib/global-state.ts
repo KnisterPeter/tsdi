@@ -1,11 +1,11 @@
-import { findIndexOf, removeElement } from './helper';
+import { findIndexOf } from './helper';
 import { ComponentOrFactoryMetadata } from './tsdi';
 
 export type ComponentListener = (
   metadataOrExternal: ComponentOrFactoryMetadata | ((...args: any[]) => any)
 ) => void;
 
-let listeners: ComponentListener[] = [];
+const listeners: ComponentListener[] = [];
 const knownComponents: ComponentOrFactoryMetadata[] = [];
 const knownExternals: object[] = [];
 
@@ -39,5 +39,6 @@ export function addListener(listener: ComponentListener): void {
 }
 
 export function removeListener(listener: ComponentListener): void {
-  listeners = removeElement(listeners, l => l === listener);
+  const index = listeners.findIndex(l => l === listener);
+  listeners.splice(index, 1);
 }
