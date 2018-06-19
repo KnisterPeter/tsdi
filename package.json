@@ -20,12 +20,12 @@
     "build:cjs": "tsc --sourceMap --module commonjs --outDir dist",
     "build:esm": "tsc --sourceMap --module es2015 --outDir dist/esm",
     "pretest": "npm run build",
-    "test": "nyc mocha -r source-map-support/register dist/tests/",
+    "test": "jest",
     "prerelease": "git checkout master && git pull origin master && npm test && npm run build",
     "release": "standard-version",
     "postrelease": "git push --follow-tags origin master && npm publish",
     "precoverage": "npm run clean && tsc --inlineSourceMap",
-    "coverage": "nyc report --reporter=lcov && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
+    "coverage": "cat ./coverage/lcov.info | npx coveralls",
     "build:watch": "npm run build:cjs -- --watch",
     "precommit": "lint-staged",
     "commitmsg": "commitlint -e $GIT_PARAMS"
@@ -44,35 +44,24 @@
     "@commitlint/config-conventional": "7.0.1",
     "@commitlint/travis-cli": "7.0.0",
     "@knisterpeter/standard-tslint": "1.7.2",
-    "@types/chai": "4.1.4",
     "@types/debug": "0.0.30",
-    "@types/mocha": "5.2.2",
+    "@types/jest": "^23.1.1",
     "@types/node": "9.6.22",
-    "chai": "4.1.2",
     "coveralls": "3.0.1",
     "cz-conventional-changelog": "2.1.0",
-    "exorcist": "1.0.1",
     "husky": "0.14.3",
+    "jest": "^23.1.0",
     "lint-staged": "7.2.0",
-    "mocha": "5.2.0",
-    "nyc": "12.0.2",
     "prettier": "1.13.5",
     "rimraf": "2.6.2",
-    "source-map-support": "0.5.6",
     "standard-version": "4.4.0",
+    "ts-jest": "^22.4.6",
     "tslint": "5.10.0",
     "typescript": "2.9.2"
   },
   "dependencies": {
     "debug": "3.1.0",
     "reflect-metadata": "0.1.12"
-  },
-  "nyc": {
-    "exclude": [
-      "node_modules",
-      "coverage",
-      "dist/tests"
-    ]
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -86,6 +75,28 @@
   "commitlint": {
     "extends": [
       "@commitlint/config-conventional"
+    ]
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/dist/"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "lib/**"
     ]
   }
 }

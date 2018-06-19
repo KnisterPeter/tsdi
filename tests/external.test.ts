@@ -1,6 +1,3 @@
-// tslint:disable:no-implicit-dependencies
-import { assert } from 'chai';
-import 'source-map-support/register';
 import {
   TSDI,
   Component,
@@ -36,27 +33,26 @@ describe('TSDI when creating a container instance with external classes', () => 
     }
 
     const test = new ExternalClass();
-    assert.strictEqual(test.user, tsdi.get(User));
-    assert.strictEqual(test.user2, tsdi.get(User2));
+    expect(test.user).toBe(tsdi.get(User));
+    expect(test.user2).toBe(tsdi.get(User2));
   });
 
   it('should call the initializer', () => {
     tsdi.enableComponentScanner();
 
-    let called = false;
-    const fn = () => (called = true);
+    const mock = jest.fn();
 
     @External()
     class ExternalClass {
       @initialize()
       public init(): void {
-        fn();
+        mock();
       }
     }
 
     // tslint:disable-next-line:no-unused-expression
     new ExternalClass();
-    assert.isTrue(called);
+    expect(mock).toBeCalled();
   });
 
   it('should inject defined properties', () => {
@@ -72,7 +68,7 @@ describe('TSDI when creating a container instance with external classes', () => 
     }
     tsdi.addProperty('prop', false);
 
-    assert.equal(new ExternalClass().prop, false);
+    expect(new ExternalClass().prop).toBeFalsy();
   });
 
   it('should allow constructor injection', () => {
@@ -87,7 +83,7 @@ describe('TSDI when creating a container instance with external classes', () => 
       }
     }
 
-    assert.equal(new ExternalClass('value').injected, tsdi.get(User));
+    expect(new ExternalClass('value').injected).toBe(tsdi.get(User));
   });
 
   it('should keep static methods and properties', () => {
@@ -100,8 +96,8 @@ describe('TSDI when creating a container instance with external classes', () => 
       public static noop = noop;
     }
 
-    assert.strictEqual(ExternalClass.user, 'test');
-    assert.strictEqual(ExternalClass.noop, noop);
+    expect(ExternalClass.user).toBe('test');
+    expect(ExternalClass.noop).toBe(noop);
   });
 
   it('should keep prototype chain correct', () => {
@@ -112,6 +108,6 @@ describe('TSDI when creating a container instance with external classes', () => 
     @External()
     class ExternalClass extends Base {}
 
-    assert.instanceOf(new ExternalClass(), Base);
+    expect(new ExternalClass()).toBeInstanceOf(Base);
   });
 });

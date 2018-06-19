@@ -173,7 +173,9 @@ export class TSDI {
   }
 
   public enableAutomock(...allowedDependencies: any[]): void {
-    console.warn('#enableAutomock is deprecated and should not be used. Instead use #override.');
+    console.warn(
+      '#enableAutomock is deprecated and should not be used. Instead use #override.'
+    );
     this.autoMock = allowedDependencies;
   }
 
@@ -610,7 +612,9 @@ export class TSDI {
   }
 
   public mock<T>(component: Constructable<T>): Mock<T> {
-    console.warn('#mock is deprecated and should not be used. Instead use #override.');
+    console.warn(
+      '#mock is deprecated and should not be used. Instead use #override.'
+    );
     const idx = this.getComponentMetadataIndex(component);
     if (!this.instances[idx]) {
       const mock = this.createAutoMock(component);
