@@ -4,7 +4,9 @@ import {
   external,
   Inject,
   External,
-  initialize
+  initialize,
+  component,
+  inject
 } from '../lib';
 
 import { User } from './user';
@@ -109,5 +111,43 @@ describe('TSDI when creating a container instance with external classes', () => 
     class ExternalClass extends Base {}
 
     expect(new ExternalClass()).toBeInstanceOf(Base);
+  });
+});
+
+describe('TSDI with external components', () => {
+  it('should use the default resolver (latest created tsdi instance)', () => {
+    const tsdiInacctive = new TSDI();
+    const tsdiActive = new TSDI();
+
+    @component
+    class Injectable {}
+    tsdiActive.register(Injectable);
+    tsdiInacctive.register(Injectable);
+
+    @external
+    class Test {
+      @inject public injectable!: Injectable;
+    }
+
+    expect(new Test().injectable).toBe(tsdiActive.get(Injectable));
+    expect(new Test().injectable).not.toBe(tsdiInacctive.get(Injectable));
+  });
+  it('should use a custom resolver if provided', () => {
+    const tsdiInacctive = new TSDI();
+    TSDI.externalContainerResolver = () => tsdiInacctive;
+    const tsdiActive = new TSDI();
+
+    @component
+    class Injectable {}
+    tsdiActive.register(Injectable);
+    tsdiInacctive.register(Injectable);
+
+    @external
+    class Test {
+      @inject public injectable!: Injectable;
+    }
+
+    expect(new Test().injectable).toBe(tsdiInacctive.get(Injectable));
+    expect(new Test().injectable).not.toBe(tsdiActive.get(Injectable));
   });
 });

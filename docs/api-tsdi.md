@@ -3,6 +3,12 @@ id: api-tsdi
 title: TSDI
 ---
 
+## TSDI.externalContainerResolver (static)
+
+Set a resolver strategy for [external components](externals.md). This enables
+advanced patterns in container resolution
+(e.g. per user container, per request container).
+
 ## constructor
 
 ```ts

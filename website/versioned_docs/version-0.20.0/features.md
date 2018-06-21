@@ -7,7 +7,7 @@ original_id: features
 ## Component Scanner
 
 To automatically register all decorated components in a
-container instance the method [`enableComponentScanner()`](api.md#enablecomponentscanner) need
+container instance the method [`enableComponentScanner()`](api-tsdi.md#enablecomponentscanner) need
 to be called on the instance.
 
 > Please note that when using `enableComponentScanner()` all components have to be imported. Make sure that your bundler (such as webpack) did not optimize the `import` statement away.
@@ -124,7 +124,7 @@ it is retrieved or injected.
 ```js
 import { TSDI, Component } from 'tsdi';
 
-@Component({singleton: false})
+@Component({ singleton: false })
 class A {}
 
 @Component()
@@ -259,9 +259,8 @@ is instanced as soon as it is discovered by TSDI.
 ```js
 import { TSDI, Component, Inject } from 'tsdi';
 
-@component({eager: true})
-class A {
-}
+@component({ eager: true })
+class A {}
 
 const tsdi: TSDI = new TSDI();
 tsdi.register(A); // <-- here the class A is instantiated
@@ -333,7 +332,6 @@ tsdi.getScope('some-scope').leave();
 // Foo is destructed
 tsdi.getScope('some-scope').enter();
 tsdi.get(Foo); // <-- will return a new Foo
-
 ```
 
 Whenever a scope is left, the lifecycle callbacks are executed. In the above
@@ -383,7 +381,7 @@ bar.bar() // <-- this will be okay, since a new foo is available here
 ## StrictPropertyInitialization
 
 The new `--strictPropertyInitialization` in TypeScript 2.7 could be used with TSDI by
-using the *definite assignment assertion modifiers*.
+using the _definite assignment assertion modifiers_.
 
 ```js
 import { component, inject } from 'tsdi';
