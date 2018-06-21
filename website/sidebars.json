@@ -1,15 +1,8 @@
 {
   "docs": {
-    "TSDI": [
-      "getting-started",
-      "features",
-      "alternative-syntax"
-    ]
+    "TSDI": ["getting-started", "features", "externals", "alternative-syntax"]
   },
   "api": {
-    "API": [
-      "api-tsdi",
-      "api-lifecyclelistener"
-    ]
+    "API": ["api-tsdi", "api-lifecyclelistener"]
   }
 }

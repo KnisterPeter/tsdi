@@ -69,6 +69,18 @@ export interface LifecycleListener {
 }
 
 export class TSDI {
+  private static customExternalContainerResolver = false;
+  private static _externalContainerResolver: () => TSDI = () => undefined!;
+
+  public static get externalContainerResolver(): () => TSDI {
+    return TSDI._externalContainerResolver;
+  }
+
+  public static set externalContainerResolver(fn: () => TSDI) {
+    TSDI.customExternalContainerResolver = true;
+    TSDI._externalContainerResolver = fn;
+  }
+
   private autoMock: any[] | undefined = undefined;
 
   private readonly components: ComponentOrFactoryMetadata[] = [];
@@ -84,6 +96,9 @@ export class TSDI {
   private readonly scopes: { [name: string]: boolean } = {};
 
   constructor() {
+    if (!TSDI.customExternalContainerResolver) {
+      TSDI._externalContainerResolver = () => this;
+    }
     this.registerComponent({
       fn: TSDI,
       options: {}

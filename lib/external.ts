@@ -1,6 +1,7 @@
 import { addKnownExternal } from './global-state';
 
 import * as debug from 'debug';
+import { TSDI } from './tsdi';
 const log = debug('tsdi');
 
 // tslint:disable-next-line:ban-types
@@ -10,7 +11,7 @@ export function External<TFunction extends Function>(
 export function External(): ClassDecorator;
 // tslint:disable-next-line:ban-types
 export function External<TFunction extends Function>(
-  ...args: any[]
+  target?: TFunction
 ): ClassDecorator | TFunction {
   const decorate = (target: TFunction) => {
     log(`@External ${target.name}`);
@@ -19,7 +20,7 @@ export function External<TFunction extends Function>(
       this: any,
       ...args: any[]
     ): any {
-      return (target as any).__tsdi__.configureExternal(args, target);
+      return TSDI.externalContainerResolver().configureExternal(args, target);
     };
     Object.setPrototypeOf
       ? Object.setPrototypeOf(constructor, target)
@@ -28,8 +29,8 @@ export function External<TFunction extends Function>(
     return constructor as any;
   };
 
-  if (args.length > 0) {
-    return decorate(args[0]);
+  if (target) {
+    return decorate(target);
   }
   return function(target: TFunction): TFunction {
     return decorate(target);
