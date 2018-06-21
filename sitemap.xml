@@ -4,14 +4,15 @@
 <url> <loc>https://tsdi.js.org/index.html</loc> <changefreq>weekly</changefreq> <priority>0.5</priority> <xhtml:link rel="alternate" hreflang="en" href="https://tsdi.js.org/en/index.html" /> </url>
 <url> <loc>https://tsdi.js.org/users.html</loc> <changefreq>weekly</changefreq> <priority>0.5</priority> <xhtml:link rel="alternate" hreflang="en" href="https://tsdi.js.org/en/users.html" /> </url>
 <url> <loc>https://tsdi.js.org/versions.html</loc> <changefreq>weekly</changefreq> <priority>0.5</priority> <xhtml:link rel="alternate" hreflang="en" href="https://tsdi.js.org/en/versions.html" /> </url>
-<url> <loc>https://tsdi.js.org/blog/2017/10/24/new-version-1.0.0.html</loc> <changefreq>weekly</changefreq> <priority>0.3</priority> </url>
-<url> <loc>https://tsdi.js.org/blog/2017/09/26/adding-rss.html</loc> <changefreq>weekly</changefreq> <priority>0.3</priority> </url>
-<url> <loc>https://tsdi.js.org/blog/2017/09/25/testing-rss.html</loc> <changefreq>weekly</changefreq> <priority>0.3</priority> </url>
-<url> <loc>https://tsdi.js.org/blog/2017/04/10/blog-post-two.html</loc> <changefreq>weekly</changefreq> <priority>0.3</priority> </url>
-<url> <loc>https://tsdi.js.org/blog/2016/03/11/blog-post.html</loc> <changefreq>weekly</changefreq> <priority>0.3</priority> </url>
+<url> <loc>https://tsdi.js.org/2017/10/24/new-version-1.0.0</loc> <changefreq>weekly</changefreq> <priority>0.3</priority> </url>
+<url> <loc>https://tsdi.js.org/2017/09/26/adding-rss</loc> <changefreq>weekly</changefreq> <priority>0.3</priority> </url>
+<url> <loc>https://tsdi.js.org/2017/09/25/testing-rss</loc> <changefreq>weekly</changefreq> <priority>0.3</priority> </url>
+<url> <loc>https://tsdi.js.org/2017/04/10/blog-post-two</loc> <changefreq>weekly</changefreq> <priority>0.3</priority> </url>
+<url> <loc>https://tsdi.js.org/2016/03/11/blog-post</loc> <changefreq>weekly</changefreq> <priority>0.3</priority> </url>
 <url> <loc>https://tsdi.js.org/docs/en/next/alternative-syntax.html</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://tsdi.js.org/docs/en/next/alternative-syntax.html" /> </url>
 <url> <loc>https://tsdi.js.org/docs/en/next/api-lifecyclelistener.html</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://tsdi.js.org/docs/en/next/api-lifecyclelistener.html" /> </url>
 <url> <loc>https://tsdi.js.org/docs/en/next/api-tsdi.html</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://tsdi.js.org/docs/en/next/api-tsdi.html" /> </url>
+<url> <loc>https://tsdi.js.org/docs/en/next/externals.html</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://tsdi.js.org/docs/en/next/externals.html" /> </url>
 <url> <loc>https://tsdi.js.org/docs/en/next/features.html</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://tsdi.js.org/docs/en/next/features.html" /> </url>
 <url> <loc>https://tsdi.js.org/docs/en/next/getting-started.html</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://tsdi.js.org/docs/en/next/getting-started.html" /> </url>
 <url> <loc>https://tsdi.js.org/docs/en/alternative-syntax.html</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://tsdi.js.org/docs/en/alternative-syntax.html" /> </url>
