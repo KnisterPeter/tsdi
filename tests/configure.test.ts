@@ -24,4 +24,31 @@ describe('TSDI without reflection should be configurable', () => {
     expect(tsdi.get(Class).dependency).toBeInstanceOf(Dependency);
     expect(tsdi.get(Class).dependency2).toBeInstanceOf(Dependency);
   });
+
+  it('to declare injections by providers', () => {
+    class Component {
+      // tslint:disable-next-line:no-parameter-properties
+      constructor(public dependency: Dependency) {}
+    }
+    class Dependency {}
+
+    class Provider {
+      public provide(dependency: Dependency): Component {
+        return new Component(dependency);
+      }
+    }
+
+    tsdi.configure(Dependency);
+    tsdi.configure(Provider);
+    tsdi.configure(Component, {
+      provider: {
+        class: Provider,
+        method: 'provide',
+        dependencies: [Dependency]
+      }
+    });
+
+    expect(tsdi.get(Component)).toBeInstanceOf(Component);
+    expect(tsdi.get(Component).dependency).toBeInstanceOf(Dependency);
+  });
 });
