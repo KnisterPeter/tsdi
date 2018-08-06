@@ -12,15 +12,16 @@ Easy dependency injection for TypeScript.
 
 # Features
 
-* Type based dependency injetion
-* Type auto registration
-* Lifecycle methods
-* Constructor parameters injection
-* Singletons and Instances
-* External components (components not managed by tsdi)
-* Scopes
+- Type based dependency injetion
+- Type auto registration
+- Lifecycle methods
+- Constructor parameters injection
+- Singletons and Instances
+- External components (components not managed by tsdi)
+- Scopes
 
 # Installation
+
 Install as npm package:
 
 ```sh
@@ -44,6 +45,14 @@ Otherwise TSDI will not be able to infer the types of some factories and compone
 # Documentation
 
 See https://tsdi.js.org/
+
+# Idea
+
+This branch tests a rebuild/refactoring which enables tsdi to statically analyze the
+dependency tree and inform the user at compile time about missing references or
+cyclic dependencies.
+
+Its heavily inspired by [dagger2](https://google.github.io/dagger/)
 
 ---
 
