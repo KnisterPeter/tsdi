@@ -48,6 +48,11 @@ export type ParameterMetadata = {
 export type ComponentMetadata = {
   fn: Constructable<any>;
   options: IComponentOptions;
+  provider?: {
+    class: Constructable<any>;
+    method: string;
+    dependencies: Constructable<any>[];
+  };
   constructorDependencies?: Constructable<any>[];
   propertyDependencies?: { property: string; type: Constructable<any> }[];
 };
@@ -430,9 +435,21 @@ export class TSDI {
       );
     }
     log('create %o with %o', (metadata.fn as any).name, metadata.options);
-    const constructor: Constructable<T> = metadata.fn as any;
-    const parameters = this.getConstructorParameters(metadata);
-    const instance = new constructor(...parameters);
+
+    const instanciate = () => {
+      if (metadata.provider) {
+        return this.get(metadata.provider.class)[metadata.provider.method](
+          ...metadata.provider.dependencies.map(dependency =>
+            this.get(dependency)
+          )
+        );
+      }
+      const constructor: Constructable<T> = metadata.fn as any;
+      const parameters = this.getConstructorParameters(metadata);
+      return new constructor(...parameters);
+    };
+
+    const instance = instanciate();
     // note: This stores an incomplete instance (injects/properties/...)
     // but it allows recursive use of injects
     this.instances[idx] = instance;
@@ -446,15 +463,10 @@ export class TSDI {
       if (awaiter) {
         this.addInitializerPromise(
           instance,
-          awaiter.then(
-            () => (instance as any)[init].call(instance) || Promise.resolve()
-          )
+          awaiter.then(() => instance[init].call(instance) || Promise.resolve())
         );
       } else {
-        this.addInitializerPromise(
-          instance,
-          (instance as any)[init].call(instance)
-        );
+        this.addInitializerPromise(instance, instance[init].call(instance));
       }
     } else if (awaiter) {
       this.addInitializerPromise(instance, awaiter);
@@ -853,6 +865,11 @@ export class TSDI {
   public configure(
     component: Constructable<any>,
     config: {
+      provider?: {
+        class: Constructable<any>;
+        method: string;
+        dependencies: Constructable<any>[];
+      };
       constructorDependencies?: Constructable<any>[];
       propertyDependencies?: {
         property: string;
@@ -863,6 +880,7 @@ export class TSDI {
     this.registerComponent({
       fn: component,
       options: {},
+      provider: config.provider,
       constructorDependencies: config.constructorDependencies,
       propertyDependencies: config.propertyDependencies
     });
