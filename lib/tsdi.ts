@@ -1,8 +1,8 @@
-import 'reflect-metadata';
-import { ComponentListener, addListener, removeListener } from './global-state';
-import { isFactoryMetadata, findIndexOf } from './helper';
-
 import * as debug from 'debug';
+import 'reflect-metadata';
+import { addListener, ComponentListener, removeListener } from './global-state';
+import { findIndexOf, isFactoryMetadata } from './helper';
+
 const log = debug('tsdi');
 
 export type Constructable<T> = { new (...args: any[]): T };
@@ -48,6 +48,8 @@ export type ParameterMetadata = {
 export type ComponentMetadata = {
   fn: Constructable<any>;
   options: IComponentOptions;
+  constructorDependencies?: Constructable<any>[];
+  propertyDependencies?: { property: string; type: Constructable<any> }[];
 };
 
 /** @internal */
@@ -328,6 +330,36 @@ export class TSDI {
   private getConstructorParameters(
     metadata: ComponentOrFactoryMetadata
   ): any[] {
+    if (!isFactoryMetadata(metadata) && metadata.constructorDependencies) {
+      const container = this;
+      const get = (dependeny: Constructable<any>) => container.get(dependeny);
+      return metadata.constructorDependencies.map(
+        dependeny =>
+          new Proxy(
+            {},
+            {
+              getPrototypeOf(): any {
+                return dependeny.prototype;
+              },
+              getOwnPropertyDescriptor(_, property): any {
+                return Reflect.getOwnPropertyDescriptor(
+                  get(dependeny),
+                  property
+                );
+              },
+              get(_, property): any {
+                return Reflect.get(get(dependeny), property);
+              },
+              has(_, property): any {
+                return Reflect.has(get(dependeny), property);
+              },
+              ownKeys(_): any {
+                return Reflect.ownKeys(get(dependeny));
+              }
+            }
+          )
+      );
+    }
     const parameterMetadata: ParameterMetadata[] = Reflect.getMetadata(
       'component:parameters',
       (metadata as ComponentMetadata).fn
@@ -487,6 +519,18 @@ export class TSDI {
     externalInstance: boolean,
     componentMetadata: ComponentMetadata
   ): void {
+    if (componentMetadata.propertyDependencies) {
+      const container = this;
+      componentMetadata.propertyDependencies.forEach(dependency => {
+        Object.defineProperty(instance, dependency.property, {
+          configurable: true,
+          enumerable: true,
+          get(): any {
+            return container.get(dependency.type);
+          }
+        });
+      });
+    }
     const injects: InjectMetadata[] = Reflect.getMetadata(
       'component:injects',
       componentMetadata.fn.prototype
@@ -792,11 +836,42 @@ export class TSDI {
       }
     };
   }
+
+  /**
+   * This method could be used to statically describe a dependency
+   * tree of an application. It states which components are
+   * required to be injected into constuctor and properties of
+   * a given component.
+   *
+   * **Note:** All static features require environments with proxy
+   * support.
+   *
+   * @param component The component to describe (and register)
+   * @param constructorDependencies The construtor dependencies
+   * @param propertyDependencies The property dependencies
+   */
+  public configure(
+    component: Constructable<any>,
+    config: {
+      constructorDependencies?: Constructable<any>[];
+      propertyDependencies?: {
+        property: string;
+        type: Constructable<any>;
+      }[];
+    } = {}
+  ): void {
+    this.registerComponent({
+      fn: component,
+      options: {},
+      constructorDependencies: config.constructorDependencies,
+      propertyDependencies: config.propertyDependencies
+    });
+  }
 }
 
 export { component, Component } from './component';
-export { external, External } from './external';
-export { inject, Inject } from './inject';
-export { initialize, Initialize } from './initialize';
 export { destroy, Destroy } from './destroy';
+export { external, External } from './external';
 export { factory, Factory } from './factory';
+export { initialize, Initialize } from './initialize';
+export { inject, Inject } from './inject';

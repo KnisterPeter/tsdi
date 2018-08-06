@@ -393,3 +393,24 @@ class RestApi {
 ```
 
 > This does not work with dynamic injections and will throw an error. Please note that async injections can not be lazy and will not be lazy by default.
+
+## Declarative configuration of dependencies
+
+```js
+class SomeClass {
+  private property!: SomeDependency;
+
+  constructor(private parameter: SomeDependency) {}
+}
+
+class SomeDependency {
+}
+
+const tsdi = new TSDI();
+tsdi.configure(
+  SomeClass,
+  {
+    constructorDependencies: [SomeDependency],
+    propertyDependencies: [{ property: 'property', type: SomeDependency }]
+  });
+```
