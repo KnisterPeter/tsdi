@@ -95,7 +95,7 @@ export async function testContainer(
   const transpile = (input: string) =>
     ts.transpileModule(input, {
       compilerOptions: {
-        target: ts.ScriptTarget.ES2017,
+        target: ts.ScriptTarget.ES2015,
         module: ts.ModuleKind.CommonJS,
         experimentalDecorators: true
       }
