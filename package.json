@@ -40,9 +40,9 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@commitlint/cli": "7.0.0",
-    "@commitlint/config-conventional": "7.0.1",
-    "@commitlint/travis-cli": "7.0.0",
+    "@commitlint/cli": "7.1.1",
+    "@commitlint/config-conventional": "7.1.1",
+    "@commitlint/travis-cli": "7.1.1",
     "@knisterpeter/standard-tslint": "1.7.2",
     "@types/debug": "0.0.30",
     "@types/jest": "23.3.1",
