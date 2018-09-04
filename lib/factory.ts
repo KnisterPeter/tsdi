@@ -1,7 +1,7 @@
+import debug from 'debug';
 import { addKnownComponent } from './global-state';
 import { IFactoryOptions } from './tsdi';
 
-import * as debug from 'debug';
 const log = debug('tsdi');
 
 export function Factory(target: object, propertyKey: string): void;
