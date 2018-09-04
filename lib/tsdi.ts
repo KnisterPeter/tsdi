@@ -1,4 +1,4 @@
-import * as debug from 'debug';
+import debug from 'debug';
 import 'reflect-metadata';
 import { addListener, ComponentListener, removeListener } from './global-state';
 import { findIndexOf, isFactoryMetadata } from './helper';

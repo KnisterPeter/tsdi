@@ -1,7 +1,7 @@
+import debug from 'debug';
 import { addKnownExternal } from './global-state';
-
-import * as debug from 'debug';
 import { TSDI } from './tsdi';
+
 const log = debug('tsdi');
 
 // tslint:disable-next-line:ban-types
