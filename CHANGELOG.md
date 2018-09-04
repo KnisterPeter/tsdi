@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.0.0-alpha.1"></a>
+# [1.0.0-alpha.1](https://github.com/KnisterPeter/tsdi/compare/v1.0.0-alpha.0...v1.0.0-alpha.1) (2018-09-04)
+
+
+### Bug Fixes
+
+* update mocks to new mapped types ([361cc74](https://github.com/KnisterPeter/tsdi/commit/361cc74))
+* use default import for debug ([dbbddf6](https://github.com/KnisterPeter/tsdi/commit/dbbddf6)), closes [#312](https://github.com/KnisterPeter/tsdi/issues/312)
+
+
+### Features
+
+* add container resolution strategy for externals ([ae8f53f](https://github.com/KnisterPeter/tsdi/commit/ae8f53f)), closes [#268](https://github.com/KnisterPeter/tsdi/issues/268)
+* add static factory setup ([d71f3f1](https://github.com/KnisterPeter/tsdi/commit/d71f3f1))
+* allow to describe static dependency tree ([86d3074](https://github.com/KnisterPeter/tsdi/commit/86d3074))
+
+
+
 <a name="1.0.0-alpha.0"></a>
 # [1.0.0-alpha.0](https://github.com/KnisterPeter/tsdi/compare/v0.20.2...v1.0.0-alpha.0) (2018-05-01)
 
