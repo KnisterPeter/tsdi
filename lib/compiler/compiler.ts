@@ -8,6 +8,7 @@ import {
   findClosestDecoratedNode,
   findTsdiRoot,
   getConstructor,
+  getDecorator,
   getDecoratorParameters,
   getValueFromObjectLiteral,
   hasDecorator,
@@ -26,6 +27,9 @@ export interface Component {
   };
   constructorDependencies: ts.ClassDeclaration[];
   propertyDependencies: { property: string; type: ts.ClassDeclaration }[];
+  meta: {
+    singleton?: boolean;
+  };
 }
 
 export interface CompilerHost {
@@ -164,7 +168,8 @@ export class Compiler {
                   const component: Component = {
                     type: returnType,
                     constructorDependencies: [],
-                    propertyDependencies: []
+                    propertyDependencies: [],
+                    meta: {}
                   };
                   components.set(returnType, component);
                 }
@@ -190,12 +195,13 @@ export class Compiler {
       components.set(dependency, {
         type: dependency,
         constructorDependencies: [],
-        propertyDependencies: []
+        propertyDependencies: [],
+        meta: {}
       });
     }
     const component = components.get(dependency)!;
 
-    if (hasDecorator('inject', dependency)) {
+    if (hasDecorator('managed', dependency)) {
       const constructor = getConstructor(dependency);
       if (constructor) {
         await Promise.all(
@@ -210,13 +216,15 @@ export class Compiler {
       }
     }
 
+    this.handleMeta(dependency, component);
+
     await Promise.all(
       dependency.members.map(async member => {
         if (!ts.isPropertyDeclaration(member)) {
           return;
         }
 
-        if (hasDecorator('inject', member)) {
+        if (hasDecorator('managed', member)) {
           if (!member.type) {
             throw new Error(`Type declaration on ${member} is required`);
           }
@@ -246,6 +254,28 @@ export class Compiler {
         }
       })
     );
+  }
+
+  private handleMeta(
+    dependency: ts.ClassDeclaration,
+    component: Component
+  ): void {
+    const meta = getDecorator('meta', dependency);
+    if (meta) {
+      const parameters = getDecoratorParameters(meta);
+
+      const config = parameters[0];
+      if (!ts.isObjectLiteralExpression(config)) {
+        throw new Error('Invalid @meta decorator');
+      }
+
+      const singleton = getValueFromObjectLiteral(config, 'singleton');
+      if (singleton.kind === ts.SyntaxKind.FalseKeyword) {
+        component.meta.singleton = false;
+      } else {
+        component.meta.singleton = true;
+      }
+    }
   }
 
   private async findContainers(

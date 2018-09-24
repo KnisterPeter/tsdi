@@ -1,13 +1,17 @@
-export function inject<T extends { new (...args: any[]): {} }>(
+export function managed<T extends { new (...args: any[]): {} }>(
   constructor: T
 ): void;
-export function inject(proto: any, prop: string): void;
-export function inject(
+export function managed(proto: any, prop: string): void;
+export function managed(
   _target: any,
   _prop?: string,
   _descr?: PropertyDescriptor
 ): void {
   //
+}
+
+export function meta(): ClassDecorator {
+  return () => undefined;
 }
 
 export function provides(_target: any, _prop: any): void {

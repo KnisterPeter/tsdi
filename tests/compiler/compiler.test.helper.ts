@@ -4,30 +4,6 @@ import { createContext, Script } from 'vm';
 import { Compiler } from '../../lib/compiler/compiler';
 import { findTsdiRoot } from '../../lib/compiler/utils';
 
-declare global {
-  namespace jest {
-    interface Matchers<R> {
-      toContainsCode(code: string): void;
-    }
-  }
-}
-
-expect.extend({
-  toContainsCode(
-    received: string,
-    argument: string
-  ): ReturnType<jest.ExpectExtendMap[0]> {
-    const normalize = (str: string) => str.replace(/\s+/g, ' ');
-
-    const pass = normalize(received).includes(normalize(argument));
-    return {
-      message: () =>
-        `expected should ${received} ${pass ? 'not ' : ' '}contain ${argument}`,
-      pass
-    };
-  }
-});
-
 async function getTestLanguageSerivce(files: {
   [name: string]: string;
 }): Promise<ts.LanguageService> {
