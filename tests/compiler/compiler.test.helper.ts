@@ -115,7 +115,7 @@ export async function testContainer(
       ${code}
 
       (async () => {
-        const container = await TSDI.start(TSDIContainer);
+        const container = new TSDIContainer();
         try {
           const result = container.test(expect);
           if (result && result.then && result.catch) {

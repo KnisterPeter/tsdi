@@ -79,10 +79,6 @@ export class TSDI {
   private static customExternalContainerResolver = false;
   private static _externalContainerResolver: () => TSDI = () => undefined!;
 
-  public static async start<T>(container: Constructable<T>): Promise<T> {
-    return new container();
-  }
-
   public static get externalContainerResolver(): () => TSDI {
     return TSDI._externalContainerResolver;
   }

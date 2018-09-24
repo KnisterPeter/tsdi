@@ -46,14 +46,6 @@ Otherwise TSDI will not be able to infer the types of some factories and compone
 
 See https://tsdi.js.org/
 
-# Idea
-
-This branch tests a rebuild/refactoring which enables tsdi to statically analyze the
-dependency tree and inform the user at compile time about missing references or
-cyclic dependencies.
-
-Its heavily inspired by [dagger2](https://google.github.io/dagger/)
-
 ---
 
 Released under MIT license - (C) 2018 Markus Wolf

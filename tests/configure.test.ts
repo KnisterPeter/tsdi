@@ -9,7 +9,6 @@ describe('TSDI without reflection should be configurable', () => {
   it('to declare injections for constructor and properties', () => {
     class Class {
       public dependency!: Dependency;
-      // tslint:disable-next-line:no-parameter-properties
       constructor(public dependency2: Dependency) {}
     }
 
@@ -27,7 +26,6 @@ describe('TSDI without reflection should be configurable', () => {
 
   it('to declare injections by providers', () => {
     class Component {
-      // tslint:disable-next-line:no-parameter-properties
       constructor(public dependency: Dependency) {}
     }
     class Dependency {}
