@@ -156,7 +156,7 @@ describe('TSDI compiler', () => {
     await testContainer(code, files, expect);
   });
 
-  it.only('supports non-singleton components', async () => {
+  it('supports non-singleton components', async () => {
     const files = {
       '/file.ts': `
         import { container, managed, meta } from '/decorators';
