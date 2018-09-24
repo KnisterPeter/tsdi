@@ -10,12 +10,12 @@ export function managed(
   //
 }
 
-export function meta(): ClassDecorator {
+export function meta(_options: { singleton?: boolean }): ClassDecorator {
   return () => undefined;
 }
 
-export function provides(_target: any, _prop: any): void {
-  //
+export function provides(_option?: { singleton?: boolean }): MethodDecorator {
+  return () => undefined;
 }
 
 export function unit(_target: any): void {

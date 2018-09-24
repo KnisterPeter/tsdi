@@ -155,7 +155,27 @@ export class Compiler {
         await Promise.all(
           unit.members.map(async member => {
             if (ts.isMethodDeclaration(member)) {
-              if (hasDecorator('provides', member)) {
+              const provides = getDecorator('provides', member);
+              if (provides) {
+                // -- is singleton?
+                const singleton = (() => {
+                  const parameters = getDecoratorParameters(provides);
+                  if (parameters.length > 0) {
+                    const config = parameters[0];
+                    if (!ts.isObjectLiteralExpression(config)) {
+                      throw new Error('Invalid @provides decorator');
+                    }
+
+                    const singleton = getValueFromObjectLiteral(
+                      config,
+                      'singleton'
+                    );
+                    return singleton.kind !== ts.SyntaxKind.FalseKeyword;
+                  }
+                  return true;
+                })();
+                // /- is singleton?
+
                 const parameterTypes = await this.getMethodParameterTypes(
                   member
                 );
@@ -169,7 +189,9 @@ export class Compiler {
                     type: returnType,
                     constructorDependencies: [],
                     propertyDependencies: [],
-                    meta: {}
+                    meta: {
+                      singleton
+                    }
                   };
                   components.set(returnType, component);
                 }

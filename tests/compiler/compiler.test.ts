@@ -180,4 +180,36 @@ describe('TSDI compiler', () => {
 
     await testContainer(code, files, expect);
   });
+
+  it('supports factories which produces non singletons', async () => {
+    const files = {
+      '/file.ts': `
+        import { container, unit, provides } from '/decorators';
+
+        export class Entry {
+        }
+
+        @unit
+        export class Unit {
+          @provides({singleton: false})
+          public entry(): Entry {
+            return new Entry();
+          }
+        }
+
+        @container({ units: [Unit] })
+        export abstract class Container {
+          public abstract entry: Entry;
+
+          public test(expect): void {
+            expect(this.entry).not.toBe(this.entry);
+          }
+        }
+      `
+    };
+
+    const code = await runCompiler(files);
+
+    await testContainer(code, files, expect);
+  });
 });

@@ -90,7 +90,11 @@ export class Generator {
                   }
                   let provider = '';
                   const meta = `{
-                    singleton: ${Boolean(component.meta.singleton)}
+                    singleton: ${
+                      typeof component.meta.singleton === 'boolean'
+                        ? component.meta.singleton
+                        : true
+                    }
                   }`;
                   if (component.provider) {
                     provider = `
