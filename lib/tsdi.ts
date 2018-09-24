@@ -880,11 +880,14 @@ export class TSDI {
         property: string;
         type: Constructable<any>;
       }[];
+      meta?: {
+        singleton?: boolean;
+      };
     } = {}
   ): void {
     this.registerComponent({
       fn: component,
-      options: {},
+      options: config.meta || {},
       provider: config.provider,
       constructorDependencies: config.constructorDependencies,
       propertyDependencies: config.propertyDependencies

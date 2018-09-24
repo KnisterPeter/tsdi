@@ -30,15 +30,15 @@ export function filter<T extends ts.Node, L extends T[] | ts.NodeArray<T>>(
   return (list as T[]).filter(test) as L;
 }
 
-export function hasDecorator(
+export function getDecorator(
   name: string,
   node: ts.ClassDeclaration | ts.MethodDeclaration | ts.PropertyDeclaration
-): boolean {
+): ts.Decorator | undefined {
   if (!node.decorators) {
-    return false;
+    return undefined;
   }
 
-  return node.decorators.some(decorator => {
+  return node.decorators.find(decorator => {
     if (ts.isIdentifier(decorator.expression)) {
       return decorator.expression.getText() === name;
     } else if (
@@ -49,6 +49,13 @@ export function hasDecorator(
     }
     throw new Error(`Unable to detect decorator '${decorator}'`);
   });
+}
+
+export function hasDecorator(
+  name: string,
+  node: ts.ClassDeclaration | ts.MethodDeclaration | ts.PropertyDeclaration
+): boolean {
+  return getDecorator(name, node) !== undefined;
 }
 
 export function findClosestDecoratedNode(decorator: ts.Node): ts.Node {
@@ -94,7 +101,7 @@ export function getDecoratorParameters(
 export function getValueFromObjectLiteral(
   node: ts.ObjectLiteralExpression,
   name: string
-): ts.Node {
+): ts.Expression {
   const property = node.properties.find(property => {
     if (!ts.isPropertyAssignment(property)) {
       throw new Error('Invalid object literal');

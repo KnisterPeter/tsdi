@@ -1,21 +1,19 @@
-module.exports = function (wallaby) {
+module.exports = function(wallaby) {
   return {
     files: [
+      'tsconfig.json',
       'lib/**/*.ts',
       'tests/**/*.ts',
-      '!tests/**/*-test.ts'
+      '!tests/**/*.test.ts'
     ],
-    tests: [
-      'tests/**/*-test.ts'
-    ],
-    testFramework: 'mocha',
+    tests: ['tests/**/*.test.ts'],
+    testFramework: 'jest',
     env: {
       type: 'node'
     },
     compilers: {
       '**/*.ts': wallaby.compilers.typeScript({
-        typescript: require('typescript'),
-        module: 1, // commonjs
+        module: 'commonjs',
         emitDecoratorMetadata: true
       })
     }

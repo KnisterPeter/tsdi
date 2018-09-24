@@ -89,6 +89,9 @@ export class Generator {
                     );
                   }
                   let provider = '';
+                  const meta = `{
+                    singleton: ${Boolean(component.meta.singleton)}
+                  }`;
                   if (component.provider) {
                     provider = `
                       provider: {
@@ -104,7 +107,10 @@ export class Generator {
                     component.constructorDependencies.length === 0 &&
                     component.propertyDependencies.length === 0
                   ) {
-                    return `this.tsdi.configure(${component.type.name.getText()}, {${provider}});`;
+                    return `this.tsdi.configure(${component.type.name.getText()}, {
+                      meta: ${meta},
+                      ${provider}
+                    });`;
                   }
                   return `this.tsdi.configure(${component.type.name.getText()}, {
                     ${provider}
@@ -118,8 +124,9 @@ export class Generator {
                             dependency.property
                           }", type: ${dependency.type.name!.getText()}}`
                       )
-                      .join(', ')}]
-                  });`;
+                      .join(', ')}],
+                      meta: ${meta}
+                });`;
                 })
                 .join('\n')}
             }

@@ -27,11 +27,11 @@ describe('TSDI compiler', () => {
   it('generates constructor injected configuration', async () => {
     const files = {
       '/file.ts': `
-        import { container, inject } from '/decorators';
+        import { container, managed } from '/decorators';
 
         export class Dependency {}
 
-        @inject
+        @managed
         export class Entry {
           constructor(public dependency: Dependency) {}
         }
@@ -131,12 +131,12 @@ describe('TSDI compiler', () => {
   it('supports property injection', async () => {
     const files = {
       '/file.ts': `
-        import { container, inject } from '/decorators';
+        import { container, managed } from '/decorators';
 
         export class Dependency {}
 
         export class Entry {
-          @inject
+          @managed
           public dependency: Dependency
         }
 
@@ -146,6 +146,31 @@ describe('TSDI compiler', () => {
 
           public test(expect): void {
             expect(this.entry.dependency).toBeInstanceOf(Dependency);
+          }
+        }
+      `
+    };
+
+    const code = await runCompiler(files);
+
+    await testContainer(code, files, expect);
+  });
+
+  it.only('supports non-singleton components', async () => {
+    const files = {
+      '/file.ts': `
+        import { container, managed, meta } from '/decorators';
+
+        @meta({singleton: false})
+        export class Entry {
+        }
+
+        @container({ units: [] })
+        export abstract class Container {
+          public abstract entry: Entry;
+
+          public test(expect): void {
+            expect(this.entry).not.toBe(this.entry);
           }
         }
       `
