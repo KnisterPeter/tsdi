@@ -251,32 +251,17 @@ export class Compiler {
         }
 
         if (hasDecorator('managed', member)) {
-          if (!member.type) {
-            throw new Error(`Type declaration on ${member} is required`);
-          }
-
           const definition = findClosestClass(
             await this.navigation.findDefinition(member)
           );
-          if (!ts.isClassDeclaration(definition)) {
-            throw new Error(
-              `Definition for ${member.getText()} must be a class`
-            );
-          }
+
           dependencyQueue.push(definition);
-          {
-            const propertyName = member.name.getText();
-            if (
-              component.propertyDependencies.every(
-                dependency => dependency.property !== propertyName
-              )
-            ) {
-              component.propertyDependencies.push({
-                property: propertyName,
-                type: definition
-              });
-            }
-          }
+
+          const propertyName = member.name.getText();
+          component.propertyDependencies.push({
+            property: propertyName,
+            type: definition
+          });
         }
       })
     );
@@ -290,10 +275,8 @@ export class Compiler {
     if (meta) {
       const parameters = getDecoratorParameters(meta);
 
-      const config = parameters[0];
-      if (!ts.isObjectLiteralExpression(config)) {
-        throw new Error('Invalid @meta decorator');
-      }
+      // per type signature first parameter of meta is always object literal expression
+      const config = parameters[0] as ts.ObjectLiteralExpression;
 
       const singleton = getValueFromObjectLiteral(config, 'singleton');
       if (singleton.kind === ts.SyntaxKind.FalseKeyword) {
@@ -318,14 +301,7 @@ export class Compiler {
     return containerDecorators
       .map(decorator => findClosestDecoratedNode(decorator))
       .map(container => {
-        if (!ts.isClassDeclaration(container)) {
-          throw new Error(
-            `Invalid @container location '${container
-              .getText()
-              .substr(0, 10)}...'`
-          );
-        }
-        return container;
+        return container as ts.ClassDeclaration;
       });
   }
 
@@ -334,9 +310,6 @@ export class Compiler {
   ): Promise<ts.ClassDeclaration[]> {
     const tasks = members.map(async member => {
       if (ts.isPropertyDeclaration(member)) {
-        if (!member.type) {
-          throw new Error(`Require type declaration for '${member.getText()}'`);
-        }
         return findClosestClass(await this.navigation.findDefinition(member));
       }
       throw new Error(`Unknown class element ${member}`);
@@ -350,11 +323,6 @@ export class Compiler {
   ): Promise<ts.ClassDeclaration[]> {
     return Promise.all(
       node.parameters.map(async parameter => {
-        if (!parameter.type) {
-          throw new Error(
-            `Parameter '${parameter.getText()}' does not have a type`
-          );
-        }
         return findClosestClass(
           await this.navigation.findDefinition(parameter)
         );
