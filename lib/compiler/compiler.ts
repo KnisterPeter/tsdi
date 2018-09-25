@@ -165,10 +165,9 @@ export class Compiler {
                 const singleton = (() => {
                   const parameters = getDecoratorParameters(provides);
                   if (parameters.length > 0) {
-                    const config = parameters[0];
-                    if (!ts.isObjectLiteralExpression(config)) {
-                      throw new Error('Invalid @provides decorator');
-                    }
+                    // per type signature first parameter of provides is always
+                    // object literal expression
+                    const config = parameters[0] as ts.ObjectLiteralExpression;
 
                     const singleton = getValueFromObjectLiteral(
                       config,
