@@ -26,9 +26,7 @@
     "postrelease": "git push --follow-tags origin master && npm publish",
     "precoverage": "npm run clean && tsc --inlineSourceMap",
     "coverage": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
-    "build:watch": "npm run build:cjs -- --watch",
-    "precommit": "lint-staged",
-    "commitmsg": "commitlint -e $GIT_PARAMS"
+    "build:watch": "npm run build:cjs -- --watch"
   },
   "author": {
     "name": "Markus Wolf",
@@ -49,7 +47,7 @@
     "@types/node": "9.6.22",
     "coveralls": "3.0.2",
     "cz-conventional-changelog": "2.1.0",
-    "husky": "0.14.3",
+    "husky": "1.0.0",
     "jest": "23.6.0",
     "lint-staged": "7.3.0",
     "prettier": "1.14.3",
@@ -115,5 +113,11 @@
         "automerge": true
       }
     ]
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -e $GIT_PARAMS",
+      "pre-commit": "lint-staged"
+    }
   }
 }
