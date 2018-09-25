@@ -55,6 +55,7 @@ export async function runCompiler(files: {
       {
         writeFile: (_, data) => resolve(data)
       },
+      '.',
       service
     );
     await compiler.run('/decorators.ts');
