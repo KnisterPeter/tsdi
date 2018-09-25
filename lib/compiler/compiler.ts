@@ -39,13 +39,17 @@ export interface CompilerHost {
 export class Compiler {
   public static create(
     host: CompilerHost,
-    languageService = Compiler.createLanguageService()
+    root = '.',
+    languageService = Compiler.createLanguageService(root)
   ): Compiler {
     return new Compiler(host, languageService);
   }
 
-  private static createLanguageService(): ts.LanguageService {
-    const configFile = ts.findConfigFile(process.cwd(), ts.sys.fileExists);
+  private static createLanguageService(root: string): ts.LanguageService {
+    const configFile = ts.findConfigFile(
+      root || process.cwd(),
+      ts.sys.fileExists
+    );
     if (!configFile) {
       throw new Error('Unable to find tsconfig.json');
     }

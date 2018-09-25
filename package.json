@@ -96,6 +96,11 @@
     "collectCoverage": true,
     "collectCoverageFrom": [
       "lib/**"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/lib/compiler/cli.ts",
+      "/lib/compiler/decorators.ts"
     ]
   },
   "renovate": {
