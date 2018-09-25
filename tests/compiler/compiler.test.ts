@@ -191,9 +191,16 @@ describe('TSDI compiler', () => {
 
         @unit
         export class Unit {
+
+          private createEntry() {
+            return new Entry();
+          }
+
           @provides({singleton: false})
           public entry(): Entry {
-            return new Entry();
+            // to handle more code cases the creation is
+            // moved to another method
+            return this.createEntry();
           }
         }
 
