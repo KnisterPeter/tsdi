@@ -4,10 +4,10 @@ import { createContext, Script } from 'vm';
 import { Compiler } from '../../lib/compiler/compiler';
 import { findTsdiRoot } from '../../lib/compiler/utils';
 
-async function getTestLanguageSerivce(files: {
+function getTestLanguageSerivce(files: {
   [name: string]: string;
-}): Promise<ts.LanguageService> {
-  const root = await findTsdiRoot();
+}): ts.LanguageService {
+  const root = findTsdiRoot();
   const decoratorsFile = join(root, 'lib', 'compiler', 'decorators.ts');
   files['/decorators.ts'] = ts.sys.readFile(decoratorsFile)!;
 
@@ -50,15 +50,16 @@ export async function runCompiler(files: {
   [name: string]: string;
 }): Promise<string> {
   return new Promise<string>(async resolve => {
-    const service = await getTestLanguageSerivce(files);
+    const service = getTestLanguageSerivce(files);
     const compiler = Compiler.create(
       {
         writeFile: (_, data) => resolve(data)
       },
       '.',
+      '/decorators.ts',
       service
     );
-    await compiler.run('/decorators.ts');
+    await compiler.run();
   });
 }
 
@@ -67,7 +68,7 @@ export async function testContainer(
   files: { [name: string]: string },
   expect: jest.Expect
 ): Promise<boolean> {
-  const root = await findTsdiRoot();
+  const root = findTsdiRoot();
 
   const transpile = (input: string) =>
     ts.transpileModule(input, {

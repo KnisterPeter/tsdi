@@ -40,12 +40,22 @@ export class Compiler {
   public static create(
     host: CompilerHost,
     root = '.',
-    languageService = Compiler.createLanguageService(root)
+    decoratorsSoureFile = join(
+      findTsdiRoot(),
+      'dist',
+      'lib',
+      'compiler',
+      'decorators.d.ts'
+    ),
+    languageService = Compiler.createLanguageService(root, decoratorsSoureFile)
   ): Compiler {
-    return new Compiler(host, languageService);
+    return new Compiler(host, decoratorsSoureFile, languageService);
   }
 
-  private static createLanguageService(root: string): ts.LanguageService {
+  private static createLanguageService(
+    root: string,
+    decoratorsSoureFile: string
+  ): ts.LanguageService {
     const configFile = ts.findConfigFile(
       root || process.cwd(),
       ts.sys.fileExists
@@ -66,7 +76,7 @@ export class Compiler {
     return ts.createLanguageService(
       {
         getProjectReferences: () => cmdline.projectReferences,
-        getScriptFileNames: () => cmdline.fileNames,
+        getScriptFileNames: () => [...cmdline.fileNames, decoratorsSoureFile],
         getDefaultLibFileName: () => ts.getDefaultLibFileName(cmdline.options),
         getCurrentDirectory: () => process.cwd(),
         getCompilationSettings: () => cmdline.options,
@@ -89,17 +99,15 @@ export class Compiler {
 
   private constructor(
     private readonly host: CompilerHost,
+    private readonly decoratorsSoureFile: string,
     private readonly services: ts.LanguageService
   ) {
     this.navigation = new Navigation(this.services);
     this.generator = new Generator();
   }
 
-  public async run(decoratorsSoureFile?: string): Promise<void> {
-    const containers = await this.findContainers(
-      decoratorsSoureFile ||
-        join(await findTsdiRoot(), 'lib', 'compiler', 'decorators.ts')
-    );
+  public async run(): Promise<void> {
+    const containers = await this.findContainers(this.decoratorsSoureFile);
 
     const builder = await Promise.all(
       containers.map(async container => {
