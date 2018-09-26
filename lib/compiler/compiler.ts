@@ -351,20 +351,16 @@ export class Compiler {
   private async getContainerUnits(
     node: ts.ClassDeclaration
   ): Promise<ts.ClassDeclaration[]> {
-    if (!node.decorators) {
-      throw new Error('Container without decorator is invalid');
-    }
+    const parameters = getDecoratorParameters(node.decorators![0]);
+    // per type signature first parameter of container is always
+    // object literal expression
+    const config = parameters[0] as ts.ObjectLiteralExpression;
 
-    const parameters = getDecoratorParameters(node.decorators[0]);
-    const config = parameters[0];
-    if (!ts.isObjectLiteralExpression(config)) {
-      throw new Error('Invalid @container decorator');
-    }
-
-    const unitsArray = getValueFromObjectLiteral(config, 'units');
-    if (!ts.isArrayLiteralExpression(unitsArray)) {
-      throw new Error('Invalid @container decorator: units must be an array');
-    }
+    // per type signature units is always array literal expression
+    const unitsArray = getValueFromObjectLiteral(
+      config,
+      'units'
+    ) as ts.ArrayLiteralExpression;
 
     const unitIdentifiers = unitsArray.elements.map(element => {
       if (!ts.isIdentifier(element)) {
