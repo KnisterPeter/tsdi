@@ -1,13 +1,14 @@
-import { existsSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { dirname, join } from 'path';
 import * as ts from 'typescript';
 
-export async function findTsdiRoot(): Promise<string> {
+export function findTsdiRoot(): string {
   let dir = __dirname;
   while (!existsSync(join(dir, 'package.json'))) {
     dir = dirname(dir);
   }
-  const pkg = await import(join(dir, 'package.json'));
+
+  const pkg = JSON.parse(readFileSync(join(dir, 'package.json')).toString());
   if (pkg.name === 'tsdi') {
     return dir;
   }
