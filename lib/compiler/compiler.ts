@@ -47,15 +47,12 @@ export class Compiler {
       'compiler',
       'decorators.d.ts'
     ),
-    languageService = Compiler.createLanguageService(root, decoratorsSoureFile)
+    languageService = Compiler.createLanguageService(root)
   ): Compiler {
     return new Compiler(host, decoratorsSoureFile, languageService);
   }
 
-  private static createLanguageService(
-    root: string,
-    decoratorsSoureFile: string
-  ): ts.LanguageService {
+  private static createLanguageService(root: string): ts.LanguageService {
     const configFile = ts.findConfigFile(
       root || process.cwd(),
       ts.sys.fileExists
@@ -73,24 +70,45 @@ export class Compiler {
       throw new Error('Unable to parse config file');
     }
 
-    return ts.createLanguageService(
-      {
-        getProjectReferences: () => cmdline.projectReferences,
-        getScriptFileNames: () => [...cmdline.fileNames, decoratorsSoureFile],
-        getDefaultLibFileName: () => ts.getDefaultLibFileName(cmdline.options),
-        getCurrentDirectory: () => process.cwd(),
-        getCompilationSettings: () => cmdline.options,
-        getScriptVersion: _ => '0',
-        getScriptSnapshot: fileName => {
-          const code = ts.sys.readFile(fileName);
-          if (!code) {
-            return undefined;
-          }
-          return ts.ScriptSnapshot.fromString(code);
+    return ts.createLanguageService({
+      getScriptFileNames: () => cmdline.fileNames,
+      getDefaultLibFileName: () => ts.getDefaultLibFileName(cmdline.options),
+      getCurrentDirectory: () => process.cwd(),
+      getCompilationSettings: () => cmdline.options,
+      getScriptVersion: _ => '0',
+      getScriptSnapshot: fileName => {
+        const code = ts.sys.readFile(fileName);
+        if (!code) {
+          return undefined;
         }
+        return ts.ScriptSnapshot.fromString(code);
       },
-      ts.createDocumentRegistry()
-    );
+      resolveModuleNames: (
+        moduleNames: string[],
+        containingFile: string
+      ): ts.ResolvedModule[] => {
+        return moduleNames.map(moduleName => {
+          let modulePath = moduleName;
+          if (!modulePath.startsWith('/')) {
+            if (modulePath.startsWith('.')) {
+              modulePath = join(dirname(containingFile), modulePath);
+            } else {
+              modulePath = join(
+                ts.sys.getCurrentDirectory(),
+                'node_modules',
+                modulePath
+              );
+            }
+          }
+          if (ts.sys.fileExists(modulePath + '.d.ts')) {
+            return { resolvedFileName: ts.sys.realpath!(modulePath + '.d.ts') };
+          } else if (ts.sys.fileExists(modulePath + '.ts')) {
+            return { resolvedFileName: ts.sys.realpath!(modulePath + '.ts') };
+          }
+          return undefined!;
+        });
+      }
+    });
   }
 
   private readonly navigation: Navigation;
@@ -108,6 +126,9 @@ export class Compiler {
 
   public async run(): Promise<void> {
     const containers = await this.findContainers(this.decoratorsSoureFile);
+    if (containers.length === 0) {
+      throw new Error('No declared containers found.');
+    }
 
     const builder = await Promise.all(
       containers.map(async container => {
