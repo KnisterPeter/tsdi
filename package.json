@@ -42,7 +42,7 @@
     "@commitlint/config-conventional": "7.1.2",
     "@commitlint/travis-cli": "7.1.2",
     "@knisterpeter/standard-tslint": "1.7.2",
-    "@types/debug": "0.0.30",
+    "@types/debug": "0.0.31",
     "@types/jest": "23.3.2",
     "@types/node": "9.6.22",
     "coveralls": "3.0.2",
