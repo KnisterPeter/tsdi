@@ -1,6 +1,7 @@
 import { dirname, join } from 'path';
 import * as ts from 'typescript';
 import { Generator } from './generator';
+import { resolver } from './module-resolver';
 import { Navigation } from './navigation';
 import {
   filter,
@@ -83,31 +84,7 @@ export class Compiler {
         }
         return ts.ScriptSnapshot.fromString(code);
       },
-      resolveModuleNames: (
-        moduleNames: string[],
-        containingFile: string
-      ): ts.ResolvedModule[] => {
-        return moduleNames.map(moduleName => {
-          let modulePath = moduleName;
-          if (!modulePath.startsWith('/')) {
-            if (modulePath.startsWith('.')) {
-              modulePath = join(dirname(containingFile), modulePath);
-            } else {
-              modulePath = join(
-                ts.sys.getCurrentDirectory(),
-                'node_modules',
-                modulePath
-              );
-            }
-          }
-          if (ts.sys.fileExists(modulePath + '.d.ts')) {
-            return { resolvedFileName: ts.sys.realpath!(modulePath + '.d.ts') };
-          } else if (ts.sys.fileExists(modulePath + '.ts')) {
-            return { resolvedFileName: ts.sys.realpath!(modulePath + '.ts') };
-          }
-          return undefined!;
-        });
-      }
+      resolveModuleNames: resolver
     });
   }
 
