@@ -1,5 +1,6 @@
 import { dirname, join } from 'path';
 import * as ts from 'typescript';
+import { DefinitionNotFoundError } from './errors';
 import { Generator } from './generator';
 import { resolver } from './module-resolver';
 import { Navigation } from './navigation';
@@ -377,12 +378,19 @@ export class Compiler {
       return element;
     });
 
-    return Promise.all(
-      unitIdentifiers.map(async unitIdentifier => {
-        return findClosestClass(
-          await this.navigation.findDefinition(unitIdentifier)
-        );
-      })
-    );
+    try {
+      return await Promise.all(
+        unitIdentifiers.map(async unitIdentifier => {
+          return findClosestClass(
+            await this.navigation.findDefinition(unitIdentifier)
+          );
+        })
+      );
+    } catch (e) {
+      if (e instanceof DefinitionNotFoundError) {
+        throw new Error('Declared unit not found');
+      }
+      throw e;
+    }
   }
 }

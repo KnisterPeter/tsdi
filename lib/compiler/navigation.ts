@@ -1,4 +1,5 @@
 import * as ts from 'typescript';
+import { DefinitionNotFoundError } from './errors';
 
 export class Navigation {
   private static getAllFunctions(node: ts.Node): ts.FunctionDeclaration[] {
@@ -80,7 +81,7 @@ export class Navigation {
       type.getStart()
     );
     if (!definitions) {
-      throw new Error('Definition not found');
+      throw new DefinitionNotFoundError('Definition not found');
     }
 
     if (definitions.length > 1) {
