@@ -112,6 +112,7 @@ export class Generator {
                     component.propertyDependencies.length === 0
                   ) {
                     return `this.tsdi.configure(${component.type.name.getText()}, {
+                      initializer: '${component.initializer}' || undefined,
                       meta: ${meta},
                       ${provider}
                     });`;
@@ -129,7 +130,8 @@ export class Generator {
                           }", type: ${dependency.type.name!.getText()}}`
                       )
                       .join(', ')}],
-                      meta: ${meta}
+                      meta: ${meta},
+                      initializer: '${component.initializer}' || undefined
                 });`;
                 })
                 .join('\n')}

@@ -32,6 +32,7 @@ export interface Component {
   meta: {
     singleton?: boolean;
   };
+  initializer?: string;
 }
 
 export interface CompilerHost {
@@ -252,22 +253,24 @@ export class Compiler {
 
     await Promise.all(
       dependency.members.map(async member => {
-        if (!ts.isPropertyDeclaration(member)) {
-          return;
-        }
+        if (ts.isPropertyDeclaration(member)) {
+          if (hasDecorator('managed', member)) {
+            const definition = findClosestClass(
+              await this.navigation.findDefinition(member)
+            );
 
-        if (hasDecorator('managed', member)) {
-          const definition = findClosestClass(
-            await this.navigation.findDefinition(member)
-          );
+            dependencyQueue.push(definition);
 
-          dependencyQueue.push(definition);
-
-          const propertyName = member.name.getText();
-          component.propertyDependencies.push({
-            property: propertyName,
-            type: definition
-          });
+            const propertyName = member.name.getText();
+            component.propertyDependencies.push({
+              property: propertyName,
+              type: definition
+            });
+          }
+        } else if (ts.isMethodDeclaration(member)) {
+          if (hasDecorator('initialize', member)) {
+            component.initializer = member.name.getText();
+          }
         }
       })
     );

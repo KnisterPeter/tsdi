@@ -25,3 +25,9 @@ export function unit(_target: any): void {
 export function container(_config: { units: any[] }): any {
   return () => undefined;
 }
+
+export function initialize(target: object, propertyKey: string): void;
+export function initialize(): MethodDecorator;
+export function initialize(): MethodDecorator | void {
+  return () => undefined;
+}

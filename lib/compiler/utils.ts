@@ -31,6 +31,7 @@ export function filter<T extends ts.Node, L extends T[] | ts.NodeArray<T>>(
   return (list as T[]).filter(test) as L;
 }
 
+// todo: refactor from name based search to reference based search
 export function getDecorator(
   name: string,
   node: ts.ClassDeclaration | ts.MethodDeclaration | ts.PropertyDeclaration
