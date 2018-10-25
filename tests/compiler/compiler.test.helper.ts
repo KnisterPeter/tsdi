@@ -49,17 +49,21 @@ function getTestLanguageSerivce(files: {
 export async function runCompiler(files: {
   [name: string]: string;
 }): Promise<string> {
-  return new Promise<string>(async resolve => {
-    const service = getTestLanguageSerivce(files);
-    const compiler = Compiler.create(
-      {
-        writeFile: (_, data) => resolve(data)
-      },
-      '.',
-      '/decorators.ts',
-      service
-    );
-    await compiler.run();
+  return new Promise<string>(async (resolve, reject) => {
+    try {
+      const service = getTestLanguageSerivce(files);
+      const compiler = Compiler.create(
+        {
+          writeFile: (_, data) => resolve(data)
+        },
+        '.',
+        '/decorators.ts',
+        service
+      );
+      await compiler.run();
+    } catch (e) {
+      reject(e);
+    }
   });
 }
 
