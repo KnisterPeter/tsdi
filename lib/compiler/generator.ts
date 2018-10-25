@@ -29,6 +29,108 @@ export class Generator {
     const imports: [string, string][] = [
       [baseName, `.${sep}${basename(base.getSourceFile().fileName)}`]
     ];
+
+    const getComponentConfiguration = (component: Component): string => {
+      let code = '';
+
+      const shouldEmit = (expr: any) =>
+        Boolean(typeof expr === 'function' ? expr() : expr);
+
+      const emitString = (input: any) => {
+        code += "'";
+        code += input;
+        code += "'";
+      };
+
+      const emitObjectIf = (expr: any, fn: () => void) => {
+        if (shouldEmit(expr)) {
+          code += '{';
+          fn();
+          code += '}';
+        }
+      };
+
+      const emitPropertyIf = (expr: any, name: string, fn: () => void) => {
+        if (shouldEmit(expr)) {
+          code += name;
+          code += ':';
+          fn();
+          code += ',';
+        }
+      };
+
+      const emitArrayIf = <T>(expr: any, items: T[], fn: (item: T) => void) => {
+        if (shouldEmit(expr)) {
+          code += '[';
+          items.forEach(item => {
+            fn(item);
+            code += ',';
+          });
+          code += ']';
+        }
+      };
+
+      const hasProvider = () => component.provider;
+      const hasConstructorDependencies = () =>
+        component.constructorDependencies.length > 0;
+      const hasPropertyDependencies = () =>
+        component.propertyDependencies.length > 0;
+      const hasSingleton = () => typeof component.meta.singleton === 'boolean';
+      const hasMeta = () => hasSingleton();
+      const hasInitializer = () => component.initializer;
+
+      emitObjectIf(true, () => {
+        emitPropertyIf(hasProvider, 'provider', () => {
+          emitObjectIf(true, () => {
+            emitPropertyIf(true, 'class', () => {
+              code += component.provider!.class.name!.getText();
+            });
+            emitPropertyIf(true, 'method', () => {
+              emitString(component.provider!.method);
+            });
+            emitPropertyIf(true, 'dependencies', () => {
+              emitArrayIf(true, component.provider!.parameters, parameter => {
+                code += parameter.name!.getText();
+              });
+            });
+          });
+        });
+        emitPropertyIf(
+          hasConstructorDependencies,
+          'constructorDependencies',
+          () => {
+            emitArrayIf(true, component.constructorDependencies, dependency => {
+              code += dependency.name!.getText();
+            });
+          }
+        );
+        emitPropertyIf(hasPropertyDependencies, 'propertyDependencies', () => {
+          emitArrayIf(true, component.propertyDependencies, dependency => {
+            emitObjectIf(true, () => {
+              emitPropertyIf(true, 'property', () => {
+                emitString(dependency.property);
+              });
+              emitPropertyIf(true, 'type', () => {
+                code += dependency.type.name!.getText();
+              });
+            });
+          });
+        });
+        emitPropertyIf(hasMeta, 'meta', () => {
+          emitObjectIf(true, () => {
+            emitPropertyIf(hasSingleton, 'singleton', () => {
+              code += Boolean(component.meta.singleton);
+            });
+          });
+        });
+        emitPropertyIf(hasInitializer, 'initializer', () => {
+          emitString(component.initializer);
+        });
+      });
+
+      return code;
+    };
+
     return {
       base,
       addAbstractMembers(nodes: ts.ClassElement[]): any {
@@ -88,51 +190,9 @@ export class Generator {
                       `Anonymous classes as components are not supported`
                     );
                   }
-                  let provider = '';
-                  const meta = `{
-                    singleton: ${
-                      typeof component.meta.singleton === 'boolean'
-                        ? component.meta.singleton
-                        : true
-                    }
-                  }`;
-                  if (component.provider) {
-                    provider = `
-                      provider: {
-                        class: ${component.provider.class.name!.getText()},
-                        method: '${component.provider.method}',
-                        dependencies: [${component.provider.parameters
-                          .map(parameter => parameter.name!.getText())
-                          .join(', ')}]
-                      },
-                    `;
-                  }
-                  if (
-                    component.constructorDependencies.length === 0 &&
-                    component.propertyDependencies.length === 0
-                  ) {
-                    return `this.tsdi.configure(${component.type.name.getText()}, {
-                      initializer: '${component.initializer}' || undefined,
-                      meta: ${meta},
-                      ${provider}
-                    });`;
-                  }
-                  return `this.tsdi.configure(${component.type.name.getText()}, {
-                    ${provider}
-                    constructorDependencies: [${component.constructorDependencies
-                      .map(dependency => dependency.name!.getText())
-                      .join(', ')}],
-                    propertyDependencies: [${component.propertyDependencies
-                      .map(
-                        dependency =>
-                          `{property: "${
-                            dependency.property
-                          }", type: ${dependency.type.name!.getText()}}`
-                      )
-                      .join(', ')}],
-                      meta: ${meta},
-                      initializer: '${component.initializer}' || undefined
-                });`;
+
+                  const config = getComponentConfiguration(component);
+                  return `this.tsdi.configure(${component.type.name.getText()}, ${config});`;
                 })
                 .join('\n')}
             }
