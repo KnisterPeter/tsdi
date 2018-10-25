@@ -55,6 +55,7 @@ export type ComponentMetadata = {
   };
   constructorDependencies?: Constructable<any>[];
   propertyDependencies?: { property: string; type: Constructable<any> }[];
+  initializer?: string;
 };
 
 /** @internal */
@@ -454,12 +455,16 @@ export class TSDI {
     // but it allows recursive use of injects
     this.instances[idx] = instance;
     this.injectIntoInstance(instance, false, metadata);
-    const init: string = Reflect.getMetadata(
-      'component:init',
-      metadata.fn.prototype
-    );
+    this.runInitializer(instance, metadata);
+    return instance;
+  }
+
+  private runInitializer(instance: any, metadata: ComponentMetadata): void {
+    const init: string =
+      metadata.initializer ||
+      Reflect.getMetadata('component:init', metadata.fn.prototype);
     const awaiter = this.waitForInjectInitializers(metadata);
-    if (init) {
+    if (init && instance[init]) {
       if (awaiter) {
         this.addInitializerPromise(
           instance,
@@ -471,7 +476,6 @@ export class TSDI {
     } else if (awaiter) {
       this.addInitializerPromise(instance, awaiter);
     }
-    return instance;
   }
 
   private waitForInjectInitializers(
@@ -879,6 +883,7 @@ export class TSDI {
       meta?: {
         singleton?: boolean;
       };
+      initializer?: string;
     } = {}
   ): void {
     this.registerComponent({
@@ -886,7 +891,8 @@ export class TSDI {
       options: config.meta || {},
       provider: config.provider,
       constructorDependencies: config.constructorDependencies,
-      propertyDependencies: config.propertyDependencies
+      propertyDependencies: config.propertyDependencies,
+      initializer: config.initializer
     });
   }
 }

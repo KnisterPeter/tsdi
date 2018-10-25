@@ -249,4 +249,34 @@ describe('TSDI compiler', () => {
       'Declared unit not found'
     );
   });
+
+  it('container supports initialize lifecycle', async () => {
+    const files = {
+      '/file.ts': `
+        import { container, unit, provides, initialize } from '/decorators';
+
+        export class Entry {
+          public ready = false;
+
+          @initialize
+          protected init(): void {
+            this.ready = true;
+          }
+        }
+
+        @container({ units: [] })
+        export abstract class Container {
+          public abstract entry: Entry;
+
+          public test(expect): void {
+            expect(this.entry.ready).toBeTruthy();
+          }
+        }
+      `
+    };
+
+    const code = await runCompiler(files);
+
+    await testContainer(code, files, expect);
+  });
 });
