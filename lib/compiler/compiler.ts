@@ -111,39 +111,30 @@ export class Compiler {
 
     const builder = await Promise.all(
       containers.map(async container => {
-        try {
-          const members = filter(container.members, isAbstract);
+        const members = filter(container.members, isAbstract);
 
-          const components: Map<ts.ClassDeclaration, Component> = new Map();
-          const dependencyQueue: ts.ClassDeclaration[] = [
-            ...(await this.findDependencies(members))
-          ];
+        const components: Map<ts.ClassDeclaration, Component> = new Map();
+        const dependencyQueue: ts.ClassDeclaration[] = [
+          ...(await this.findDependencies(members))
+        ];
 
-          const units = await this.getContainerUnits(container);
-          units.forEach(unit => dependencyQueue.push(unit));
-          await this.handleProvides(units, components, dependencyQueue);
+        const units = await this.getContainerUnits(container);
+        units.forEach(unit => dependencyQueue.push(unit));
+        await this.handleProvides(units, components, dependencyQueue);
 
-          while (dependencyQueue.length > 0) {
-            const dependency = dependencyQueue.shift();
-            if (!dependency) {
-              break;
-            }
-
-            await this.handleDependency(
-              dependency,
-              components,
-              dependencyQueue
-            );
+        while (dependencyQueue.length > 0) {
+          const dependency = dependencyQueue.shift();
+          if (!dependency) {
+            break;
           }
 
-          return this.generator
-            .buildContainer(container)
-            .addAbstractMembers(members)
-            .addComponents(...Array.from(components.values()));
-        } catch (e) {
-          console.error(e);
-          throw e;
+          await this.handleDependency(dependency, components, dependencyQueue);
         }
+
+        return this.generator
+          .buildContainer(container)
+          .addAbstractMembers(members)
+          .addComponents(...Array.from(components.values()));
       })
     );
     await Promise.all(
