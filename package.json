@@ -43,7 +43,7 @@
     "@commitlint/travis-cli": "7.2.1",
     "@knisterpeter/standard-tslint": "1.7.2",
     "@types/debug": "0.0.31",
-    "@types/jest": "23.3.7",
+    "@types/jest": "23.3.8",
     "@types/node": "9.6.22",
     "coveralls": "3.0.2",
     "cz-conventional-changelog": "2.1.0",
