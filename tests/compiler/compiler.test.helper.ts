@@ -1,4 +1,4 @@
-import { join } from 'path';
+import { dirname, join } from 'path';
 import * as ts from 'typescript';
 import { createContext, Script } from 'vm';
 import { Compiler } from '../../lib/compiler/compiler';
@@ -38,8 +38,38 @@ function getTestLanguageSerivce(files: {
               )!
             );
           }
+        } else if (fileName.startsWith('/tsdi')) {
+          console.log(require.resolve(fileName.substr(1)));
+          return ts.ScriptSnapshot.fromString(
+            ts.sys.readFile(require.resolve(fileName.substr(1)))!
+          );
         }
+        console.log('unable to load ' + fileName);
         return undefined;
+      },
+      resolveModuleNames: (moduleNames, containingFile) => {
+        return moduleNames.map(moduleName => {
+          if (files[moduleName + '.ts']) {
+            return {
+              resolvedFileName: moduleName + '.ts'
+            };
+          }
+          if (moduleName === 'tsdi') {
+            return {
+              resolvedFileName: join('/tsdi', 'lib', 'index.ts')
+            };
+          }
+          if (
+            moduleName.startsWith('.') &&
+            containingFile.startsWith('/tsdi')
+          ) {
+            return {
+              resolvedFileName:
+                join(dirname(containingFile), moduleName) + '.ts'
+            };
+          }
+          return undefined!;
+        });
       }
     },
     ts.createDocumentRegistry()
