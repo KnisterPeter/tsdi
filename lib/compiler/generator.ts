@@ -78,6 +78,7 @@ export class Generator {
       const hasSingleton = () => typeof component.meta.singleton === 'boolean';
       const hasMeta = () => hasSingleton();
       const hasInitializer = () => component.initializer;
+      const hasDisposer = () => component.disposer;
 
       emitObjectIf(true, () => {
         emitPropertyIf(hasProvider, 'provider', () => {
@@ -125,6 +126,9 @@ export class Generator {
         });
         emitPropertyIf(hasInitializer, 'initializer', () => {
           emitString(component.initializer);
+        });
+        emitPropertyIf(hasDisposer, 'disposer', () => {
+          emitString(component.disposer);
         });
       });
 
