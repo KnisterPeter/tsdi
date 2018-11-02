@@ -33,6 +33,7 @@ export interface Component {
     singleton?: boolean;
   };
   initializer?: string;
+  disposer?: string;
 }
 
 export interface CompilerHost {
@@ -261,6 +262,9 @@ export class Compiler {
         } else if (ts.isMethodDeclaration(member)) {
           if (hasDecorator('initialize', member)) {
             component.initializer = member.name.getText();
+          }
+          if (hasDecorator('destroy', member)) {
+            component.disposer = member.name.getText();
           }
         }
       })

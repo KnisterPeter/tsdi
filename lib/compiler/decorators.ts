@@ -31,3 +31,9 @@ export function initialize(): MethodDecorator;
 export function initialize(): MethodDecorator | void {
   return () => undefined;
 }
+
+export function destroy(target: object, propertyKey: string): void;
+export function destroy(): MethodDecorator;
+export function destroy(): MethodDecorator | void {
+  return () => undefined;
+}

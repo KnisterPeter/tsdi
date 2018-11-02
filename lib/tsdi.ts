@@ -56,6 +56,7 @@ export type ComponentMetadata = {
   constructorDependencies?: Constructable<any>[];
   propertyDependencies?: { property: string; type: Constructable<any> }[];
   initializer?: string;
+  disposer?: string;
 };
 
 /** @internal */
@@ -142,13 +143,18 @@ export class TSDI {
   }
 
   public close(): void {
-    Object.keys(this.instances).forEach(key => {
-      const idx = parseInt(key, 10);
-      const metadata = this.components[idx];
-      if (!isFactoryMetadata(metadata)) {
-        this.destroyInstance(idx, metadata);
-      }
-    });
+    Object.keys(this.instances)
+      .reverse()
+      .forEach(key => {
+        const idx = parseInt(key, 10);
+        const metadata = this.components[idx];
+        if (!metadata) {
+          throw new Error('Invalid components ' + idx);
+        }
+        if (!isFactoryMetadata(metadata)) {
+          this.destroyInstance(idx, metadata);
+        }
+      });
     this.instances = [];
 
     if (this.listener) {
@@ -165,10 +171,17 @@ export class TSDI {
     if (instance) {
       this.notifyOnDestroy(instance);
 
-      const destroy = Reflect.getMetadata(
-        'component:destroy',
-        isFactoryMetadata(metadata) ? metadata.rtti : metadata.fn.prototype
-      );
+      const getDestroyCallback = () => {
+        if (!isFactoryMetadata(metadata) && metadata.disposer) {
+          return metadata.disposer;
+        }
+        return Reflect.getMetadata(
+          'component:destroy',
+          isFactoryMetadata(metadata) ? metadata.rtti : metadata.fn.prototype
+        );
+      };
+      const destroy = getDestroyCallback();
+
       if (destroy && instance[destroy]) {
         instance[destroy].call(instance);
       }
@@ -884,15 +897,21 @@ export class TSDI {
         singleton?: boolean;
       };
       initializer?: string;
+      disposer?: string;
     } = {}
   ): void {
+    if (component === TSDI) {
+      // skip registering TSDI by itself
+      return;
+    }
     this.registerComponent({
       fn: component,
       options: config.meta || {},
       provider: config.provider,
       constructorDependencies: config.constructorDependencies,
       propertyDependencies: config.propertyDependencies,
-      initializer: config.initializer
+      initializer: config.initializer,
+      disposer: config.disposer
     });
   }
 }

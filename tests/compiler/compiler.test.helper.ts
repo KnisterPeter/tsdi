@@ -39,12 +39,10 @@ function getTestLanguageSerivce(files: {
             );
           }
         } else if (fileName.startsWith('/tsdi')) {
-          console.log(require.resolve(fileName.substr(1)));
           return ts.ScriptSnapshot.fromString(
             ts.sys.readFile(require.resolve(fileName.substr(1)))!
           );
         }
-        console.log('unable to load ' + fileName);
         return undefined;
       },
       resolveModuleNames: (moduleNames, containingFile) => {
