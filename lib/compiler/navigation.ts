@@ -81,7 +81,9 @@ export class Navigation {
       type.getStart()
     );
     if (!definitions) {
-      throw new DefinitionNotFoundError('Definition not found');
+      throw new DefinitionNotFoundError(
+        `Definition of '${type.getText(type.getSourceFile())}' not found`
+      );
     }
 
     if (definitions.length > 1) {
