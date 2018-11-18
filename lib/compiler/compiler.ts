@@ -211,6 +211,23 @@ export class Compiler {
     );
   }
 
+  private checkManagedDecorator(
+    dependency: ts.ClassDeclaration,
+    component: Component
+  ): void {
+    if (
+      !hasDecorator('managed', dependency) &&
+      !component.provider &&
+      !hasDecorator('unit', dependency)
+    ) {
+      throw new Error(
+        `Managed dependency '${
+          dependency.name!.text
+        }' is missing @managed decorator`
+      );
+    }
+  }
+
   private async handleDependency(
     dependency: ts.ClassDeclaration,
     components: Map<ts.ClassDeclaration, Component>,
@@ -225,6 +242,8 @@ export class Compiler {
       });
     }
     const component = components.get(dependency)!;
+
+    this.checkManagedDecorator(dependency, component);
 
     if (hasDecorator('managed', dependency)) {
       const constructor = getConstructor(dependency);
