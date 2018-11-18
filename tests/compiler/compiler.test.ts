@@ -4,8 +4,9 @@ describe('TSDI compiler', () => {
   it('generates a container for an entry point', async () => {
     const files = {
       '/file.ts': `
-        import { container } from '/decorators';
+        import { container, managed } from '/decorators';
 
+        @managed
         export class Entry {}
 
         @container({ units: [] })
@@ -29,6 +30,7 @@ describe('TSDI compiler', () => {
       '/file.ts': `
         import { container, managed } from '/decorators';
 
+        @managed
         export class Dependency {}
 
         @managed
@@ -96,8 +98,9 @@ describe('TSDI compiler', () => {
   it('supports factories with injected parameters', async () => {
     const files = {
       '/file.ts': `
-        import { container, unit, provides } from '/decorators';
+        import { container, managed, unit, provides } from '/decorators';
 
+        @managed
         export class Dependency {}
 
         export class Entry {
@@ -133,8 +136,10 @@ describe('TSDI compiler', () => {
       '/file.ts': `
         import { container, managed } from '/decorators';
 
+        @managed
         export class Dependency {}
 
+        @managed
         export class Entry {
           @managed
           public dependency: Dependency
@@ -162,6 +167,7 @@ describe('TSDI compiler', () => {
         import { container, managed, meta } from '/decorators';
 
         @meta({singleton: false})
+        @managed
         export class Entry {
         }
 
@@ -253,8 +259,9 @@ describe('TSDI compiler', () => {
   it('container supports initialize lifecycle', async () => {
     const files = {
       '/file.ts': `
-        import { container, unit, provides, initialize } from '/decorators';
+        import { container, managed, initialize } from '/decorators';
 
+        @managed
         export class Entry {
           public ready = false;
 
@@ -340,5 +347,24 @@ describe('TSDI compiler', () => {
     const code = await runCompiler(files);
 
     await testContainer(code, files, expect);
+  });
+
+  it('throws on unmanaged dependencies', async () => {
+    const files = {
+      '/file.ts': `
+        import { container } from '/decorators';
+
+        export class Entry {}
+
+        @container({ units: [] })
+        export abstract class Container {
+          public abstract entry: Entry;
+        }
+      `
+    };
+
+    await expect(runCompiler(files)).rejects.toThrow(
+      "Managed dependency 'Entry' is missing @managed decorator"
+    );
   });
 });

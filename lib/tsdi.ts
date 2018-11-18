@@ -1,5 +1,6 @@
 import debug from 'debug';
 import 'reflect-metadata';
+import { managed } from './compiler/decorators';
 import { addListener, ComponentListener, removeListener } from './global-state';
 import { findIndexOf, isFactoryMetadata } from './helper';
 
@@ -77,6 +78,7 @@ export interface LifecycleListener {
   onDestroy?(component: any): void;
 }
 
+@managed
 export class TSDI {
   private static customExternalContainerResolver = false;
   private static _externalContainerResolver: () => TSDI = () => undefined!;
@@ -781,11 +783,10 @@ export class TSDI {
       log(e);
       log(
         'Known Components: %o',
-        this.components.map(
-          component =>
-            isFactoryMetadata(component)
-              ? (component.rtti as any).name
-              : (component.fn as any).name
+        this.components.map(component =>
+          isFactoryMetadata(component)
+            ? (component.rtti as any).name
+            : (component.fn as any).name
         )
       );
       throw e;
