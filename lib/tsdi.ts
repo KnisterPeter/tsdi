@@ -108,10 +108,7 @@ export class TSDI {
     if (!TSDI.customExternalContainerResolver) {
       TSDI._externalContainerResolver = () => this;
     }
-    this.registerComponent({
-      fn: TSDI,
-      options: {}
-    });
+    this.configure(TSDI);
     this.instances[0] = this;
   }
 
@@ -900,10 +897,6 @@ export class TSDI {
       disposer?: string;
     } = {}
   ): void {
-    if (component === TSDI) {
-      // skip registering TSDI by itself
-      return;
-    }
     this.registerComponent({
       fn: component,
       options: config.meta || {},
