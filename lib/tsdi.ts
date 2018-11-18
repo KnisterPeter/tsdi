@@ -198,7 +198,26 @@ export class TSDI {
         if (typeof metadataOrExternal === 'function') {
           (metadataOrExternal as any).__tsdi__ = this;
         } else {
-          this.registerComponent(metadataOrExternal);
+          if (isFactoryMetadata(metadataOrExternal)) {
+            this.configure(metadataOrExternal.rtti, {
+              meta: metadataOrExternal.options,
+              provider: {
+                class: metadataOrExternal.target.constructor as any,
+                method: metadataOrExternal.property,
+                dependencies: []
+              }
+            });
+          } else {
+            this.configure(metadataOrExternal.fn, {
+              meta: metadataOrExternal.options,
+              provider: metadataOrExternal.provider,
+              constructorDependencies:
+                metadataOrExternal.constructorDependencies,
+              propertyDependencies: metadataOrExternal.propertyDependencies,
+              initializer: metadataOrExternal.initializer,
+              disposer: metadataOrExternal.disposer
+            });
+          }
         }
       };
       if (this.listener) {
@@ -284,12 +303,12 @@ export class TSDI {
   public register(component: Constructable<any>, name?: string): void {
     const options: IComponentOptions =
       Reflect.getMetadata('component:options', component) || {};
-    this.registerComponent({
-      fn: component,
-      options: {
+    // meta here is the fallback to the component options
+    this.configure(component, {
+      meta: {
         ...options,
         name: name || options.name
-      }
+      } as any
     });
   }
 
@@ -783,10 +802,12 @@ export class TSDI {
       log(e);
       log(
         'Known Components: %o',
-        this.components.map(component =>
-          isFactoryMetadata(component)
-            ? (component.rtti as any).name
-            : (component.fn as any).name
+        this.components.map(
+          component =>
+            (isFactoryMetadata(component)
+              ? (component.rtti as any)
+              : (component.fn as any)
+            ).name
         )
       );
       throw e;
