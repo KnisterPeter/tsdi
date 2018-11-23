@@ -190,34 +190,30 @@ export class TSDI {
 
   public enableComponentScanner(): void {
     if (!this.listener) {
-      this.listener = (
-        metadataOrExternal:
-          | ComponentOrFactoryMetadata
-          | ((...args: any[]) => any)
-      ) => {
-        if (typeof metadataOrExternal === 'function') {
-          (metadataOrExternal as any).__tsdi__ = this;
+      this.listener = (metadata: ComponentOrFactoryMetadata) => {
+        if (isFactoryMetadata(metadata)) {
+          this.configure(metadata.rtti, {
+            meta: metadata.options,
+            provider: {
+              class: metadata.target.constructor as any,
+              method: metadata.property,
+              dependencies: []
+            }
+          });
         } else {
-          if (isFactoryMetadata(metadataOrExternal)) {
-            this.configure(metadataOrExternal.rtti, {
-              meta: metadataOrExternal.options,
-              provider: {
-                class: metadataOrExternal.target.constructor as any,
-                method: metadataOrExternal.property,
-                dependencies: []
-              }
-            });
-          } else {
-            this.configure(metadataOrExternal.fn, {
-              meta: metadataOrExternal.options,
-              provider: metadataOrExternal.provider,
-              constructorDependencies:
-                metadataOrExternal.constructorDependencies,
-              propertyDependencies: metadataOrExternal.propertyDependencies,
-              initializer: metadataOrExternal.initializer,
-              disposer: metadataOrExternal.disposer
-            });
-          }
+          const constructorDependencies = this.getConstructorParameterMetadata(
+            metadata.fn
+          );
+
+          this.configure(metadata.fn, {
+            meta: metadata.options,
+            provider: metadata.provider,
+            constructorDependencies:
+              constructorDependencies || metadata.constructorDependencies,
+            propertyDependencies: metadata.propertyDependencies,
+            initializer: metadata.initializer,
+            disposer: metadata.disposer
+          });
         }
       };
       if (this.listener) {
@@ -370,47 +366,9 @@ export class TSDI {
     if (!isFactoryMetadata(metadata) && metadata.constructorDependencies) {
       const container = this;
       const get = (dependeny: Constructable<any>) => container.get(dependeny);
-      return metadata.constructorDependencies.map(
-        dependeny =>
-          new Proxy(
-            {},
-            {
-              getPrototypeOf(): any {
-                return dependeny.prototype;
-              },
-              getOwnPropertyDescriptor(_, property): any {
-                return Reflect.getOwnPropertyDescriptor(
-                  get(dependeny),
-                  property
-                );
-              },
-              get(_, property): any {
-                return Reflect.get(get(dependeny), property);
-              },
-              has(_, property): any {
-                return Reflect.has(get(dependeny), property);
-              },
-              ownKeys(_): any {
-                return Reflect.ownKeys(get(dependeny));
-              }
-            }
-          )
-      );
-    }
-    const parameterMetadata: ParameterMetadata[] = Reflect.getMetadata(
-      'component:parameters',
-      (metadata as ComponentMetadata).fn
-    );
-    if (parameterMetadata) {
-      return parameterMetadata
-        .sort((a, b) => a.index - b.index)
-        .map(parameter => ({
-          index: this.getComponentMetadataIndex(
-            parameter.rtti,
-            parameter.options.name
-          )
-        }))
-        .map(({ index }) => this.getOrCreate(this.components[index], index));
+      return metadata.constructorDependencies.map(dependeny => {
+        return get(dependeny);
+      });
     }
     return [];
   }
@@ -544,9 +502,29 @@ export class TSDI {
     );
   }
 
+  private getConstructorParameterMetadata(
+    component: Constructable<any>
+  ): Constructable<any>[] | undefined {
+    const parameterMetadata: ParameterMetadata[] = Reflect.getMetadata(
+      'component:parameters',
+      component
+    );
+    if (!parameterMetadata) {
+      return undefined;
+    }
+    return parameterMetadata
+      .sort((a, b) => a.index - b.index)
+      .map(parameter => parameter.rtti);
+  }
+
   public configureExternal<T>(args: any[], target: any): T {
+    const constructorDependencies = this.getConstructorParameterMetadata(
+      target
+    );
+
     const parameters = this.getConstructorParameters({
       fn: target,
+      constructorDependencies,
       options: {}
     });
     const instance = new target(...args, ...parameters);
@@ -836,6 +814,7 @@ export class TSDI {
     } else {
       component = componentOrHint;
     }
+
     const idx = this.getComponentMetadataIndex(component, hint);
     const metadata = this.components[idx];
     if (!metadata) {

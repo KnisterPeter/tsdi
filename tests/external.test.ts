@@ -1,14 +1,13 @@
 import {
-  TSDI,
   Component,
+  component,
   external,
-  Inject,
   External,
   initialize,
-  component,
-  inject
+  Inject,
+  inject,
+  TSDI
 } from '../lib';
-
 import { User } from './user';
 
 describe('TSDI when creating a container instance with external classes', () => {

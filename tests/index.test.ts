@@ -1,15 +1,15 @@
 import {
-  TSDI,
   Component,
   component,
-  Inject,
-  inject,
+  destroy,
+  external,
   Factory,
   factory,
-  external,
   Initialize,
   initialize,
-  destroy
+  Inject,
+  inject,
+  TSDI
 } from '../lib/tsdi';
 import { Cyclic1 } from './cyclic1';
 import { Dependency } from './dependency';
