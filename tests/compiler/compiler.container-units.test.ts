@@ -1,0 +1,42 @@
+import { runCompiler, testContainer } from './compiler.test.helper';
+
+test('TSDI compiler choses the declared unit', async () => {
+  const files = {
+    '/file.ts': `
+      import { container, unit, provides } from '/decorators';
+
+      export class Entry {
+        constructor() {}
+      }
+
+      @unit
+      export class Unit {
+        @provides
+        public entry(): Entry {
+          return new Entry();
+        }
+      }
+
+      @unit
+      export class Unit2 {
+        @provides
+        public entry(): Entry {
+          throw new Error('Wrong unit');
+        }
+      }
+
+      @container({ units: [Unit] })
+      export abstract class Container {
+        public abstract entry: Entry;
+
+        public test(expect): void {
+          expect(this.entry).toBeInstanceOf(Entry);
+        }
+      }
+    `
+  };
+
+  const code = await runCompiler(files);
+
+  await testContainer(code, files, expect);
+});

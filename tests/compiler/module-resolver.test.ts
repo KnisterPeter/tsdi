@@ -8,11 +8,11 @@ describe('Module Resolver', () => {
   });
 
   it('will return the path for relative resolutions', () => {
-    expect(resolver(['./compiler.test'], __filename)).toEqual([
+    expect(resolver(['./compiler.entry-point.test'], __filename)).toEqual([
       {
         resolvedFileName: path.join(
           path.dirname(__filename),
-          'compiler.test.ts'
+          'compiler.entry-point.test.ts'
         )
       }
     ]);
