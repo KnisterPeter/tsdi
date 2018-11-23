@@ -573,7 +573,7 @@ describe('TSDI', () => {
               setTimeout(() => {
                 this.value = 10;
                 resolve();
-              }, 10);
+              }, 100);
             });
           }
         }
@@ -606,7 +606,7 @@ describe('TSDI', () => {
         setTimeout(() => {
           expect(testValue).toBe(10);
           done();
-        }, 20);
+        }, 200);
       });
 
       it('should call the initializer after  async dependencies w/o initializers are initialized', done => {
@@ -622,7 +622,7 @@ describe('TSDI', () => {
               setTimeout(() => {
                 this.value = 10;
                 resolve();
-              }, 10);
+              }, 100);
             });
           }
         }
@@ -648,7 +648,7 @@ describe('TSDI', () => {
         setTimeout(() => {
           expect(testValue).toBe(10);
           done();
-        }, 20);
+        }, 200);
       });
 
       it('should call the initalizer if all injections are itself initialized', done => {
@@ -663,7 +663,7 @@ describe('TSDI', () => {
               setTimeout(() => {
                 this.value = 10;
                 resolve();
-              }, 10);
+              }, 100);
             });
           }
         }
@@ -683,7 +683,7 @@ describe('TSDI', () => {
         setTimeout(() => {
           expect(testValue).toBe(10);
           done();
-        }, 15);
+        }, 150);
       });
 
       it('should throw if async initializer dependency is injected dynamically', () => {
@@ -698,7 +698,7 @@ describe('TSDI', () => {
               setTimeout(() => {
                 this.value = 10;
                 resolve();
-              }, 10);
+              }, 100);
             });
           }
         }
