@@ -10,7 +10,10 @@ export function managed(
   //
 }
 
-export function meta(_options: { singleton?: boolean }): ClassDecorator {
+export function meta(_options: {
+  singleton?: boolean;
+  scope?: string;
+}): ClassDecorator {
   return () => undefined;
 }
 

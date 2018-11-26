@@ -893,6 +893,7 @@ export class TSDI {
       }[];
       meta?: {
         singleton?: boolean;
+        scope?: string;
       };
       initializer?: string;
       disposer?: string;

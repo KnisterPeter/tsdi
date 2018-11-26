@@ -103,7 +103,7 @@ export function getDecoratorParameters(
 export function getValueFromObjectLiteral(
   node: ts.ObjectLiteralExpression,
   name: string
-): ts.Expression {
+): ts.Expression | undefined {
   const property = node.properties.find(property => {
     if (!ts.isPropertyAssignment(property)) {
       throw new Error('Invalid object literal');
@@ -114,7 +114,7 @@ export function getValueFromObjectLiteral(
     return property.name.getText() === name;
   }) as ts.PropertyAssignment;
   if (!property) {
-    throw new Error(`Property with '${name}' not found in object literal`);
+    return undefined;
   }
   return property.initializer;
 }
