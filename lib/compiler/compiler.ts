@@ -31,6 +31,7 @@ export interface Component {
   propertyDependencies: { property: string; type: ts.ClassDeclaration }[];
   meta: {
     singleton?: boolean;
+    scope?: string;
   };
   initializer?: string;
   disposer?: string;
@@ -168,12 +169,7 @@ export class Compiler {
                     // per type signature first parameter of provides is always
                     // object literal expression
                     const config = parameters[0] as ts.ObjectLiteralExpression;
-
-                    const singleton = getValueFromObjectLiteral(
-                      config,
-                      'singleton'
-                    );
-                    return singleton.kind !== ts.SyntaxKind.FalseKeyword;
+                    return this.isSingleton(config);
                   }
                   return true;
                 })();
@@ -297,17 +293,23 @@ export class Compiler {
     const meta = getDecorator('meta', dependency);
     if (meta) {
       const parameters = getDecoratorParameters(meta);
-
       // per type signature first parameter of meta is always object literal expression
       const config = parameters[0] as ts.ObjectLiteralExpression;
 
-      const singleton = getValueFromObjectLiteral(config, 'singleton');
-      if (singleton.kind === ts.SyntaxKind.FalseKeyword) {
-        component.meta.singleton = false;
-      } else {
-        component.meta.singleton = true;
+      component.meta.singleton = this.isSingleton(config);
+
+      const scope = getValueFromObjectLiteral(config, 'scope');
+      if (scope) {
+        if (ts.isStringLiteral(scope)) {
+          component.meta.scope = scope.text;
+        }
       }
     }
+  }
+
+  private isSingleton(expr: ts.ObjectLiteralExpression): boolean {
+    const singleton = getValueFromObjectLiteral(expr, 'singleton');
+    return !singleton || singleton.kind !== ts.SyntaxKind.FalseKeyword;
   }
 
   private async findContainers(
