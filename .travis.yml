@@ -1,9 +1,9 @@
 sudo: false
 language: node_js
 node_js:
-- stable
-- '8'
-- '6'
+  - stable
+  - '8'
+  - '6'
 matrix:
   fast_finish: true
 branches:
@@ -15,10 +15,10 @@ notifications:
     on_success: never
 cache:
   directories:
-  - node_modules
+    - node_modules
 
 before_script:
   - 'commitlint-travis'
   - 'yarn linter'
-script: 'yarn test'
+script: 'yarn test --runInBand'
 after_script: 'yarn coverage'
