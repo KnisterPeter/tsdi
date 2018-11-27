@@ -1,7 +1,7 @@
 import { basename, dirname, relative, sep } from 'path';
 import * as prettier from 'prettier';
 import * as ts from 'typescript';
-import { Component } from './compiler';
+import { Component } from './types';
 
 export interface ContainerBuilder {
   base: ts.ClassDeclaration;
