@@ -2,8 +2,13 @@ import { TSDI } from '../lib';
 
 describe('TSDI without reflection should be configurable', () => {
   let tsdi: TSDI;
+
   beforeEach(() => {
     tsdi = new TSDI();
+  });
+
+  afterEach(() => {
+    tsdi.close();
   });
 
   it('to declare injections for constructor and properties', () => {

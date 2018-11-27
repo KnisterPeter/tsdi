@@ -15,18 +15,18 @@
   "scripts": {
     "linter": "tslint --project ./tsconfig.json",
     "clean": "rimraf dist",
-    "prebuild": "npm run clean",
-    "build": "npm run build:cjs && npm run build:esm",
+    "prebuild": "yarn clean",
+    "build": "yarn build:cjs && yarn build:esm",
     "build:cjs": "tsc --sourceMap --module commonjs --outDir dist",
     "build:esm": "tsc --sourceMap --module esnext --outDir dist/esm",
-    "pretest": "npm run build",
+    "pretest": "yarn build",
     "test": "jest",
-    "prerelease": "git checkout master && git pull origin master && npm test && npm run build",
+    "prerelease": "git checkout master && git pull origin master && yarn test && yarn build",
     "release": "standard-version",
     "postrelease": "git push --follow-tags origin master && npm publish",
-    "precoverage": "npm run clean && tsc --inlineSourceMap",
+    "precoverage": "yarn clean && tsc --inlineSourceMap",
     "coverage": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
-    "build:watch": "npm run build:cjs -- --watch"
+    "build:watch": "yarn build:cjs -- --watch"
   },
   "author": {
     "name": "Markus Wolf",

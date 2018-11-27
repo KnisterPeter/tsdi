@@ -106,6 +106,8 @@ export class Compiler {
   }
 
   public async run(): Promise<void> {
+    const managed = await this.findManagedComponents(this.decoratorsSoureFile);
+
     const containers = await this.findContainers(this.decoratorsSoureFile);
     if (containers.length === 0) {
       throw new Error('No declared containers found.');
@@ -117,6 +119,7 @@ export class Compiler {
 
         const components: Map<ts.ClassDeclaration, Component> = new Map();
         const dependencyQueue: ts.ClassDeclaration[] = [
+          ...managed,
           ...(await this.findDependencies(members))
         ];
 
@@ -245,13 +248,19 @@ export class Compiler {
       const constructor = getConstructor(dependency);
       if (constructor) {
         await Promise.all(
-          constructor.parameters.map(async parameter => {
-            const dependency = findClosestClass(
-              await this.navigation.findDefinition(parameter)
-            );
-            dependencyQueue.push(dependency);
-            component.constructorDependencies.push(dependency);
-          })
+          constructor.parameters
+            .filter(
+              parameter =>
+                parameter.type &&
+                parameter.type.kind !== ts.SyntaxKind.AnyKeyword
+            )
+            .map(async parameter => {
+              const dependency = findClosestClass(
+                await this.navigation.findDefinition(parameter)
+              );
+              dependencyQueue.push(dependency);
+              component.constructorDependencies.push(dependency);
+            })
         );
       }
     }
@@ -328,6 +337,20 @@ export class Compiler {
       .map(container => {
         return container as ts.ClassDeclaration;
       });
+  }
+
+  private async findManagedComponents(
+    decoratorsSoureFile: string
+  ): Promise<ts.ClassDeclaration[]> {
+    const managedFunction = this.navigation.findFunction(
+      decoratorsSoureFile,
+      'managed'
+    );
+    const managedDecorators = await this.navigation.findUsages(managedFunction);
+
+    return managedDecorators
+      .map(decorator => findClosestDecoratedNode(decorator))
+      .map(node => findClosestClass(node));
   }
 
   private async findDependencies(
