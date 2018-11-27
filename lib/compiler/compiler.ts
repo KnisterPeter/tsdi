@@ -1,41 +1,17 @@
 import { dirname, join } from 'path';
 import * as ts from 'typescript';
-import { DefinitionNotFoundError } from './errors';
 import { Generator } from './generator';
 import { resolver } from './module-resolver';
 import { Navigation } from './navigation';
+import { Component, Container } from './types';
 import {
-  filter,
   findClosestClass,
   findClosestDecoratedNode,
   findTsdiRoot,
-  getConstructor,
   getDecorator,
   getDecoratorParameters,
-  getValueFromObjectLiteral,
-  hasDecorator,
-  isAbstract
+  getValueFromObjectLiteral
 } from './utils';
-
-/**
- * @internal
- */
-export interface Component {
-  type: ts.ClassDeclaration;
-  provider?: {
-    class: ts.ClassDeclaration;
-    method: string;
-    parameters: ts.ClassDeclaration[];
-  };
-  constructorDependencies: ts.ClassDeclaration[];
-  propertyDependencies: { property: string; type: ts.ClassDeclaration }[];
-  meta: {
-    singleton?: boolean;
-    scope?: string;
-  };
-  initializer?: string;
-  disposer?: string;
-}
 
 export interface CompilerHost {
   writeFile(fileName: string, data: string): void;
@@ -106,42 +82,25 @@ export class Compiler {
   }
 
   public async run(): Promise<void> {
-    const managed = await this.findManagedComponents(this.decoratorsSoureFile);
+    const managed = this.findManagedComponents(this.decoratorsSoureFile);
 
-    const containers = await this.findContainers(this.decoratorsSoureFile);
+    const containers = this.findContainers(this.decoratorsSoureFile);
     if (containers.length === 0) {
       throw new Error('No declared containers found.');
     }
 
-    const builder = await Promise.all(
-      containers.map(async container => {
-        const members = filter(container.members, isAbstract);
+    const builder = containers.map(containerNode => {
+      const container = new Container(containerNode, this.navigation);
+      this.addExternalComponents(containers, container, managed);
 
-        const components: Map<ts.ClassDeclaration, Component> = new Map();
-        const dependencyQueue: ts.ClassDeclaration[] = [
-          ...managed,
-          ...(await this.findDependencies(members))
-        ];
+      container.validate();
 
-        const units = await this.getContainerUnits(container);
-        units.forEach(unit => dependencyQueue.push(unit));
-        await this.handleProvides(units, components, dependencyQueue);
+      return this.generator
+        .buildContainer(container.node)
+        .addAbstractMembers(container.entryPoints)
+        .addComponents(...container.managed);
+    });
 
-        while (dependencyQueue.length > 0) {
-          const dependency = dependencyQueue.shift();
-          if (!dependency) {
-            break;
-          }
-
-          await this.handleDependency(dependency, components, dependencyQueue);
-        }
-
-        return this.generator
-          .buildContainer(container)
-          .addAbstractMembers(members)
-          .addComponents(...Array.from(components.values()));
-      })
-    );
     await Promise.all(
       builder.map(async builder => {
         const name = `tsdi-${builder.base.name!.getText().toLowerCase()}.ts`;
@@ -153,184 +112,26 @@ export class Compiler {
     );
   }
 
-  private async handleProvides(
-    units: ts.ClassDeclaration[],
-    components: Map<ts.ClassDeclaration, Component>,
-    dependencyQueue: ts.ClassDeclaration[]
-  ): Promise<void> {
-    await Promise.all(
-      units.map(async unit => {
-        await Promise.all(
-          unit.members.map(async member => {
-            if (ts.isMethodDeclaration(member)) {
-              const provides = getDecorator('provides', member);
-              if (provides) {
-                // -- is singleton?
-                const singleton = (() => {
-                  const parameters = getDecoratorParameters(provides);
-                  if (parameters.length > 0) {
-                    // per type signature first parameter of provides is always
-                    // object literal expression
-                    const config = parameters[0] as ts.ObjectLiteralExpression;
-                    return this.isSingleton(config);
-                  }
-                  return true;
-                })();
-                // /- is singleton?
-
-                const parameterTypes = await this.getMethodParameterTypes(
-                  member
-                );
-                const returnType = await this.getMethodReturnType(member);
-                parameterTypes.forEach(parameter =>
-                  dependencyQueue.push(parameter)
-                );
-                dependencyQueue.push(returnType);
-                if (!components.has(returnType)) {
-                  const component: Component = {
-                    type: returnType,
-                    constructorDependencies: [],
-                    propertyDependencies: [],
-                    meta: {
-                      singleton
-                    }
-                  };
-                  components.set(returnType, component);
-                }
-                components.get(returnType)!.provider = {
-                  class: unit,
-                  method: member.name.getText(),
-                  parameters: parameterTypes
-                };
-              }
-            }
-          })
-        );
-      })
-    );
-  }
-
-  private checkManagedDecorator(
-    dependency: ts.ClassDeclaration,
-    component: Component
+  private addExternalComponents(
+    containers: ts.ClassDeclaration[],
+    container: Container,
+    managed: ts.ClassDeclaration[]
   ): void {
-    if (
-      !hasDecorator('managed', dependency) &&
-      !component.provider &&
-      !hasDecorator('unit', dependency)
-    ) {
-      throw new Error(
-        `Managed dependency '${
-          dependency.name!.text
-        }' is missing @managed decorator`
-      );
-    }
+    const externals =
+      containers.length === 1
+        ? managed.map(external => new Component(external, this.navigation))
+        : this.getExternalsForContainer(managed, container);
+    externals.forEach(external => {
+      container.addManagedDependency(external);
+    });
   }
 
-  private async handleDependency(
-    dependency: ts.ClassDeclaration,
-    components: Map<ts.ClassDeclaration, Component>,
-    dependencyQueue: ts.ClassDeclaration[]
-  ): Promise<void> {
-    if (!components.has(dependency)) {
-      components.set(dependency, {
-        type: dependency,
-        constructorDependencies: [],
-        propertyDependencies: [],
-        meta: {}
-      });
-    }
-    const component = components.get(dependency)!;
-
-    this.checkManagedDecorator(dependency, component);
-
-    if (hasDecorator('managed', dependency)) {
-      const constructor = getConstructor(dependency);
-      if (constructor) {
-        await Promise.all(
-          constructor.parameters
-            .filter(
-              parameter =>
-                parameter.type &&
-                parameter.type.kind !== ts.SyntaxKind.AnyKeyword
-            )
-            .map(async parameter => {
-              const dependency = findClosestClass(
-                await this.navigation.findDefinition(parameter)
-              );
-              dependencyQueue.push(dependency);
-              component.constructorDependencies.push(dependency);
-            })
-        );
-      }
-    }
-
-    this.handleMeta(dependency, component);
-
-    await Promise.all(
-      dependency.members.map(async member => {
-        if (ts.isPropertyDeclaration(member)) {
-          if (hasDecorator('managed', member)) {
-            const definition = findClosestClass(
-              await this.navigation.findDefinition(member)
-            );
-
-            dependencyQueue.push(definition);
-
-            const propertyName = member.name.getText();
-            component.propertyDependencies.push({
-              property: propertyName,
-              type: definition
-            });
-          }
-        } else if (ts.isMethodDeclaration(member)) {
-          if (hasDecorator('initialize', member)) {
-            component.initializer = member.name.getText();
-          }
-          if (hasDecorator('destroy', member)) {
-            component.disposer = member.name.getText();
-          }
-        }
-      })
-    );
-  }
-
-  private handleMeta(
-    dependency: ts.ClassDeclaration,
-    component: Component
-  ): void {
-    const meta = getDecorator('meta', dependency);
-    if (meta) {
-      const parameters = getDecoratorParameters(meta);
-      // per type signature first parameter of meta is always object literal expression
-      const config = parameters[0] as ts.ObjectLiteralExpression;
-
-      component.meta.singleton = this.isSingleton(config);
-
-      const scope = getValueFromObjectLiteral(config, 'scope');
-      if (scope) {
-        if (ts.isStringLiteral(scope)) {
-          component.meta.scope = scope.text;
-        }
-      }
-    }
-  }
-
-  private isSingleton(expr: ts.ObjectLiteralExpression): boolean {
-    const singleton = getValueFromObjectLiteral(expr, 'singleton');
-    return !singleton || singleton.kind !== ts.SyntaxKind.FalseKeyword;
-  }
-
-  private async findContainers(
-    decoratorsSoureFile: string
-  ): Promise<ts.ClassDeclaration[]> {
+  private findContainers(decoratorsSoureFile: string): ts.ClassDeclaration[] {
     const containerFunction = this.navigation.findFunction(
       decoratorsSoureFile,
       'container'
     );
-    const containerDecorators = await this.navigation.findUsages(
-      containerFunction
-    );
+    const containerDecorators = this.navigation.findUsages(containerFunction);
 
     return containerDecorators
       .map(decorator => findClosestDecoratedNode(decorator))
@@ -339,100 +140,41 @@ export class Compiler {
       });
   }
 
-  private async findManagedComponents(
+  private findManagedComponents(
     decoratorsSoureFile: string
-  ): Promise<ts.ClassDeclaration[]> {
+  ): ts.ClassDeclaration[] {
     const managedFunction = this.navigation.findFunction(
       decoratorsSoureFile,
       'managed'
     );
-    const managedDecorators = await this.navigation.findUsages(managedFunction);
+    const managedDecorators = this.navigation.findUsages(managedFunction);
 
     return managedDecorators
       .map(decorator => findClosestDecoratedNode(decorator))
       .map(node => findClosestClass(node));
   }
 
-  private async findDependencies(
-    members: ReadonlyArray<ts.ClassElement>
-  ): Promise<ts.ClassDeclaration[]> {
-    const tasks = members.map(async member => {
-      if (ts.isPropertyDeclaration(member)) {
-        return findClosestClass(await this.navigation.findDefinition(member));
-      }
-      throw new Error(`Unknown class element ${member}`);
-    });
+  private getExternalsForContainer(
+    externals: ts.ClassDeclaration[],
+    container: Container
+  ): Component[] {
+    return externals
+      .filter(external => {
+        const externalDecorator = getDecorator('managed', external)!;
 
-    return Promise.all(tasks);
-  }
-
-  private async getMethodParameterTypes(
-    node: ts.MethodDeclaration
-  ): Promise<ts.ClassDeclaration[]> {
-    return Promise.all(
-      node.parameters.map(async parameter => {
-        return findClosestClass(
-          await this.navigation.findDefinition(parameter)
-        );
+        const parameters = getDecoratorParameters(externalDecorator);
+        if (parameters.length > 0) {
+          // per type signature first parameter of provides is always
+          // object literal expression
+          const config = parameters[0] as ts.ObjectLiteralExpression;
+          const value = getValueFromObjectLiteral(config, 'by');
+          if (value && ts.isIdentifier(value)) {
+            const cls = findClosestClass(this.navigation.findDefinition(value));
+            return cls === container.node;
+          }
+        }
+        return false;
       })
-    );
-  }
-
-  private async getMethodReturnType(
-    node: ts.MethodDeclaration
-  ): Promise<ts.ClassDeclaration> {
-    if (!node.type) {
-      throw new Error(
-        `@provides requires methods to declare a return type '${node.getText()}`
-      );
-    }
-    let type: ts.Node = node.type;
-    if (ts.isTypeReferenceNode(type)) {
-      type = type.typeName;
-    }
-    if (!ts.isIdentifier(type)) {
-      throw new Error(`${type.getText()} is an unsupported type declartaion`);
-    }
-
-    return findClosestClass(await this.navigation.findDefinition(type));
-  }
-
-  private async getContainerUnits(
-    node: ts.ClassDeclaration
-  ): Promise<ts.ClassDeclaration[]> {
-    const parameters = getDecoratorParameters(node.decorators![0]);
-    // per type signature first parameter of container is always
-    // object literal expression
-    const config = parameters[0] as ts.ObjectLiteralExpression;
-
-    // per type signature units is always array literal expression
-    const unitsArray = getValueFromObjectLiteral(
-      config,
-      'units'
-    ) as ts.ArrayLiteralExpression;
-
-    const unitIdentifiers = unitsArray.elements.map(element => {
-      if (!ts.isIdentifier(element)) {
-        throw new Error(
-          'Invalid @container decorator: units need to be identifiers'
-        );
-      }
-      return element;
-    });
-
-    try {
-      return await Promise.all(
-        unitIdentifiers.map(async unitIdentifier => {
-          return findClosestClass(
-            await this.navigation.findDefinition(unitIdentifier)
-          );
-        })
-      );
-    } catch (e) {
-      if (e instanceof DefinitionNotFoundError) {
-        throw new Error('Declared unit not found');
-      }
-      throw e;
-    }
+      .map(external => new Component(external, this.navigation));
   }
 }

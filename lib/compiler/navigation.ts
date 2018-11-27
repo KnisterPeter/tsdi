@@ -60,9 +60,9 @@ export class Navigation {
   }
 
   // tslint:disable-next-line:cyclomatic-complexity
-  public async findDefinition(
+  public findDefinition(
     node: ts.PropertyDeclaration | ts.ParameterDeclaration | ts.Identifier
-  ): Promise<ts.Node> {
+  ): ts.Node {
     let type: ts.Node;
     if (ts.isIdentifier(node)) {
       type = node;
@@ -111,11 +111,9 @@ export class Navigation {
     return definitionNode;
   }
 
-  public async findUsages(node: ts.Identifier): Promise<ts.Node[]>;
-  public async findUsages(node: ts.FunctionDeclaration): Promise<ts.Node[]>;
-  public async findUsages(
-    node: ts.Identifier | ts.FunctionDeclaration
-  ): Promise<ts.Node[]> {
+  public findUsages(node: ts.Identifier): ts.Node[];
+  public findUsages(node: ts.FunctionDeclaration): ts.Node[];
+  public findUsages(node: ts.Identifier | ts.FunctionDeclaration): ts.Node[] {
     let name: ts.Identifier;
     if (!ts.isIdentifier(node)) {
       if (!node.name) {

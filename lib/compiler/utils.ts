@@ -1,6 +1,8 @@
 import { existsSync, readFileSync } from 'fs';
 import { dirname, join } from 'path';
 import * as ts from 'typescript';
+import { Navigation } from './navigation';
+import { Component } from './types';
 
 export function findTsdiRoot(): string {
   let dir = __dirname;
@@ -117,4 +119,58 @@ export function getValueFromObjectLiteral(
     return undefined;
   }
   return property.initializer;
+}
+
+export function checkManagedDecorator(
+  dependency: ts.ClassDeclaration,
+  component: Component
+): void {
+  if (
+    !hasDecorator('managed', dependency) &&
+    !component.provider &&
+    !hasDecorator('unit', dependency)
+  ) {
+    throw new Error(
+      `Managed dependency '${
+        dependency.name!.text
+      }' is missing @managed decorator`
+    );
+  }
+}
+
+export function isSingleton(expr: ts.ObjectLiteralExpression): boolean {
+  const singleton = getValueFromObjectLiteral(expr, 'singleton');
+  return !singleton || singleton.kind !== ts.SyntaxKind.FalseKeyword;
+}
+
+export function getMethodReturnType(
+  node: ts.MethodDeclaration,
+  navigation: Navigation
+): ts.ClassDeclaration {
+  if (!node.type) {
+    throw new Error(
+      `@provides requires methods to declare a return type '${node.getText()}`
+    );
+  }
+  let type: ts.Node = node.type;
+  if (ts.isTypeReferenceNode(type)) {
+    type = type.typeName;
+  }
+  if (!ts.isIdentifier(type)) {
+    throw new Error(`${type.getText()} is an unsupported type declartaion`);
+  }
+
+  return findClosestClass(navigation.findDefinition(type));
+}
+
+export function findDependencies(
+  members: ReadonlyArray<ts.ClassElement>,
+  navigation: Navigation
+): ts.ClassDeclaration[] {
+  return members.map(member => {
+    if (ts.isPropertyDeclaration(member)) {
+      return findClosestClass(navigation.findDefinition(member));
+    }
+    throw new Error(`Unknown class element ${member}`);
+  });
 }
