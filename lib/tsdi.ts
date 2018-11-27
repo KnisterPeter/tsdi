@@ -80,8 +80,31 @@ export interface LifecycleListener {
 
 @managed
 export class TSDI {
+  /**
+   * @internal
+   */
+  public static creating = false;
+
+  private static containerHolder: { criteria: any; container: TSDI }[] = [];
+
   private static customExternalContainerResolver = false;
   private static _externalContainerResolver: () => TSDI = () => undefined!;
+
+  /**
+   * @internal
+   */
+  public static getContainer(criteria: any): TSDI {
+    const container = this.containerHolder.find(
+      container => container.criteria === criteria
+    );
+    if (!container) {
+      if (criteria === undefined) {
+        return TSDI.containerHolder[0].container;
+      }
+      throw new Error(`Failed to get TSDI for '${criteria.name || criteria}'`);
+    }
+    return container.container;
+  }
 
   public static get externalContainerResolver(): () => TSDI {
     return TSDI._externalContainerResolver;
@@ -106,10 +129,16 @@ export class TSDI {
 
   private readonly scopes: { [name: string]: boolean } = {};
 
-  constructor() {
+  constructor(criteria?: any) {
     if (!TSDI.customExternalContainerResolver) {
       TSDI._externalContainerResolver = () => this;
     }
+
+    if (TSDI.containerHolder.find(holder => holder.criteria === criteria)) {
+      console.warn('Already existing TSDI criteria', criteria);
+    }
+    TSDI.containerHolder.push({ criteria, container: this });
+
     this.configure(TSDI);
     this.instances[0] = this;
   }
@@ -160,6 +189,10 @@ export class TSDI {
       removeListener(this.listener);
       this.listener = undefined;
     }
+
+    TSDI.containerHolder = TSDI.containerHolder.filter(
+      container => container.container !== this
+    );
   }
 
   private destroyInstance(
@@ -436,7 +469,12 @@ export class TSDI {
       }
       const constructor: Constructable<T> = metadata.fn as any;
       const parameters = this.getConstructorParameters(metadata);
-      return new constructor(...parameters);
+      try {
+        TSDI.creating = true;
+        return new constructor(...parameters);
+      } finally {
+        TSDI.creating = false;
+      }
     };
 
     const instance = instanciate();
@@ -537,6 +575,28 @@ export class TSDI {
       instance[init].call(instance);
     }
     return instance;
+  }
+
+  /**
+   * @internal
+   */
+  public injectExternal(instance: any, target: any): void {
+    const idx = this.getComponentMetadataIndex(target);
+    const metadata = this.components[idx];
+    if (!metadata) {
+      this.throwComponentNotFoundError(target);
+    }
+    if (isFactoryMetadata(metadata)) {
+      throw new Error('Unable to inject into external factory');
+    }
+    this.injectIntoInstance(instance, true, metadata);
+    const init: string = Reflect.getMetadata(
+      'component:init',
+      target.prototype
+    );
+    if (init) {
+      instance[init].call(instance);
+    }
   }
 
   private injectIntoInstance(

@@ -29,6 +29,25 @@ describe('TSDI', () => {
       tsdi.close();
     });
 
+    it('should warn if create two instances with same criteria', done => {
+      let tsdi2: TSDI | undefined;
+
+      const consoleWarn = console.warn;
+      try {
+        console.warn = function(msg: string): void {
+          expect(msg).toBe('Already existing TSDI criteria');
+          done();
+        };
+
+        tsdi2 = new TSDI();
+      } finally {
+        console.warn = consoleWarn;
+        if (tsdi2) {
+          tsdi2.close();
+        }
+      }
+    });
+
     it('a returned component should be of the requested instance', () => {
       tsdi.register(User);
       tsdi.register(Dependency);

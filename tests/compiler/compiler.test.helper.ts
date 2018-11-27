@@ -119,13 +119,16 @@ export async function testContainer(
       exports: {}
     };
     const context = createContext(sandbox);
-    new Script(moduleCode).runInContext(context);
+    new Script(moduleCode).runInContext(context, {
+      displayErrors: true
+    });
     return sandbox.exports;
   };
 
   const moduleCache: { [id: string]: any } = {};
+  // tslint:disable-next-line:cyclomatic-complexity
   const customRequire = (id: string) => {
-    if (id === 'tsdi') {
+    if (id === 'tsdi' || id === '../tsdi') {
       return require('../../lib');
     }
     if (id === '/decorators') {
@@ -148,21 +151,17 @@ export async function testContainer(
     const script = transpile(`
       ${code}
 
-      (async () => {
-        const container = new TSDIContainer();
-        try {
-          const result = container.test(expect);
-          if (result && result.then && result.catch) {
-            result.then(() => resolve()).catch(e => reject(e));
-          } else {
-            resolve();
-          }
-        } catch (e) {
-          reject(e);
+      const container = new TSDIContainer();
+      try {
+        const result = container.test(expect);
+        if (result && result.then && result.catch) {
+          result.then(() => resolve()).catch(e => reject(e));
+        } else {
+          resolve();
         }
-      })().catch(e => {
+      } catch (e) {
         reject(e);
-      });
+      }
     `);
     new Script(script).runInNewContext({
       expect,
@@ -170,7 +169,8 @@ export async function testContainer(
       module: { exports: {} },
       exports: {},
       resolve,
-      reject
+      reject,
+      console
     });
   });
 }

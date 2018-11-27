@@ -114,10 +114,20 @@ describe('TSDI when creating a container instance with external classes', () => 
 });
 
 describe('TSDI with external components', () => {
-  it('should use the default resolver (latest created tsdi instance)', () => {
-    const tsdiInacctive = new TSDI();
-    const tsdiActive = new TSDI();
+  let tsdiInacctive: TSDI;
+  let tsdiActive: TSDI;
 
+  beforeEach(() => {
+    tsdiInacctive = new TSDI();
+    tsdiActive = new TSDI({});
+  });
+
+  afterEach(() => {
+    tsdiInacctive.close();
+    tsdiActive.close();
+  });
+
+  it('should use the default resolver (latest created tsdi instance)', () => {
     @component
     class Injectable {}
     tsdiActive.register(Injectable);
@@ -131,10 +141,9 @@ describe('TSDI with external components', () => {
     expect(new Test().injectable).toBe(tsdiActive.get(Injectable));
     expect(new Test().injectable).not.toBe(tsdiInacctive.get(Injectable));
   });
+
   it('should use a custom resolver if provided', () => {
-    const tsdiInacctive = new TSDI();
     TSDI.externalContainerResolver = () => tsdiInacctive;
-    const tsdiActive = new TSDI();
 
     @component
     class Injectable {}

@@ -186,7 +186,7 @@ export class Generator {
 
             constructor() {
               super();
-              this.tsdi = new TSDI();
+              this.tsdi = new TSDI(${baseName});
               ${components
                 .map(component => {
                   if (!component.type.name) {

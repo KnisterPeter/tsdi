@@ -111,13 +111,21 @@ export class Navigation {
     return definitionNode;
   }
 
+  public async findUsages(node: ts.Identifier): Promise<ts.Node[]>;
+  public async findUsages(node: ts.FunctionDeclaration): Promise<ts.Node[]>;
   public async findUsages(
-    node: ts.FunctionLikeDeclaration
+    node: ts.Identifier | ts.FunctionDeclaration
   ): Promise<ts.Node[]> {
-    if (!node.name) {
-      throw new Error(
-        'Finding usage of function like nodes without name is not implemented'
-      );
+    let name: ts.Identifier;
+    if (!ts.isIdentifier(node)) {
+      if (!node.name) {
+        throw new Error(
+          'Finding usage of function like nodes without name is not implemented'
+        );
+      }
+      name = node.name;
+    } else {
+      name = node;
     }
 
     const sourceFile = node.getSourceFile();
@@ -125,7 +133,7 @@ export class Navigation {
 
     const referencedSymbols = this.services.findReferences(
       filename,
-      node.name.getStart()
+      name.getStart()
     );
     if (!referencedSymbols) {
       throw new Error('No references found');
