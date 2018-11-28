@@ -1,6 +1,6 @@
-import { runCompiler, testContainer } from './compiler.test.helper';
+import { runCompiler } from './compiler.test.helper';
 
-test('TSDI compiler generates constructor injected configuration', async () => {
+test('TSDI compiler generates scope configuration', async () => {
   const files: { [name: string]: string } = {
     '/file.ts': `
       import { container, managed, meta } from '/decorators';
@@ -24,5 +24,7 @@ test('TSDI compiler generates constructor injected configuration', async () => {
 
   await runCompiler(files);
 
-  await testContainer(files['/tsdi-container.ts'], files, expect);
+  expect(files['/tsdi-container.ts']).toEqual(
+    expect.stringContaining('meta: { singleton: true, scope: "some-scope" }')
+  );
 });

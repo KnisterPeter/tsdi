@@ -76,6 +76,7 @@ export class Generator {
       const hasPropertyDependencies = () =>
         component.propertyDependencies.length > 0;
       const hasSingleton = () => typeof component.meta.singleton === 'boolean';
+      const hasScope = () => typeof component.meta.scope !== 'undefined';
       const hasMeta = () => hasSingleton();
       const hasInitializer = () => component.initializer;
       const hasDisposer = () => component.disposer;
@@ -121,6 +122,9 @@ export class Generator {
           emitObjectIf(true, () => {
             emitPropertyIf(hasSingleton, 'singleton', () => {
               code += Boolean(component.meta.singleton);
+            });
+            emitPropertyIf(hasScope, 'scope', () => {
+              emitString(component.meta.scope);
             });
           });
         });
