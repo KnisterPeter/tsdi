@@ -1,93 +1,88 @@
-import { dirname, join } from 'path';
+import { join } from 'path';
 import * as ts from 'typescript';
 import { createContext, Script } from 'vm';
 import { Compiler } from '../../lib/compiler/compiler';
+import { CompilerHost } from '../../lib/compiler/host';
 import { findTsdiRoot } from '../../lib/compiler/utils';
-
-function getTestLanguageSerivce(files: {
-  [name: string]: string;
-}): ts.LanguageService {
-  const root = findTsdiRoot();
-  const decoratorsFile = join(root, 'lib', 'compiler', 'decorators.ts');
-  files['/decorators.ts'] = ts.sys.readFile(decoratorsFile)!;
-
-  const options = ts.getDefaultCompilerOptions();
-  options.experimentalDecorators = true;
-
-  return ts.createLanguageService(
-    {
-      getScriptFileNames: () => Object.keys(files),
-      getDefaultLibFileName: () => ts.getDefaultLibFileName(options),
-      getCurrentDirectory: () => '/',
-      getCompilationSettings: () => options,
-      getScriptVersion: _ => '0',
-      getScriptSnapshot: fileName => {
-        if (files[fileName]) {
-          return ts.ScriptSnapshot.fromString(files[fileName]);
-        } else if (fileName === decoratorsFile) {
-          return ts.ScriptSnapshot.fromString(ts.sys.readFile(decoratorsFile)!);
-        } else if (fileName.endsWith('.d.ts')) {
-          try {
-            return ts.ScriptSnapshot.fromString(
-              ts.sys.readFile(require.resolve(`typescript/lib/${fileName}`))!
-            );
-          } catch {
-            return ts.ScriptSnapshot.fromString(
-              ts.sys.readFile(
-                require.resolve(`typescript/lib/lib.${fileName}`)
-              )!
-            );
-          }
-        } else if (fileName.startsWith('/tsdi')) {
-          return ts.ScriptSnapshot.fromString(
-            ts.sys.readFile(require.resolve(fileName.substr(1)))!
-          );
-        }
-        return undefined;
-      },
-      resolveModuleNames: (moduleNames, containingFile) => {
-        return moduleNames.map(moduleName => {
-          if (files[moduleName + '.ts']) {
-            return {
-              resolvedFileName: moduleName + '.ts'
-            };
-          }
-          if (moduleName === 'tsdi') {
-            return {
-              resolvedFileName: join('/tsdi', 'lib', 'index.ts')
-            };
-          }
-          if (
-            moduleName.startsWith('.') &&
-            containingFile.startsWith('/tsdi')
-          ) {
-            return {
-              resolvedFileName:
-                join(dirname(containingFile), moduleName) + '.ts'
-            };
-          }
-          return undefined!;
-        });
-      }
-    },
-    ts.createDocumentRegistry()
-  );
-}
 
 export async function runCompiler(files: {
   [name: string]: string;
 }): Promise<string> {
   return new Promise<string>(async (resolve, reject) => {
     try {
-      const service = getTestLanguageSerivce(files);
-      const compiler = Compiler.create(
-        {
-          writeFile: (_, data) => resolve(data)
+      const root = findTsdiRoot();
+      const decoratorsFile = join(root, 'lib', 'compiler', 'decorators.ts');
+      files['/decorators.ts'] = ts.sys
+        .readFile(decoratorsFile)!
+        .replace('../tsdi', 'tsdi');
+      files['/tsconfig.json'] = `{
+        "compilerOptions": {
+          "target": "es5",
+          "module": "commonjs",
+          "experimentalDecorators": true,
+        }
+      }`;
+
+      const resolveTsdiLibraryPath = (path: string) => {
+        return require.resolve(path.replace(/node_modules\//, '').substr(1));
+      };
+
+      const host: CompilerHost = {
+        getCurrentDirectory: () => '/',
+        realpath: path => {
+          if (path.startsWith('./')) {
+            return join(host.getCurrentDirectory(), path).replace('//', '/');
+          }
+          return path;
         },
-        '.',
-        '/decorators.ts',
-        service
-      );
+        fileExists: path => {
+          const exists = Boolean(files[host.realpath!(path)]);
+          if (!exists) {
+            try {
+              return Boolean(resolveTsdiLibraryPath(path));
+            } catch (e) {
+              //
+            }
+          }
+          return exists;
+        },
+        readFile: path => {
+          const content = files[host.realpath!(path)];
+          if (content === undefined) {
+            try {
+              return ts.sys.readFile(resolveTsdiLibraryPath(path));
+            } catch (e) {
+              if (path.endsWith('.d.ts')) {
+                try {
+                  return ts.sys.readFile(
+                    require.resolve(`typescript/lib/${path}`)
+                  );
+                } catch {
+                  console.log(path);
+                  return ts.sys.readFile(
+                    require.resolve(`typescript/lib/lib.${path}`)
+                  );
+                }
+              }
+              console.log('readFile', path, 'unimplemented');
+            }
+          }
+          return content;
+        },
+        readDirectory: path => {
+          if (path !== '/') {
+            throw new Error('unimplemented');
+          }
+          return Object.keys(files).filter(path => path.indexOf('/', 1) === -1);
+        },
+        writeFile: (_, data) => resolve(data)
+      };
+      (host as any).onUnRecoverableConfigFileDiagnostic = (
+        diagnostic: ts.Diagnostic
+      ) => {
+        throw new Error(diagnostic.messageText.toString());
+      };
+      const compiler = Compiler.create(host, '.', '/decorators.ts');
       await compiler.run();
     } catch (e) {
       reject(e);

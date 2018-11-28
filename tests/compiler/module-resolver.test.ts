@@ -1,8 +1,17 @@
 import * as path from 'path';
 import * as ts from 'typescript';
-import { resolver } from '../../lib/compiler/module-resolver';
+import {
+  createResolver,
+  ResolverFunction
+} from '../../lib/compiler/module-resolver';
 
 describe('Module Resolver', () => {
+  let resolver: ResolverFunction;
+
+  beforeAll(() => {
+    resolver = createResolver(ts.sys);
+  });
+
   it('will return undefined for unresolved modules', () => {
     expect(resolver(['unknown'], '/source.ts')).toEqual([undefined]);
   });
