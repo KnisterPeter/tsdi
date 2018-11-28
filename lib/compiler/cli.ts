@@ -1,13 +1,9 @@
-import { writeFileSync } from 'fs';
-import { Compiler, CompilerHost } from './compiler';
+import * as ts from 'typescript';
+import { Compiler } from './compiler';
 
 const root = process.argv.length > 1 ? process.argv[2] : undefined;
 
-const host: CompilerHost = {
-  writeFile: (filename, code) => writeFileSync(filename, code)
-};
-
-Compiler.create(host, root)
+Compiler.create(ts.sys, root)
   .run()
   .then(() => {
     process.exit(0);

@@ -1,7 +1,8 @@
 import { dirname, join } from 'path';
 import * as ts from 'typescript';
 import { Generator } from './generator';
-import { resolver } from './module-resolver';
+import { CompilerHost } from './host';
+import { createResolver } from './module-resolver';
 import { Navigation } from './navigation';
 import { Component, Container } from './types';
 import {
@@ -13,10 +14,6 @@ import {
   getValueFromObjectLiteral
 } from './utils';
 
-export interface CompilerHost {
-  writeFile(fileName: string, data: string): void;
-}
-
 export class Compiler {
   public static create(
     host: CompilerHost,
@@ -27,16 +24,11 @@ export class Compiler {
       'lib',
       'compiler',
       'decorators.d.ts'
-    ),
-    languageService = Compiler.createLanguageService(root)
+    )
   ): Compiler {
-    return new Compiler(host, decoratorsSoureFile, languageService);
-  }
-
-  private static createLanguageService(root: string): ts.LanguageService {
     const configFile = ts.findConfigFile(
-      root || process.cwd(),
-      ts.sys.fileExists
+      root || host.getCurrentDirectory(),
+      host.fileExists
     );
     if (!configFile) {
       throw new Error('Unable to find tsconfig.json');
@@ -45,12 +37,20 @@ export class Compiler {
     const cmdline = ts.getParsedCommandLineOfConfigFile(
       configFile,
       {},
-      ts.sys as any
+      host as any
     );
     if (!cmdline) {
       throw new Error('Unable to parse config file');
     }
 
+    const languageService = Compiler.createLanguageService(cmdline, host);
+    return new Compiler(host, decoratorsSoureFile, languageService);
+  }
+
+  private static createLanguageService(
+    cmdline: ts.ParsedCommandLine,
+    host: CompilerHost
+  ): ts.LanguageService {
     return ts.createLanguageService({
       getScriptFileNames: () => cmdline.fileNames,
       getDefaultLibFileName: () => ts.getDefaultLibFileName(cmdline.options),
@@ -58,13 +58,13 @@ export class Compiler {
       getCompilationSettings: () => cmdline.options,
       getScriptVersion: _ => '0',
       getScriptSnapshot: fileName => {
-        const code = ts.sys.readFile(fileName);
+        const code = host.readFile(fileName);
         if (!code) {
           return undefined;
         }
         return ts.ScriptSnapshot.fromString(code);
       },
-      resolveModuleNames: resolver
+      resolveModuleNames: createResolver(host)
     });
   }
 
@@ -78,6 +78,21 @@ export class Compiler {
     private readonly services: ts.LanguageService
   ) {
     this.navigation = new Navigation(this.services);
+
+    // // enable to output diagnostics
+    // const diag = [
+    //   ...this.services.getProgram()!.getGlobalDiagnostics(),
+    //   ...this.services.getProgram()!.getSyntacticDiagnostics(),
+    //   ...this.services.getProgram()!.getSemanticDiagnostics()
+    // ];
+    // console.log(
+    //   ts.formatDiagnostics(diag, {
+    //     getCanonicalFileName: path => path,
+    //     getCurrentDirectory: ts.sys.getCurrentDirectory,
+    //     getNewLine: () => '\n'
+    //   })
+    // );
+
     this.generator = new Generator();
   }
 

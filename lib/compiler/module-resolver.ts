@@ -1,29 +1,47 @@
 import { dirname, join } from 'path';
 import * as ts from 'typescript';
+import { CompilerHost } from './host';
 
-export function resolver(
-  moduleNames: string[],
-  containingFile: string
-): ts.ResolvedModule[] {
-  return moduleNames.map(moduleName => {
-    let resolvedPath = moduleName;
-    if (!resolvedPath.startsWith('/')) {
-      if (resolvedPath.startsWith('.')) {
-        resolvedPath = join(dirname(containingFile), resolvedPath);
-      } else {
-        resolvedPath = join(
-          ts.sys.getCurrentDirectory(),
-          'node_modules',
-          resolvedPath
-        );
+export type ResolverFunction = (
+  names: string[],
+  file: string
+) => ts.ResolvedModule[];
+
+export function createResolver(host: CompilerHost = ts.sys): ResolverFunction {
+  return function resolver(
+    moduleNames: string[],
+    containingFile: string
+  ): ts.ResolvedModule[] {
+    return moduleNames.map(moduleName => {
+      let resolvedPath = moduleName;
+      if (!resolvedPath.startsWith('/')) {
+        if (resolvedPath.startsWith('.')) {
+          resolvedPath = join(dirname(containingFile), resolvedPath);
+        } else {
+          const { resolvedModule } = ts.nodeModuleNameResolver(
+            moduleName,
+            containingFile,
+            {},
+            host
+          );
+          if (resolvedModule) {
+            return { resolvedFileName: resolvedModule.resolvedFileName };
+          }
+
+          resolvedPath = join(
+            host.getCurrentDirectory(),
+            'node_modules',
+            resolvedPath
+          );
+        }
       }
-    }
-    if (ts.sys.fileExists(resolvedPath + '.ts')) {
-      return { resolvedFileName: ts.sys.realpath!(resolvedPath + '.ts') };
-    }
-    if (ts.sys.fileExists(resolvedPath + '.d.ts')) {
-      return { resolvedFileName: ts.sys.realpath!(resolvedPath + '.d.ts') };
-    }
-    return undefined!;
-  });
+      if (host.fileExists(resolvedPath + '.ts')) {
+        return { resolvedFileName: host.realpath!(resolvedPath + '.ts') };
+      }
+      if (host.fileExists(resolvedPath + '.d.ts')) {
+        return { resolvedFileName: host.realpath!(resolvedPath + '.d.ts') };
+      }
+      return undefined!;
+    });
+  };
 }
