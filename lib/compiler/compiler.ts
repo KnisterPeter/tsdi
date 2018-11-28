@@ -82,19 +82,21 @@ export class Compiler {
   }
 
   public async run(): Promise<void> {
-    const managed = this.findManagedComponents(this.decoratorsSoureFile);
-
-    const containers = this.findContainers(this.decoratorsSoureFile);
-    if (containers.length === 0) {
+    const containerNodes = this.findContainers(this.decoratorsSoureFile);
+    if (containerNodes.length === 0) {
       throw new Error('No declared containers found.');
     }
 
-    const builder = containers.map(containerNode => {
-      const container = new Container(containerNode, this.navigation);
-      this.addExternalComponents(containers, container, managed);
-
+    const containers = containerNodes.map(node => {
+      const container = new Container(node, this.navigation);
       container.validate();
+      return container;
+    });
 
+    const managed = this.findManagedComponents(this.decoratorsSoureFile);
+    this.addExternalComponents(containers, managed);
+
+    const builder = containers.map(container => {
       return this.generator
         .buildContainer(container.node)
         .addAbstractMembers(container.entryPoints)
@@ -113,17 +115,43 @@ export class Compiler {
   }
 
   private addExternalComponents(
-    containers: ts.ClassDeclaration[],
-    container: Container,
+    containers: Container[],
     managed: ts.ClassDeclaration[]
   ): void {
-    const externals =
-      containers.length === 1
-        ? managed.map(external => new Component(external, this.navigation))
-        : this.getExternalsForContainer(managed, container);
-    externals.forEach(external => {
-      container.addManagedDependency(external);
-    });
+    if (containers.length === 1) {
+      const container = containers[0];
+      const externals = managed
+        .filter(node =>
+          container.managed.every(managed => managed.type !== node)
+        )
+        .map(node => new Component(node, this.navigation));
+      externals.forEach(external => {
+        container.addManagedDependency(external);
+      });
+    } else {
+      const unassignedExternals = managed.filter(node => {
+        return containers.reduce((result, container) => {
+          return (
+            result && container.managed.every(managed => managed.type !== node)
+          );
+        }, true);
+      });
+      if (unassignedExternals.length > 0) {
+        const names = unassignedExternals
+          .map(node => node.name!.getText())
+          .join(', ');
+        throw new Error(
+          `Unassigned externals [${names}] are not supported if using multiple containers`
+        );
+      }
+
+      containers.forEach(container => {
+        const externals = this.getExternalsForContainer(managed, container);
+        externals.forEach(external => {
+          container.addManagedDependency(external);
+        });
+      });
+    }
   }
 
   private findContainers(decoratorsSoureFile: string): ts.ClassDeclaration[] {
