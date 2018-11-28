@@ -1,7 +1,7 @@
 import { runCompiler, testContainer } from './compiler.test.helper';
 
 test('TSDI compiler choses the declared unit', async () => {
-  const files = {
+  const files: { [name: string]: string } = {
     '/file.ts': `
       import { container, unit, provides } from '/decorators';
 
@@ -36,7 +36,7 @@ test('TSDI compiler choses the declared unit', async () => {
     `
   };
 
-  const code = await runCompiler(files);
+  await runCompiler(files);
 
-  await testContainer(code, files, expect);
+  await testContainer(files['/tsdi-container.ts'], files, expect);
 });
