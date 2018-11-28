@@ -1,7 +1,7 @@
 import { runCompiler, testContainer } from './compiler.test.helper';
 
 test('TSDI compiler container supports initialize lifecycle', async () => {
-  const files = {
+  const files: { [name: string]: string } = {
     '/file.ts': `
       import { container, managed, initialize } from '/decorators';
 
@@ -26,7 +26,7 @@ test('TSDI compiler container supports initialize lifecycle', async () => {
     `
   };
 
-  const code = await runCompiler(files);
+  await runCompiler(files);
 
-  await testContainer(code, files, expect);
+  await testContainer(files['/tsdi-container.ts'], files, expect);
 });
