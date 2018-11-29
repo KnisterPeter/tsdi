@@ -59,6 +59,7 @@ describe('TSDI', () => {
       tsdi.register(User);
       tsdi.register(Dependency);
       const user: User = tsdi.get(User);
+
       expect(user.method()).toBe('hello');
     });
 
@@ -67,6 +68,7 @@ describe('TSDI', () => {
       tsdi.register(Dependency);
       const user1: User = tsdi.get(User);
       const user2: User = tsdi.get(User);
+
       expect(user1.getDep()).toBe(user2.getDep());
     });
 
@@ -74,13 +76,16 @@ describe('TSDI', () => {
       tsdi.register(User);
       tsdi.register(Dependency);
       const user: User = tsdi.get(User);
+
       expect(user.initResult()).toBe('init');
     });
 
     it('enabling componentScanner should add all known components to the container', () => {
       tsdi.enableComponentScanner();
+
       const user: User = tsdi.get(User);
-      expect(user instanceof User).toBeTruthy();
+
+      expect(user).toBeInstanceOf(User);
     });
 
     it('a container with enabled componentScanner should lazy register components', () => {
@@ -90,7 +95,8 @@ describe('TSDI', () => {
       class Late {}
 
       const late: Late = tsdi.get(Late);
-      expect(late instanceof Late).toBeTruthy();
+
+      expect(late).toBeInstanceOf(Late);
     });
 
     it('components could registered by name', () => {
@@ -258,6 +264,36 @@ describe('TSDI', () => {
       );
     });
 
+    it('should inject annotated constructor parameters during register', () => {
+      @Component
+      class ConstructorParameterComponent {}
+      tsdi.register(ConstructorParameterComponent);
+
+      @Component
+      class ComponentWithConstructor {
+        private readonly _tsdi: TSDI;
+        public b: ConstructorParameterComponent;
+
+        constructor(
+          @Inject() container: TSDI,
+          @Inject b: ConstructorParameterComponent
+        ) {
+          this._tsdi = container;
+          this.b = b;
+        }
+
+        public get prop(): TSDI {
+          return this._tsdi;
+        }
+      }
+      tsdi.register(ComponentWithConstructor);
+
+      expect(tsdi.get(ComponentWithConstructor).prop).toBe(tsdi);
+      expect(tsdi.get(ComponentWithConstructor).b).toBeInstanceOf(
+        ConstructorParameterComponent
+      );
+    });
+
     it('should create a new instance for non-singletons', () => {
       tsdi.enableComponentScanner();
 
@@ -283,9 +319,6 @@ describe('TSDI', () => {
           return new NonSingletonObject();
         }
       }
-
-      // @Component()
-      // class C {}
 
       expect(tsdi.get(NonSingletonObject)).toBeInstanceOf(NonSingletonObject);
       expect(tsdi.get(NonSingletonObject)).toBe(tsdi.get(NonSingletonObject));
