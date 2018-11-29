@@ -594,11 +594,15 @@ export class TSDI {
   /**
    * @internal
    */
-  public injectExternal(instance: any, target: any): void {
+  public injectExternal(
+    instance: any,
+    target: any,
+    componentName: string
+  ): void {
     const idx = this.getComponentMetadataIndex(target);
     const metadata = this.components[idx];
     if (!metadata) {
-      this.throwComponentNotFoundError(target);
+      this.throwComponentNotFoundError(target, componentName);
     }
     if (isFactoryMetadata(metadata)) {
       throw new Error('Unable to inject into external factory');

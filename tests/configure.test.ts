@@ -1,4 +1,5 @@
 import { TSDI } from '../lib';
+import { managed } from '../lib/compiler';
 
 describe('TSDI without reflection should be configurable', () => {
   let tsdi: TSDI;
@@ -53,5 +54,12 @@ describe('TSDI without reflection should be configurable', () => {
 
     expect(tsdi.get(Component)).toBeInstanceOf(Component);
     expect(tsdi.get(Component).dependency).toBeInstanceOf(Dependency);
+  });
+
+  it('to throw on unknown externals', () => {
+    @managed
+    class Component {}
+
+    expect(() => new Component()).toThrow(/Component 'Component' not found/);
   });
 });
