@@ -144,13 +144,29 @@ export class Compiler {
         container.addManagedDependency(external);
       });
     } else {
-      const unassignedExternals = managed.filter(node => {
-        return containers.reduce((result, container) => {
-          return (
-            result && container.managed.every(managed => managed.type !== node)
+      const unassignedExternals = managed
+        .filter(node => {
+          const parameters = getDecoratorParameters(
+            getDecorator('managed', node)!
           );
-        }, true);
-      });
+          if (parameters.length === 0) {
+            return true;
+          }
+          return !Boolean(
+            getValueFromObjectLiteral(
+              parameters[0] as ts.ObjectLiteralExpression,
+              'by'
+            )
+          );
+        })
+        .filter(node => {
+          return containers.reduce((result, container) => {
+            return (
+              result &&
+              container.managed.every(managed => managed.type !== node)
+            );
+          }, true);
+        });
       if (unassignedExternals.length > 0) {
         const names = unassignedExternals
           .map(node => node.name!.getText())

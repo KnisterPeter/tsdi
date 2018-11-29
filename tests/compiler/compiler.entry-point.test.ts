@@ -11,15 +11,15 @@ test('TSDI compiler generates a container for an entry point', async () => {
       @container({ units: [] })
       export abstract class Container {
         public abstract entry: Entry;
+      }
 
-        public test(expect): void {
-          expect(this.entry).toBeInstanceOf(Entry);
-        }
+      export function test(expect, container): void {
+        expect(container.entry).toBeInstanceOf(Entry);
       }
     `
   };
 
   await runCompiler(files);
 
-  await testContainer(files['/tsdi-container.ts'], files, expect);
+  await testContainer(files);
 });

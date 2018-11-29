@@ -41,7 +41,6 @@ const createTestCompilerHost = (files: {
             try {
               return ts.sys.readFile(require.resolve(`typescript/lib/${path}`));
             } catch {
-              console.log(path);
               return ts.sys.readFile(
                 require.resolve(`typescript/lib/lib.${path}`)
               );
@@ -91,45 +90,29 @@ export async function runCompiler(files: {
   return Compiler.create(host, '.', '/decorators.ts').run();
 }
 
-export async function testContainer(
-  code: string,
-  files: { [name: string]: string },
-  expect: jest.Expect
-): Promise<boolean> {
-  const root = findTsdiRoot();
+function transpile(input: string): string {
+  return ts.transpileModule(input, {
+    compilerOptions: {
+      target: ts.ScriptTarget.ES2015,
+      module: ts.ModuleKind.CommonJS,
+      experimentalDecorators: true
+    }
+  }).outputText;
+}
 
-  const transpile = (input: string) =>
-    ts.transpileModule(input, {
-      compilerOptions: {
-        target: ts.ScriptTarget.ES2015,
-        module: ts.ModuleKind.CommonJS,
-        experimentalDecorators: true
-      }
-    }).outputText;
-
-  const evaluate = (code: string) => {
-    const moduleCode = transpile(code);
-    const sandbox = {
-      console,
-      require: customRequire,
-      exports: {}
-    };
-    const context = createContext(sandbox);
-    new Script(moduleCode).runInContext(context, {
-      displayErrors: true
-    });
-    return sandbox.exports;
-  };
-
+function createRequire(
+  root: string,
+  files: { [name: string]: string }
+): (id: string) => any {
   const moduleCache: { [id: string]: any } = {};
   // tslint:disable-next-line:cyclomatic-complexity
-  const customRequire = (id: string) => {
+  return function customRequire(id: string): any {
     if (id === 'tsdi' || id === '../tsdi') {
       return require('../../lib');
     }
     if (id === '/decorators') {
       const decoratorsFile = join(root, 'lib', 'compiler', 'decorators.ts');
-      return evaluate(ts.sys.readFile(decoratorsFile)!);
+      return evaluate(ts.sys.readFile(decoratorsFile)!, customRequire);
     }
     if (id.startsWith('./')) {
       id = id.substr(1);
@@ -137,19 +120,54 @@ export async function testContainer(
         if (moduleCache[id]) {
           return moduleCache[id];
         }
-        return (moduleCache[id] = evaluate(files[id + '.ts']));
+        return (moduleCache[id] = evaluate(files[id + '.ts'], customRequire));
       }
     }
     throw new Error(`id ${id} not found`);
   };
+}
+
+function evaluate<R = any>(
+  code: string,
+  customRequire: (id: string) => any
+): R {
+  const moduleCode = transpile(code);
+  const sandbox = {
+    console,
+    require: customRequire,
+    exports: {}
+  };
+  const context = createContext(sandbox);
+  new Script(moduleCode).runInContext(context, {
+    displayErrors: true
+  });
+  return sandbox.exports as R;
+}
+
+export async function testContainer(
+  files: { [name: string]: string },
+  fileNames: string[] = ['/tsdi-container'],
+  containerNames: string[] = ['TSDIContainer']
+): Promise<boolean> {
+  const root = findTsdiRoot();
 
   return new Promise<boolean>((resolve, reject) => {
     const script = transpile(`
-      ${code}
+      import { test } from './file';
+      ${fileNames
+        .map(
+          (_, idx) =>
+            `import { ${containerNames[idx]} } from '.${fileNames[idx]}';`
+        )
+        .join('\n')}
 
-      const container = new TSDIContainer();
+      const containers = [
+        ${containerNames
+          .map(containerName => `new ${containerName}(),`)
+          .join('\n')}
+      ];
       try {
-        const result = container.test(expect);
+        const result = test(expect, ...containers);
         if (result && result.then && result.catch) {
           result.then(() => resolve()).catch(e => reject(e));
         } else {
@@ -161,7 +179,7 @@ export async function testContainer(
     `);
     new Script(script).runInNewContext({
       expect,
-      require: customRequire,
+      require: createRequire(root, files),
       module: { exports: {} },
       exports: {},
       resolve,

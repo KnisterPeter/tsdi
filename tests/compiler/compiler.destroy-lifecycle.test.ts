@@ -21,16 +21,16 @@ test('TSDI compiler container supports destroy lifecycle', async () => {
       @container({ units: [] })
       export abstract class Container {
         public abstract entry: Entry;
+      }
 
-        public test(expect): void {
-          this.entry.tsdi.close();
-          expect(shutdownCalled).toBeTruthy();
-        }
+      export function test(expect, container): void {
+        container.entry.tsdi.close();
+        expect(shutdownCalled).toBeTruthy();
       }
     `
   };
 
   await runCompiler(files);
 
-  await testContainer(files['/tsdi-container.ts'], files, expect);
+  await testContainer(files);
 });

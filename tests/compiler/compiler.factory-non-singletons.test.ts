@@ -26,15 +26,15 @@ test('TSDI compiler supports factories which produces non singletons', async () 
       @container({ units: [Unit] })
       export abstract class Container {
         public abstract entry: Entry;
+      }
 
-        public test(expect): void {
-          expect(this.entry).not.toBe(this.entry);
-        }
+      export function test(expect, container): void {
+        expect(container.entry).not.toBe(this.entry);
       }
     `
   };
 
   await runCompiler(files);
 
-  await testContainer(files['/tsdi-container.ts'], files, expect);
+  await testContainer(files);
 });
