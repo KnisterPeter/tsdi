@@ -11,10 +11,6 @@ test('TSDI compiler allows managing of external components', async () => {
       @container({ units: [] })
       export abstract class Container {
         public abstract dependency: Dependency;
-
-        public test(expect): void {
-          expect(new Entry().depenency).toBe(this.dependency);
-        }
       }
 
       @managed
@@ -22,10 +18,14 @@ test('TSDI compiler allows managing of external components', async () => {
         @managed
         public depenency!: Dependency;
       }
-    `
+
+      export function test(expect, container): void {
+        expect(new Entry().depenency).toBe(container.dependency);
+      }
+  `
   };
 
   await runCompiler(files);
 
-  await testContainer(files['/tsdi-container.ts'], files, expect);
+  await testContainer(files);
 });
