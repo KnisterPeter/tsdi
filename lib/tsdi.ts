@@ -237,6 +237,10 @@ export class TSDI {
           const constructorDependencies = this.getConstructorParameterMetadata(
             metadata.fn
           );
+          const initializer = Reflect.getMetadata(
+            'component:init',
+            metadata.fn.prototype
+          );
 
           this.configure(metadata.fn, {
             meta: metadata.options,
@@ -244,7 +248,7 @@ export class TSDI {
             constructorDependencies:
               constructorDependencies || metadata.constructorDependencies,
             propertyDependencies: metadata.propertyDependencies,
-            initializer: metadata.initializer,
+            initializer: initializer || metadata.initializer,
             disposer: metadata.disposer
           });
         }
@@ -332,12 +336,18 @@ export class TSDI {
   public register(component: Constructable<any>, name?: string): void {
     const options: IComponentOptions =
       Reflect.getMetadata('component:options', component) || {};
+    const initializer = Reflect.getMetadata(
+      'component:init',
+      component.prototype
+    );
+
     // meta here is the fallback to the component options
     this.configure(component, {
       meta: {
         ...options,
         name: name || options.name
-      } as any
+      } as any,
+      initializer
     });
   }
 
@@ -487,18 +497,22 @@ export class TSDI {
   }
 
   private runInitializer(instance: any, metadata: ComponentMetadata): void {
-    const init: string =
-      metadata.initializer ||
-      Reflect.getMetadata('component:init', metadata.fn.prototype);
     const awaiter = this.waitForInjectInitializers(metadata);
-    if (init && instance[init]) {
+    if (metadata.initializer && instance[metadata.initializer]) {
       if (awaiter) {
         this.addInitializerPromise(
           instance,
-          awaiter.then(() => instance[init].call(instance) || Promise.resolve())
+          awaiter.then(
+            () =>
+              instance[metadata.initializer!].call(instance) ||
+              Promise.resolve()
+          )
         );
       } else {
-        this.addInitializerPromise(instance, instance[init].call(instance));
+        this.addInitializerPromise(
+          instance,
+          instance[metadata.initializer].call(instance)
+        );
       }
     } else if (awaiter) {
       this.addInitializerPromise(instance, awaiter);
@@ -590,13 +604,7 @@ export class TSDI {
       throw new Error('Unable to inject into external factory');
     }
     this.injectIntoInstance(instance, true, metadata);
-    const init: string = Reflect.getMetadata(
-      'component:init',
-      target.prototype
-    );
-    if (init) {
-      instance[init].call(instance);
-    }
+    this.runInitializer(instance, metadata);
   }
 
   private injectIntoInstance(
