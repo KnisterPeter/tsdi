@@ -24,7 +24,11 @@ export function managed(
       const instance = new target(...args);
       if (by || !TSDI.creating) {
         TSDI.creating = false;
-        TSDI.getContainer(by).injectExternal(instance, constructor);
+        TSDI.getContainer(by).injectExternal(
+          instance,
+          constructor,
+          target.name
+        );
       }
       return instance;
     };
