@@ -141,6 +141,12 @@ export class Component {
     if (Component.cache[key]) {
       return Component.cache[key];
     }
+    if (
+      hasDecorator('component', type) &&
+      !(this instanceof ClassicComponent)
+    ) {
+      return new ClassicComponent(type, navigation);
+    }
     Component.cache[key] = this;
   }
 
@@ -150,6 +156,16 @@ export class Component {
 
   public validate(): void {
     checkManagedDecorator(this.type, this);
+  }
+}
+
+export class ClassicComponent extends Component {
+  constructor(type: ts.ClassDeclaration, navigation: Navigation) {
+    super(type, navigation);
+  }
+
+  public validate(): void {
+    //
   }
 }
 

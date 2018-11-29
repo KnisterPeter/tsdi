@@ -336,6 +336,9 @@ export class TSDI {
   public register(component: Constructable<any>, name?: string): void {
     const options: IComponentOptions =
       Reflect.getMetadata('component:options', component) || {};
+    const constructorDependencies = this.getConstructorParameterMetadata(
+      component
+    );
     const initializer = Reflect.getMetadata(
       'component:init',
       component.prototype
@@ -347,6 +350,7 @@ export class TSDI {
         ...options,
         name: name || options.name
       } as any,
+      constructorDependencies,
       initializer
     });
   }
