@@ -501,7 +501,9 @@ export class TSDI {
   }
 
   private runInitializer(instance: any, metadata: ComponentMetadata): void {
-    const awaiter = this.waitForInjectInitializers(metadata);
+    const awaiter = metadata.propertyDependencies
+      ? undefined
+      : this.waitForInjectInitializers(metadata);
     if (metadata.initializer && instance[metadata.initializer]) {
       if (awaiter) {
         this.addInitializerPromise(
@@ -531,6 +533,7 @@ export class TSDI {
       metadata.fn.prototype
     );
     if (injects) {
+      console.log(injects);
       const hasAsyncInitializers = injects.some(
         inject =>
           Reflect.getMetadata(
@@ -631,26 +634,27 @@ export class TSDI {
           }
         });
       });
-    }
-    const injects: InjectMetadata[] = Reflect.getMetadata(
-      'component:injects',
-      componentMetadata.fn.prototype
-    );
-    if (injects) {
-      for (const inject of injects) {
-        log('injecting %s.%s', instance.constructor.name, inject.property);
-        if (
-          inject.options.name &&
-          typeof this.properties[inject.options.name] !== 'undefined'
-        ) {
-          instance[inject.property] = this.properties[inject.options.name];
-        } else {
-          this.injectDependency(
-            instance,
-            externalInstance,
-            inject,
-            componentMetadata
-          );
+    } else {
+      const injects: InjectMetadata[] = Reflect.getMetadata(
+        'component:injects',
+        componentMetadata.fn.prototype
+      );
+      if (injects) {
+        for (const inject of injects) {
+          log('injecting %s.%s', instance.constructor.name, inject.property);
+          if (
+            inject.options.name &&
+            typeof this.properties[inject.options.name] !== 'undefined'
+          ) {
+            instance[inject.property] = this.properties[inject.options.name];
+          } else {
+            this.injectDependency(
+              instance,
+              externalInstance,
+              inject,
+              componentMetadata
+            );
+          }
         }
       }
     }

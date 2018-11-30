@@ -135,7 +135,7 @@ export class Component {
 
   constructor(
     public readonly type: ts.ClassDeclaration,
-    private readonly navigation: Navigation
+    protected readonly navigation: Navigation
   ) {
     const key = `${type.getSourceFile()}:${type.getStart()}`;
     if (Component.cache[key]) {
@@ -160,6 +160,29 @@ export class Component {
 }
 
 export class ClassicComponent extends Component {
+  public get propertyDependencies(): {
+    property: string;
+    type: ts.ClassDeclaration;
+  }[] {
+    return this.type.members
+      .filter(
+        (member): member is ts.PropertyDeclaration =>
+          ts.isPropertyDeclaration(member)
+      )
+      .filter(member => hasDecorator('inject', member))
+      .map(member => {
+        const definition = findClosestClass(
+          this.navigation.findDefinition(member)
+        );
+
+        const propertyName = member.name.getText();
+        return {
+          property: propertyName,
+          type: definition
+        };
+      });
+  }
+
   constructor(type: ts.ClassDeclaration, navigation: Navigation) {
     super(type, navigation);
   }
