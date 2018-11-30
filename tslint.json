@@ -1,6 +1,7 @@
 {
   "extends": "@knisterpeter/standard-tslint",
   "rules": {
+    "ban": [true, { "name": ["test", "only"] }],
     "space-before-function-paren": [
       true,
       {
