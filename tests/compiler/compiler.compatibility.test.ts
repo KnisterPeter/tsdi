@@ -1,6 +1,6 @@
 import { runCompiler, testContainer } from './compiler.test.helper';
 
-test.only('TSDI compiler generates configuration for runtime components', async () => {
+test('TSDI compiler generates configuration for runtime components', async () => {
   const files: { [name: string]: string } = {
     '/file.ts': `
       import { container } from '/decorators';
