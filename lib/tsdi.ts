@@ -533,7 +533,6 @@ export class TSDI {
       metadata.fn.prototype
     );
     if (injects) {
-      console.log(injects);
       const hasAsyncInitializers = injects.some(
         inject =>
           Reflect.getMetadata(
