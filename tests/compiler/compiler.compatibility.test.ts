@@ -1,13 +1,22 @@
 import { runCompiler, testContainer } from './compiler.test.helper';
 
-test('TSDI compiler generates configuration for runtime components', async () => {
+test.only('TSDI compiler generates configuration for runtime components', async () => {
   const files: { [name: string]: string } = {
     '/file.ts': `
       import { container } from '/decorators';
-      import { component } from 'tsdi';
+      import { component, inject } from 'tsdi';
 
       @component
-      export class Component {}
+      export class Dependency {
+      }
+
+      @component
+      export class Component {
+
+        @inject
+        public dependency!: Dependency;
+
+      }
 
       @container({ units: [] })
       export abstract class Container {
@@ -15,11 +24,13 @@ test('TSDI compiler generates configuration for runtime components', async () =>
       }
 
       export function test(expect, container) {
+        expect(container.component).toBeInstanceOf(Component);
       }
     `
   };
 
   await runCompiler(files);
+  console.log(files['/tsdi-container.ts']);
 
   await testContainer(files);
 });
