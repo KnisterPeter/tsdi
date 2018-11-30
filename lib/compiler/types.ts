@@ -160,6 +160,41 @@ export class Component {
 }
 
 export class ClassicComponent extends Component {
+  public get meta(): {
+    singleton?: boolean;
+    scope?: string;
+  } {
+    const meta: {
+      singleton?: boolean;
+      scope?: string;
+    } = {
+      singleton: undefined,
+      scope: undefined
+    };
+
+    const component = getDecorator('component', this.type);
+    if (component) {
+      const parameters = getDecoratorParameters(component);
+      if (
+        parameters.length > 0 &&
+        ts.isObjectLiteralExpression(parameters[0])
+      ) {
+        const config = parameters[0] as ts.ObjectLiteralExpression;
+
+        meta.singleton = isSingleton(config);
+
+        const scopeNode = getValueFromObjectLiteral(config, 'scope');
+        if (scopeNode) {
+          if (ts.isStringLiteral(scopeNode)) {
+            meta.scope = scopeNode.text;
+          }
+        }
+      }
+    }
+
+    return meta;
+  }
+
   public get propertyDependencies(): {
     property: string;
     type: ts.ClassDeclaration;
