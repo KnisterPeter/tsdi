@@ -41,7 +41,8 @@ export class Navigation {
   ): ts.FunctionDeclaration {
     const sourceFile = this.services.getProgram()!.getSourceFile(filename);
     if (!sourceFile) {
-      throw new Error(`SourceFile '${filename}' not found.`);
+      /* istanbul ignore next */
+      throw new Error(`Program Error: SourceFile '${filename}' not found.`);
     }
     const functions: ts.FunctionDeclaration[] = Navigation.getAllFunctions(
       sourceFile
@@ -54,7 +55,10 @@ export class Navigation {
       return false;
     });
     if (!match) {
-      throw new Error(`No function with name '${functionName}' found.`);
+      /* istanbul ignore next */
+      throw new Error(
+        `Program Error: No function with name '${functionName}' found.`
+      );
     }
     return match;
   }
@@ -68,7 +72,10 @@ export class Navigation {
       type = node;
     } else {
       if (!node.type) {
-        throw new Error(`Type definition required for '${node.getText()}'`);
+        /* istanbul ignore next */
+        throw new Error(
+          `Program Error: Type definition required for '${node.getText()}'`
+        );
       }
       type = node.type;
     }
@@ -87,7 +94,10 @@ export class Navigation {
     }
 
     if (definitions.length > 1) {
-      throw new Error(`Ambigous definitions for '${node.getText()}' found`);
+      /* istanbul ignore next */
+      throw new Error(
+        `Program Error: Ambigous definitions for '${node.getText()}' found`
+      );
     }
     const definition = definitions[0];
 
@@ -95,8 +105,11 @@ export class Navigation {
       .getProgram()!
       .getSourceFile(definition.fileName);
     if (!definitionFile) {
+      /* istanbul ignore next */
       throw new Error(
-        `Inconsistent definition found for '${definition.fileName}'`
+        `Program Error: Inconsistent definition found for '${
+          definition.fileName
+        }'`
       );
     }
 
@@ -106,7 +119,8 @@ export class Navigation {
       definition.textSpan.start + definition.textSpan.length
     );
     if (!definitionNode) {
-      throw new Error('No node for definition found');
+      /* istanbul ignore next */
+      throw new Error('Program Error: No node for definition found');
     }
     return definitionNode;
   }
@@ -117,8 +131,9 @@ export class Navigation {
     let name: ts.Identifier;
     if (!ts.isIdentifier(node)) {
       if (!node.name) {
+        /* istanbul ignore next */
         throw new Error(
-          'Finding usage of function like nodes without name is not implemented'
+          'Program Error: Finding usage of function like nodes without name is not implemented'
         );
       }
       name = node.name;
@@ -134,7 +149,8 @@ export class Navigation {
       name.getStart()
     );
     if (!referencedSymbols) {
-      throw new Error('No references found');
+      /* istanbul ignore next */
+      throw new Error('Program Error: No references found');
     }
 
     const usingReferences = referencedSymbols.reduce(
@@ -152,8 +168,11 @@ export class Navigation {
         .getProgram()!
         .getSourceFile(reference.fileName);
       if (!referenceFile) {
+        /* istanbul ignore next */
         throw new Error(
-          `Inconsistent reference found for '${reference.fileName}'`
+          `Program Error: Inconsistent reference found for '${
+            reference.fileName
+          }'`
         );
       }
 
@@ -163,7 +182,8 @@ export class Navigation {
         reference.textSpan.start + reference.textSpan.length
       );
       if (!refNode) {
-        throw new Error('No node for reference found');
+        /* istanbul ignore next */
+        throw new Error('Program Error: No node for reference found');
       }
       return refNode;
     });
