@@ -1,4 +1,4 @@
-import debug from 'debug';
+import debug from './debug';
 import { TSDI } from './tsdi';
 
 const log = debug('tsdi');
