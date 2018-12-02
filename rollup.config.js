@@ -2,8 +2,6 @@
 import builtinModules from 'builtin-modules';
 import * as rollup from 'rollup';
 import commonjs from 'rollup-plugin-commonjs';
-import builtins from 'rollup-plugin-node-builtins';
-import globals from 'rollup-plugin-node-globals';
 import nodeResolve from 'rollup-plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
 
@@ -20,14 +18,6 @@ const config = {
   },
   // @ts-ignore
   external: builtinModules,
-  plugins: [
-    nodeResolve(),
-    commonjs(),
-    // @ts-ignore
-    builtins(),
-    // @ts-ignore
-    globals(),
-    terser()
-  ]
+  plugins: [nodeResolve(), commonjs(), terser()]
 };
 export default config;

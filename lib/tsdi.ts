@@ -1,6 +1,6 @@
-import debug from 'debug';
 import 'reflect-metadata';
 import { managed } from './compiler/decorators';
+import debug from './debug';
 import { addListener, ComponentListener, removeListener } from './global-state';
 import { findIndexOf, isFactoryMetadata } from './helper';
 

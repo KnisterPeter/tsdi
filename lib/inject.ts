@@ -1,4 +1,4 @@
-import debug from 'debug';
+import debug from './debug';
 import { getNamedOptions } from './helper';
 import {
   Constructable,

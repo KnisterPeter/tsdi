@@ -1,4 +1,4 @@
-import debug from 'debug';
+import debug from './debug';
 import { addKnownComponent } from './global-state';
 import { getNamedOptions } from './helper';
 import { IComponentOptions } from './tsdi';
