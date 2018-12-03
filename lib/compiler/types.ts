@@ -220,6 +220,24 @@ export class ClassicComponent extends Component {
 
   constructor(type: ts.ClassDeclaration, navigation: Navigation) {
     super(type, navigation);
+
+    // required to check for @factory here
+    this.type.members
+      .filter(
+        (member): member is ts.MethodDeclaration =>
+          ts.isMethodDeclaration(member)
+      )
+      .filter(member => hasDecorator('factory', member))
+      .forEach(member => {
+        const returnType = getMethodReturnType(member, this.navigation);
+
+        const component = new Component(returnType, this.navigation);
+        component.provider = {
+          class: this.type,
+          method: member.name.getText(),
+          parameters: []
+        };
+      });
   }
 
   public validate(): void {

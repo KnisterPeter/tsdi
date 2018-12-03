@@ -1,6 +1,6 @@
 import { getTestEnv, runCompiler, testContainer } from './compiler.test.helper';
 
-test('TSDI compiler generates configuration for runtime components', async () => {
+test('TSDI compiler generates configuration for runtime components with scope and lifecycle', async () => {
   const { host, fs } = getTestEnv();
   fs.add(
     'file.ts',
