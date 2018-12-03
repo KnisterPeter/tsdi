@@ -110,7 +110,8 @@ export class Compiler {
     });
 
     const managed = this.findManagedComponents();
-    this.addExternalComponents(containers, managed);
+    const legacyExternals = this.findLegacyExternals();
+    this.addExternalComponents(containers, [...managed, ...legacyExternals]);
 
     const builder = containers.map(container => {
       return this.generator
@@ -220,7 +221,12 @@ export class Compiler {
       .findUsages(managedFunction)
       .filter((node): node is ts.Decorator => ts.isDecorator(node.parent));
 
-    // legacy externals
+    return [...managedDecorators]
+      .map(decorator => findClosestDecoratedNode(decorator))
+      .map(node => findClosestClass(node));
+  }
+
+  private findLegacyExternals(): ts.ClassDeclaration[] {
     const externalFunction1 = this.navigation.findNamedExport(
       this.findTsdiFile('external').fileName,
       'External'
@@ -237,10 +243,28 @@ export class Compiler {
       .findUsages(externalFunction2)
       .filter((node): node is ts.Decorator => ts.isDecorator(node.parent));
 
+    // legacy factory
+    const factoryFunction = this.navigation.findNamedExport(
+      this.findTsdiFile('component').fileName,
+      'component'
+    );
+    const factoryDecorators = this.navigation
+      .findUsages(factoryFunction)
+      .filter((node): node is ts.Decorator => ts.isDecorator(node.parent))
+      .filter(node => {
+        const clazz = findClosestClass(node);
+        return clazz.members
+          .filter(
+            (member): member is ts.MethodDeclaration =>
+              ts.isMethodDeclaration(member)
+          )
+          .some(member => hasDecorator('factory', member));
+      });
+
     return [
-      ...managedDecorators,
       ...externalDecorators1,
-      ...externalDecorators2
+      ...externalDecorators2,
+      ...factoryDecorators
     ]
       .map(decorator => findClosestDecoratedNode(decorator))
       .map(node => findClosestClass(node));
