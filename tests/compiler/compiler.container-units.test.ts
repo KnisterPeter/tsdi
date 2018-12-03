@@ -1,9 +1,11 @@
-import { runCompiler, testContainer } from './compiler.test.helper';
+import { getTestEnv, runCompiler, testContainer } from './compiler.test.helper';
 
 test('TSDI compiler choses the declared unit', async () => {
-  const files: { [name: string]: string } = {
-    '/file.ts': `
-      import { container, unit, provides } from '/decorators';
+  const { fs, host } = getTestEnv();
+  fs.add(
+    'file.ts',
+    `
+      import { container, unit, provides } from 'tsdi/compiler/decorators';
 
       export class Entry {
         constructor() {}
@@ -34,9 +36,9 @@ test('TSDI compiler choses the declared unit', async () => {
         expect(container.entry).toBeInstanceOf(Entry);
       }
     `
-  };
+  );
 
-  await runCompiler(files);
+  await runCompiler(host, fs);
 
-  await testContainer(files);
+  await testContainer(fs);
 });

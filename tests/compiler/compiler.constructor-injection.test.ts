@@ -1,9 +1,11 @@
-import { runCompiler, testContainer } from './compiler.test.helper';
+import { getTestEnv, runCompiler, testContainer } from './compiler.test.helper';
 
 test('TSDI compiler generates constructor injected configuration', async () => {
-  const files: { [name: string]: string } = {
-    '/file.ts': `
-      import { container, managed } from '/decorators';
+  const { fs, host } = getTestEnv();
+  fs.add(
+    'file.ts',
+    `
+      import { container, managed } from 'tsdi/compiler/decorators';
 
       @managed
       export class Dependency {}
@@ -22,9 +24,9 @@ test('TSDI compiler generates constructor injected configuration', async () => {
         expect(container.entry.dependency).toBeInstanceOf(Dependency);
       }
     `
-  };
+  );
 
-  await runCompiler(files);
+  await runCompiler(host, fs);
 
-  await testContainer(files);
+  await testContainer(fs);
 });

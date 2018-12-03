@@ -1,9 +1,11 @@
-import { runCompiler, testContainer } from './compiler.test.helper';
+import { getTestEnv, runCompiler, testContainer } from './compiler.test.helper';
 
 test('TSDI compiler container supports injecting itself', async () => {
-  const files: { [name: string]: string } = {
-    '/file.ts': `
-      import { managed, container } from '/decorators';
+  const { fs, host } = getTestEnv();
+  fs.add(
+    'file.ts',
+    `
+      import { managed, container } from 'tsdi/compiler/decorators';
       import { TSDI } from 'tsdi';
 
       @managed
@@ -20,9 +22,9 @@ test('TSDI compiler container supports injecting itself', async () => {
         expect(container.entry.tsdi).toBeInstanceOf(TSDI);
       }
     `
-  };
+  );
 
-  await runCompiler(files);
+  await runCompiler(host, fs);
 
-  await testContainer(files);
+  await testContainer(fs);
 });

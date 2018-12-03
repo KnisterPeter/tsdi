@@ -1,9 +1,11 @@
-import { runCompiler, testContainer } from './compiler.test.helper';
+import { getTestEnv, runCompiler, testContainer } from './compiler.test.helper';
 
 test('TSDI compiler generates a container for an entry point', async () => {
-  const files: { [name: string]: string } = {
-    '/file.ts': `
-      import { container, managed } from '/decorators';
+  const { fs, host } = getTestEnv();
+  fs.add(
+    'file.ts',
+    `
+      import { container, managed } from 'tsdi/compiler/decorators';
 
       @managed
       export class Entry {}
@@ -17,9 +19,9 @@ test('TSDI compiler generates a container for an entry point', async () => {
         expect(container.entry).toBeInstanceOf(Entry);
       }
     `
-  };
+  );
 
-  await runCompiler(files);
+  await runCompiler(host, fs);
 
-  await testContainer(files);
+  await testContainer(fs);
 });

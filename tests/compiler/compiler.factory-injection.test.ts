@@ -1,9 +1,11 @@
-import { runCompiler, testContainer } from './compiler.test.helper';
+import { getTestEnv, runCompiler, testContainer } from './compiler.test.helper';
 
 test('TSDI compiler supports factories with injected parameters', async () => {
-  const files: { [name: string]: string } = {
-    '/file.ts': `
-      import { container, managed, unit, provides } from '/decorators';
+  const { fs, host } = getTestEnv();
+  fs.add(
+    'file.ts',
+    `
+      import { container, managed, unit, provides } from 'tsdi/compiler/decorators';
 
       @managed
       export class Dependency {}
@@ -29,9 +31,9 @@ test('TSDI compiler supports factories with injected parameters', async () => {
         expect(container.entry.dependency).toBeInstanceOf(Dependency);
       }
     `
-  };
+  );
 
-  await runCompiler(files);
+  await runCompiler(host, fs);
 
-  await testContainer(files);
+  await testContainer(fs);
 });

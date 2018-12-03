@@ -1,9 +1,11 @@
-import { runCompiler, testContainer } from './compiler.test.helper';
+import { getTestEnv, runCompiler, testContainer } from './compiler.test.helper';
 
 test('TSDI compiler container supports destroy lifecycle', async () => {
-  const files: { [name: string]: string } = {
-    '/file.ts': `
-      import { managed, container, destroy } from '/decorators';
+  const { fs, host } = getTestEnv();
+  fs.add(
+    'file.ts',
+    `
+      import { managed, container, destroy } from 'tsdi/compiler/decorators';
       import { TSDI } from 'tsdi';
 
       let shutdownCalled = false;
@@ -28,9 +30,9 @@ test('TSDI compiler container supports destroy lifecycle', async () => {
         expect(shutdownCalled).toBeTruthy();
       }
     `
-  };
+  );
 
-  await runCompiler(files);
+  await runCompiler(host, fs);
 
-  await testContainer(files);
+  await testContainer(fs);
 });

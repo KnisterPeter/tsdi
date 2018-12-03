@@ -142,7 +142,7 @@ export class Component {
       return Component.cache[key];
     }
     if (
-      hasDecorator('component', type) &&
+      (hasDecorator('component', type) || hasDecorator('external', type)) &&
       !(this instanceof ClassicComponent)
     ) {
       return new ClassicComponent(type, navigation);

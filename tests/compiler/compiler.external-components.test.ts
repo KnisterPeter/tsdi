@@ -1,9 +1,11 @@
-import { runCompiler, testContainer } from './compiler.test.helper';
+import { getTestEnv, runCompiler, testContainer } from './compiler.test.helper';
 
 test('TSDI compiler allows managing of external components', async () => {
-  const files: { [name: string]: string } = {
-    '/file.ts': `
-      import { container, managed, meta } from '/decorators';
+  const { fs, host } = getTestEnv();
+  fs.add(
+    'file.ts',
+    `
+      import { container, managed, meta } from 'tsdi/compiler/decorators';
 
       @managed
       export class Dependency {}
@@ -29,13 +31,13 @@ test('TSDI compiler allows managing of external components', async () => {
         expect(new Entry().depenency).not.toBe(container2.dependency);
       }
   `
-  };
+  );
 
-  await runCompiler(files);
+  await runCompiler(host, fs);
 
   await testContainer(
-    files,
-    ['/tsdi-container', '/tsdi-container2'],
+    fs,
+    ['/tsdi-container', 'tsdi-container2'],
     ['TSDIContainer', 'TSDIContainer2']
   );
 });

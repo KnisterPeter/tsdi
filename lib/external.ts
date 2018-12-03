@@ -18,7 +18,11 @@ export function External<TFunction extends Function>(
       this: any,
       ...args: any[]
     ): any {
-      return TSDI.externalContainerResolver().configureExternal(args, target);
+      return TSDI.externalContainerResolver().configureExternal(
+        args,
+        target,
+        constructor
+      );
     };
     Object.setPrototypeOf
       ? Object.setPrototypeOf(constructor, target)

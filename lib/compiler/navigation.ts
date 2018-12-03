@@ -35,15 +35,54 @@ export class Navigation {
 
   constructor(private readonly services: ts.LanguageService) {}
 
-  public findFunction(
-    filename: string,
-    functionName: string
-  ): ts.FunctionDeclaration {
+  public findNamedExport(filename: string, name: string): ts.Identifier {
+    const isExported = (node: ts.Node) => {
+      return (
+        node.modifiers &&
+        node.modifiers.find(
+          modifier => modifier.kind === ts.SyntaxKind.ExportKeyword
+        )
+      );
+    };
+
     const sourceFile = this.services.getProgram()!.getSourceFile(filename);
     if (!sourceFile) {
       /* istanbul ignore next */
       throw new Error(`Program Error: SourceFile '${filename}' not found.`);
     }
+
+    // tslint:disable-next-line:cyclomatic-complexity
+    const exportNode = sourceFile.forEachChild(child => {
+      if (ts.isFunctionDeclaration(child) && child.name) {
+        if (isExported(child) && child.name.getText() === name) {
+          return child.name;
+        }
+      }
+      if (ts.isVariableStatement(child)) {
+        if (isExported(child)) {
+          const declaration = child.declarationList.declarations.find(
+            declaration => {
+              return declaration.name.getText() === name;
+            }
+          );
+          if (declaration && ts.isIdentifier(declaration.name)) {
+            return declaration.name;
+          }
+        }
+      }
+      return undefined;
+    });
+    if (exportNode) {
+      return exportNode;
+    }
+
+    throw new Error(`Cannot find export with name '${name}'`);
+  }
+
+  public findFunction(
+    sourceFile: ts.SourceFile,
+    functionName: string
+  ): ts.FunctionDeclaration {
     const functions: ts.FunctionDeclaration[] = Navigation.getAllFunctions(
       sourceFile
     );
