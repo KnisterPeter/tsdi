@@ -2,6 +2,44 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.0.0"></a>
+# [1.0.0](https://github.com/KnisterPeter/tsdi/compare/v1.0.0-alpha.1...v1.0.0) (2018-12-03)
+
+
+### Bug Fixes
+
+* add basic module resolution ([a42bb14](https://github.com/KnisterPeter/tsdi/commit/a42bb14))
+* iterate over prototype property descriptors ([6df6a2f](https://github.com/KnisterPeter/tsdi/commit/6df6a2f))
+* missing scope in configuration ([e48768e](https://github.com/KnisterPeter/tsdi/commit/e48768e))
+* throw on unassigned externals ([6e1822f](https://github.com/KnisterPeter/tsdi/commit/6e1822f))
+* update dependency debug to v4 ([c2979a7](https://github.com/KnisterPeter/tsdi/commit/c2979a7))
+* update dependency debug to v4.1.0 ([058357d](https://github.com/KnisterPeter/tsdi/commit/058357d))
+* use decorators declaration file ([27ecd1d](https://github.com/KnisterPeter/tsdi/commit/27ecd1d))
+
+
+### Features
+
+* accept classic components ([324de2e](https://github.com/KnisterPeter/tsdi/commit/324de2e))
+* add classic scope, singleton and lifecycles ([f9117dd](https://github.com/KnisterPeter/tsdi/commit/f9117dd))
+* add cli ([0bc8693](https://github.com/KnisterPeter/tsdi/commit/0bc8693))
+* add compatibility for property inject ([1c3cdd6](https://github.com/KnisterPeter/tsdi/commit/1c3cdd6))
+* add destroy lifecycle ([9609c57](https://github.com/KnisterPeter/tsdi/commit/9609c57))
+* add initializer decorator ([3cd0d95](https://github.com/KnisterPeter/tsdi/commit/3cd0d95))
+* add static compiler ([7fa1b0f](https://github.com/KnisterPeter/tsdi/commit/7fa1b0f))
+* add static scope api ([fe408a5](https://github.com/KnisterPeter/tsdi/commit/fe408a5))
+* allow external components to be managed ([af37dde](https://github.com/KnisterPeter/tsdi/commit/af37dde))
+* allow legacy external inject ([b3afb6b](https://github.com/KnisterPeter/tsdi/commit/b3afb6b))
+* allow lifecycle on externals ([e19ec26](https://github.com/KnisterPeter/tsdi/commit/e19ec26))
+* allow non singleton factories ([a05bd30](https://github.com/KnisterPeter/tsdi/commit/a05bd30))
+* allow static non singleton instances ([cbfdcc8](https://github.com/KnisterPeter/tsdi/commit/cbfdcc8))
+* error if invalid unassigned externals ([bbe0d8b](https://github.com/KnisterPeter/tsdi/commit/bbe0d8b))
+* export decorators for ease of use ([297870a](https://github.com/KnisterPeter/tsdi/commit/297870a))
+* make managed flag mandatory to document component handling ([9bd7171](https://github.com/KnisterPeter/tsdi/commit/9bd7171))
+* only use static api to configure container ([c360358](https://github.com/KnisterPeter/tsdi/commit/c360358))
+* support legacy factories ([834bcda](https://github.com/KnisterPeter/tsdi/commit/834bcda))
+
+
+
 <a name="1.0.0-alpha.1"></a>
 # [1.0.0-alpha.1](https://github.com/KnisterPeter/tsdi/compare/v1.0.0-alpha.0...v1.0.0-alpha.1) (2018-09-04)
 
