@@ -1,9 +1,11 @@
-import { runCompiler } from './compiler.test.helper';
+import { getTestEnv, runCompiler } from './compiler.test.helper';
 
 test('TSDI compiler container throws if declard unit is not found', async () => {
-  const files = {
-    '/file.ts': `
-      import { container, unit, provides, initialize } from '/decorators';
+  const { fs, host } = getTestEnv();
+  fs.add(
+    'file.ts',
+    `
+      import { container, unit, provides, initialize } from 'tsdi/compiler/decorators';
 
       export class Entry {
         public ready = false;
@@ -23,9 +25,9 @@ test('TSDI compiler container throws if declard unit is not found', async () => 
         }
       }
     `
-  };
+  );
 
-  await expect(runCompiler(files)).rejects.toThrowError(
+  await expect(runCompiler(host, fs)).rejects.toThrowError(
     'Declared unit not found'
   );
 });

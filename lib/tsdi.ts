@@ -1,5 +1,4 @@
 import 'reflect-metadata';
-import { managed } from './compiler/decorators';
 import debug from './debug';
 import { addListener, ComponentListener, removeListener } from './global-state';
 import { findIndexOf, isFactoryMetadata } from './helper';
@@ -78,7 +77,6 @@ export interface LifecycleListener {
   onDestroy?(component: any): void;
 }
 
-@managed
 export class TSDI {
   /**
    * @internal
@@ -575,26 +573,42 @@ export class TSDI {
       .map(parameter => parameter.rtti);
   }
 
-  public configureExternal<T>(args: any[], target: any): T {
-    const constructorDependencies = this.getConstructorParameterMetadata(
-      target
-    );
+  // tslint:disable-next-line:cyclomatic-complexity
+  public configureExternal<T>(
+    args: any[],
+    target: any,
+    decoratedTarget?: any
+  ): T {
+    const idx = this.getComponentMetadataIndex(decoratedTarget || target);
+    const metadata = this.components[idx] || { fn: target, options: {} };
+    if (isFactoryMetadata(metadata)) {
+      throw new Error('Unable to inject into external factory');
+    }
 
-    const parameters = this.getConstructorParameters({
-      fn: target,
-      constructorDependencies,
-      options: {}
-    });
+    const parameters = this.getExternalConstructorParameters(metadata, target);
     const instance = new target(...args, ...parameters);
-    this.injectIntoInstance(instance, true, { fn: target, options: {} });
-    const init: string = Reflect.getMetadata(
-      'component:init',
-      target.prototype
-    );
+    this.injectIntoInstance(instance, true, metadata);
+    const init: string =
+      metadata.initializer ||
+      Reflect.getMetadata('component:init', target.prototype);
     if (init) {
       instance[init].call(instance);
     }
     return instance;
+  }
+
+  private getExternalConstructorParameters(
+    metadata: ComponentMetadata,
+    target: any
+  ): any[] {
+    if (metadata.constructorDependencies) {
+      return this.getConstructorParameters(metadata);
+    }
+    return this.getConstructorParameters({
+      fn: target,
+      constructorDependencies: this.getConstructorParameterMetadata(target),
+      options: {}
+    });
   }
 
   /**

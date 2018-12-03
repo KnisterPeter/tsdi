@@ -1,9 +1,11 @@
-import { runCompiler, testContainer } from './compiler.test.helper';
+import { getTestEnv, runCompiler, testContainer } from './compiler.test.helper';
 
 test('TSDI compiler supports non-singleton components', async () => {
-  const files: { [name: string]: string } = {
-    '/file.ts': `
-      import { container, managed, meta } from '/decorators';
+  const { fs, host } = getTestEnv();
+  fs.add(
+    'file.ts',
+    `
+      import { container, managed, meta } from 'tsdi/compiler/decorators';
 
       @meta({singleton: false})
       @managed
@@ -19,9 +21,9 @@ test('TSDI compiler supports non-singleton components', async () => {
         expect(container.entry).not.toBe(this.entry);
       }
     `
-  };
+  );
 
-  await runCompiler(files);
+  await runCompiler(host, fs);
 
-  await testContainer(files);
+  await testContainer(fs);
 });

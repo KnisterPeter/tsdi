@@ -1,9 +1,11 @@
-import { runCompiler } from './compiler.test.helper';
+import { getTestEnv, runCompiler } from './compiler.test.helper';
 
 test('TSDI compiler generates scope configuration', async () => {
-  const files: { [name: string]: string } = {
-    '/file.ts': `
-      import { container, managed, meta } from '/decorators';
+  const { fs, host } = getTestEnv();
+  fs.add(
+    'file.ts',
+    `
+      import { container, managed, meta } from 'tsdi/compiler/decorators';
 
       @managed
       @meta({scope: 'some-scope'})
@@ -20,11 +22,11 @@ test('TSDI compiler generates scope configuration', async () => {
         }
       }
     `
-  };
+  );
 
-  await runCompiler(files);
+  await runCompiler(host, fs);
 
-  expect(files['/tsdi-container.ts']).toEqual(
-    expect.stringContaining('meta: { singleton: true, scope: "some-scope" }')
+  expect(fs.get('tsdi-container.ts')).toEqual(
+    expect.stringContaining("meta: { singleton: true, scope: 'some-scope' }")
   );
 });

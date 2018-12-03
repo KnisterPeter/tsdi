@@ -11,25 +11,16 @@ import {
   findTsdiRoot,
   getDecorator,
   getDecoratorParameters,
-  getValueFromObjectLiteral
+  getValueFromObjectLiteral,
+  hasDecorator
 } from './utils';
 
 export class Compiler {
   public static create(
     host: CompilerHost,
-    root = '.',
-    decoratorsSoureFile = join(
-      findTsdiRoot(),
-      'dist',
-      'lib',
-      'compiler',
-      'decorators.d.ts'
-    )
+    root = host.getCurrentDirectory()
   ): Compiler {
-    const configFile = ts.findConfigFile(
-      root || host.getCurrentDirectory(),
-      host.fileExists
-    );
+    const configFile = ts.findConfigFile(root, host.fileExists);
     if (!configFile) {
       throw new Error('Unable to find tsconfig.json');
     }
@@ -42,9 +33,19 @@ export class Compiler {
     if (!cmdline) {
       throw new Error('Unable to parse config file');
     }
+    if (cmdline.errors && cmdline.errors.length > 0) {
+      console.error(
+        ts.formatDiagnostics(ts.getConfigFileParsingDiagnostics(cmdline), {
+          getCanonicalFileName: fileName => fileName,
+          getCurrentDirectory: host.getCurrentDirectory,
+          getNewLine: () => '\n'
+        })
+      );
+      throw new Error('Errors in config file setup');
+    }
 
     const languageService = Compiler.createLanguageService(cmdline, host);
-    return new Compiler(host, decoratorsSoureFile, languageService);
+    return new Compiler(host, languageService);
   }
 
   private static createLanguageService(
@@ -54,7 +55,7 @@ export class Compiler {
     return ts.createLanguageService({
       getScriptFileNames: () => cmdline.fileNames,
       getDefaultLibFileName: () => ts.getDefaultLibFileName(cmdline.options),
-      getCurrentDirectory: () => process.cwd(),
+      getCurrentDirectory: () => host.getCurrentDirectory(),
       getCompilationSettings: () => cmdline.options,
       getScriptVersion: _ => '0',
       getScriptSnapshot: fileName => {
@@ -74,7 +75,6 @@ export class Compiler {
 
   private constructor(
     private readonly host: CompilerHost,
-    private readonly decoratorsSoureFile: string,
     private readonly services: ts.LanguageService
   ) {
     this.navigation = new Navigation(this.services);
@@ -92,12 +92,13 @@ export class Compiler {
     //     getNewLine: () => '\n'
     //   })
     // );
+    // throw new Error('Failed to compile');
 
     this.generator = new Generator();
   }
 
   public async run(): Promise<void> {
-    const containerNodes = this.findContainers(this.decoratorsSoureFile);
+    const containerNodes = this.findContainers();
     if (containerNodes.length === 0) {
       throw new Error('No declared containers found.');
     }
@@ -108,7 +109,7 @@ export class Compiler {
       return container;
     });
 
-    const managed = this.findManagedComponents(this.decoratorsSoureFile);
+    const managed = this.findManagedComponents();
     this.addExternalComponents(containers, managed);
 
     const builder = containers.map(container => {
@@ -146,6 +147,13 @@ export class Compiler {
     } else {
       const unassignedExternals = managed
         .filter(node => {
+          // legacy decorators
+          if (
+            hasDecorator('External', node) ||
+            hasDecorator('external', node)
+          ) {
+            return true;
+          }
           const parameters = getDecoratorParameters(
             getDecorator('managed', node)!
           );
@@ -158,6 +166,10 @@ export class Compiler {
               'by'
             )
           );
+        })
+        .filter(node => {
+          // todo: filter TSDI by reference instead of name
+          return node.name && node.name.getText() !== 'TSDI';
         })
         .filter(node => {
           return containers.reduce((result, container) => {
@@ -185,9 +197,9 @@ export class Compiler {
     }
   }
 
-  private findContainers(decoratorsSoureFile: string): ts.ClassDeclaration[] {
+  private findContainers(): ts.ClassDeclaration[] {
     const containerFunction = this.navigation.findFunction(
-      decoratorsSoureFile,
+      this.findTsdiFile('decorators'),
       'container'
     );
     const containerDecorators = this.navigation.findUsages(containerFunction);
@@ -199,16 +211,37 @@ export class Compiler {
       });
   }
 
-  private findManagedComponents(
-    decoratorsSoureFile: string
-  ): ts.ClassDeclaration[] {
+  private findManagedComponents(): ts.ClassDeclaration[] {
     const managedFunction = this.navigation.findFunction(
-      decoratorsSoureFile,
+      this.findTsdiFile('decorators'),
       'managed'
     );
-    const managedDecorators = this.navigation.findUsages(managedFunction);
+    const managedDecorators = this.navigation
+      .findUsages(managedFunction)
+      .filter((node): node is ts.Decorator => ts.isDecorator(node.parent));
 
-    return managedDecorators
+    // legacy externals
+    const externalFunction1 = this.navigation.findNamedExport(
+      this.findTsdiFile('external').fileName,
+      'External'
+    );
+    const externalDecorators1 = this.navigation
+      .findUsages(externalFunction1)
+      .filter((node): node is ts.Decorator => ts.isDecorator(node.parent));
+
+    const externalFunction2 = this.navigation.findNamedExport(
+      this.findTsdiFile('external').fileName,
+      'external'
+    );
+    const externalDecorators2 = this.navigation
+      .findUsages(externalFunction2)
+      .filter((node): node is ts.Decorator => ts.isDecorator(node.parent));
+
+    return [
+      ...managedDecorators,
+      ...externalDecorators1,
+      ...externalDecorators2
+    ]
       .map(decorator => findClosestDecoratedNode(decorator))
       .map(node => findClosestClass(node));
   }
@@ -235,5 +268,21 @@ export class Compiler {
         return false;
       })
       .map(external => new Component(external, this.navigation));
+  }
+
+  private findTsdiFile(name: string): ts.SourceFile {
+    const sourceFile = this.services
+      .getProgram()!
+      .getSourceFiles()
+      .find(sourceFile => {
+        return (
+          sourceFile.fileName.startsWith(findTsdiRoot()) &&
+          sourceFile.fileName.indexOf(name) !== -1
+        );
+      });
+    if (!sourceFile) {
+      throw new Error(`No file found with '${name}' in its name.`);
+    }
+    return sourceFile;
   }
 }

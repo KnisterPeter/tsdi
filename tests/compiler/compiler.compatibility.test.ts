@@ -1,10 +1,12 @@
-import { runCompiler, testContainer } from './compiler.test.helper';
+import { getTestEnv, runCompiler, testContainer } from './compiler.test.helper';
 
 test('TSDI compiler generates configuration for runtime components', async () => {
-  const files: { [name: string]: string } = {
-    '/file.ts': `
-      import { container } from '/decorators';
-      import { component, inject, initialize, destroy } from 'tsdi';
+  const { host, fs } = getTestEnv();
+  fs.add(
+    'file.ts',
+    `
+      import { container } from 'tsdi/compiler/decorators';
+      import { TSDI, component, inject, initialize, destroy } from 'tsdi';
 
       let initCalled = false;
       let disposeCalled = false;
@@ -70,9 +72,9 @@ test('TSDI compiler generates configuration for runtime components', async () =>
         expect(container.nonSingleton).not.toBe(container.nonSingleton);
       }
     `
-  };
+  );
 
-  await runCompiler(files);
+  await runCompiler(host, fs);
 
-  await testContainer(files);
+  await testContainer(fs);
 });

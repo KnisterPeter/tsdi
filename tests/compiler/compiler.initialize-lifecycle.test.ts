@@ -1,9 +1,11 @@
-import { runCompiler, testContainer } from './compiler.test.helper';
+import { getTestEnv, runCompiler, testContainer } from './compiler.test.helper';
 
 test('TSDI compiler container supports initialize lifecycle', async () => {
-  const files: { [name: string]: string } = {
-    '/file.ts': `
-      import { container, managed, initialize } from '/decorators';
+  const { fs, host } = getTestEnv();
+  fs.add(
+    'file.ts',
+    `
+      import { container, managed, initialize } from 'tsdi/compiler/decorators';
 
       @managed
       export class Entry {
@@ -24,9 +26,9 @@ test('TSDI compiler container supports initialize lifecycle', async () => {
         expect(container.entry.ready).toBeTruthy();
       }
     `
-  };
+  );
 
-  await runCompiler(files);
+  await runCompiler(host, fs);
 
-  await testContainer(files);
+  await testContainer(fs);
 });
