@@ -63,7 +63,7 @@
   "dependencies": {
     "prettier": "1.15.3",
     "reflect-metadata": "0.1.12",
-    "typescript": "3.2.1"
+    "typescript": "3.2.2"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
