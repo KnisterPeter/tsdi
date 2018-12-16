@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from 'fs';
 import { dirname, join } from 'path';
+import { createWrappedNode, Decorator, Node, TypeGuards } from 'ts-simple-ast';
 import * as ts from 'typescript';
 import { Navigation } from './navigation';
 import { Component } from './types';
@@ -17,108 +18,71 @@ export function findTsdiRoot(): string {
   throw new Error('Unable to locate tsdi root');
 }
 
-export function isAbstract(node: ts.Node): boolean {
-  if (!node.modifiers) {
-    return false;
-  }
-  return node.modifiers.some(
-    modifier => modifier.kind === ts.SyntaxKind.AbstractKeyword
-  );
-}
-
-export function filter<T extends ts.Node, L extends T[] | ts.NodeArray<T>>(
-  list: L,
-  test: (node: T) => boolean
-): L {
-  return (list as T[]).filter(test) as L;
-}
-
-// todo: refactor from name based search to reference based search
-export function getDecorator(
-  name: string,
-  node: ts.ClassDeclaration | ts.MethodDeclaration | ts.PropertyDeclaration
-): ts.Decorator | undefined {
-  if (!node.decorators) {
-    return undefined;
-  }
-
-  return node.decorators.find(decorator => {
-    if (ts.isIdentifier(decorator.expression)) {
-      return decorator.expression.getText() === name;
-    } else if (
-      ts.isCallExpression(decorator.expression) &&
-      ts.isIdentifier(decorator.expression.expression)
-    ) {
-      return decorator.expression.expression.getText() === name;
-    }
-    throw new Error(`Unable to detect decorator '${decorator}'`);
-  });
-}
-
 export function hasDecorator(
   name: string,
   node: ts.ClassDeclaration | ts.MethodDeclaration | ts.PropertyDeclaration
 ): boolean {
-  return getDecorator(name, node) !== undefined;
+  return createWrappedNode(node).getDecorator(name) !== undefined;
 }
 
 export function findClosestDecoratedNode(decorator: ts.Node): ts.Node {
-  let node: ts.Node = decorator;
-  while (node !== undefined) {
-    if (node.decorators) {
-      return node;
-    }
-    node = node.parent;
+  const node = createWrappedNode(decorator).getFirstAncestor(
+    node =>
+      TypeGuards.isDecoratableNode(node) && node.getDecorators().length > 0
+  );
+  if (!node) {
+    throw new Error('No decorated node found');
   }
-  throw new Error('No decorated node found');
+  return node.compilerNode;
 }
 
 export function findClosestClass(node: ts.Node): ts.ClassDeclaration {
-  while (node && !ts.isClassDeclaration(node)) {
-    node = node.parent;
+  const wrappedNode = createWrappedNode(node);
+
+  if (TypeGuards.isClassDeclaration(wrappedNode)) {
+    return wrappedNode.compilerNode;
   }
-  if (!ts.isClassDeclaration(node)) {
-    throw new Error(`Could not find ClassDeclaration for ${node}`);
+  const clazz = wrappedNode.getFirstAncestorByKind(
+    ts.SyntaxKind.ClassDeclaration
+  );
+  if (!clazz) {
+    throw new Error(`Could not find ClassDeclaration for ${node.getText()}`);
   }
-  return node;
+  return clazz.compilerNode;
 }
 
 export function getConstructor(
   node: ts.ClassDeclaration
 ): ts.ConstructorDeclaration | undefined {
-  return node.members.find(memer =>
-    ts.isConstructorDeclaration(memer)
-  ) as ts.ConstructorDeclaration;
+  const constructors = createWrappedNode(node).getConstructors();
+  return constructors && constructors.length > 0
+    ? constructors[0].compilerNode
+    : undefined;
 }
 
 export function getDecoratorParameters(
   node: ts.Decorator
 ): ReadonlyArray<ts.Node> {
-  if (ts.isIdentifier(node.expression)) {
-    return [];
-  } else if (ts.isCallExpression(node.expression)) {
-    return node.expression.arguments;
+  const decorator = createWrappedNode(node);
+  if (decorator.isDecoratorFactory()) {
+    return decorator.getArguments().map(argument => argument.compilerNode);
   }
-  throw new Error('Unhandled decorator pattern');
+  return [];
 }
 
 export function getValueFromObjectLiteral(
   node: ts.ObjectLiteralExpression,
   name: string
 ): ts.Expression | undefined {
-  const property = node.properties.find(property => {
-    if (!ts.isPropertyAssignment(property)) {
-      throw new Error('Invalid object literal');
+  const ole = createWrappedNode(node);
+  const property = ole.getProperty(name);
+  if (property) {
+    if (TypeGuards.isPropertyAssignment(property)) {
+      const initializer = property.getInitializer();
+      return initializer ? initializer.compilerNode : undefined;
     }
-    if (!ts.isIdentifier(property.name)) {
-      throw new Error('Invalid object literal');
-    }
-    return property.name.getText() === name;
-  }) as ts.PropertyAssignment;
-  if (!property) {
-    return undefined;
   }
-  return property.initializer;
+  return undefined;
 }
 
 export function checkManagedDecorator(
@@ -173,4 +137,44 @@ export function findDependencies(
     }
     throw new Error(`Unknown class element ${member}`);
   });
+}
+
+function getDecorator(
+  node: Node<ts.Node>,
+  name: string
+): Decorator | undefined {
+  if (TypeGuards.isDecoratableNode(node)) {
+    const decorator = node.getDecorator(name);
+    return decorator;
+  }
+  return undefined;
+}
+
+// todo: use smaller methods above
+// tslint:disable-next-line:cyclomatic-complexity
+export function getDecoratorParameter(
+  node: ts.Node,
+  decoratorName: string,
+  propertyName: string
+): ts.Expression | undefined {
+  const wrappedNode = createWrappedNode(node);
+
+  const decorator = getDecorator(wrappedNode, decoratorName);
+  if (!decorator) {
+    return undefined;
+  }
+  const args = decorator.getArguments();
+  if (args.length === 0) {
+    return undefined;
+  }
+  const arg = args[0];
+  if (!TypeGuards.isObjectLiteralExpression(arg)) {
+    return undefined;
+  }
+  const property = arg.getProperty(propertyName);
+  if (!property || !TypeGuards.isPropertyAssignment(property)) {
+    return undefined;
+  }
+  const initializer = property.getInitializer();
+  return initializer ? initializer.compilerNode : undefined;
 }

@@ -3,17 +3,14 @@ import { DefinitionNotFoundError } from './errors';
 import { Navigation } from './navigation';
 import {
   checkManagedDecorator,
-  filter,
   findClosestClass,
   findDependencies,
   getConstructor,
-  getDecorator,
+  getDecoratorParameter,
   getDecoratorParameters,
   getMethodReturnType,
   getValueFromObjectLiteral,
-  hasDecorator,
-  isAbstract,
-  isSingleton
+  hasDecorator
 } from './utils';
 
 /**
@@ -76,21 +73,14 @@ export class Component {
       typeof this._singleton !== 'undefined' ? this._singleton : undefined;
     let scope: string | undefined;
 
-    const meta = getDecorator('meta', this.type);
-    if (meta) {
-      const parameters = getDecoratorParameters(meta);
-      // per type signature first parameter of meta is always object literal expression
-      const config = parameters[0] as ts.ObjectLiteralExpression;
+    const singletonNode = getDecoratorParameter(this.type, 'meta', 'singleton');
+    singleton =
+      !singletonNode || singletonNode.kind !== ts.SyntaxKind.FalseKeyword;
 
-      singleton = isSingleton(config);
-
-      const scopeNode = getValueFromObjectLiteral(config, 'scope');
-      if (scopeNode) {
-        if (ts.isStringLiteral(scopeNode)) {
-          scope = scopeNode.text;
-        }
-      }
-    }
+    const scopeNode = getDecoratorParameter(this.type, 'meta', 'scope');
+    scope =
+      (scopeNode && ts.isStringLiteral(scopeNode) && scopeNode.text) ||
+      undefined;
 
     return {
       singleton,
@@ -172,25 +162,17 @@ export class ClassicComponent extends Component {
       scope: undefined
     };
 
-    const component = getDecorator('component', this.type);
-    if (component) {
-      const parameters = getDecoratorParameters(component);
-      if (
-        parameters.length > 0 &&
-        ts.isObjectLiteralExpression(parameters[0])
-      ) {
-        const config = parameters[0] as ts.ObjectLiteralExpression;
+    const singleton = getDecoratorParameter(
+      this.type,
+      'component',
+      'singleton'
+    );
+    meta.singleton =
+      !singleton || singleton.kind !== ts.SyntaxKind.FalseKeyword;
 
-        meta.singleton = isSingleton(config);
-
-        const scopeNode = getValueFromObjectLiteral(config, 'scope');
-        if (scopeNode) {
-          if (ts.isStringLiteral(scopeNode)) {
-            meta.scope = scopeNode.text;
-          }
-        }
-      }
-    }
+    const scope = getDecoratorParameter(this.type, 'component', 'scope');
+    meta.scope =
+      (scope && ts.isStringLiteral(scope) && scope.text) || undefined;
 
     return meta;
   }
@@ -251,8 +233,15 @@ export class ClassicComponent extends Component {
 export class Container {
   private readonly externalComponents: Component[] = [];
 
-  public get entryPoints(): ts.NodeArray<ts.ClassElement> {
-    return filter(this.node.members, isAbstract);
+  public get entryPoints(): ts.ClassElement[] {
+    return this.node.members.filter(member => {
+      if (!member.modifiers) {
+        return false;
+      }
+      return member.modifiers.some(
+        modifier => modifier.kind === ts.SyntaxKind.AbstractKeyword
+      );
+    });
   }
 
   private _units: Unit[] | undefined;
@@ -397,15 +386,8 @@ export class Unit {
       .map(member => {
         // -- is singleton?
         const singleton = (() => {
-          const provides = getDecorator('provides', member)!;
-          const parameters = getDecoratorParameters(provides);
-          if (parameters.length > 0) {
-            // per type signature first parameter of provides is always
-            // object literal expression
-            const config = parameters[0] as ts.ObjectLiteralExpression;
-            return isSingleton(config);
-          }
-          return true;
+          const value = getDecoratorParameter(member, 'provides', 'singleton');
+          return !value || value.kind !== ts.SyntaxKind.FalseKeyword;
         })();
         // /- is singleton?
 

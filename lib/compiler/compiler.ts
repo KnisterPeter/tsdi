@@ -9,17 +9,42 @@ import {
   findClosestClass,
   findClosestDecoratedNode,
   findTsdiRoot,
-  getDecorator,
-  getDecoratorParameters,
-  getValueFromObjectLiteral,
+  getDecoratorParameter,
   hasDecorator
 } from './utils';
 
+function createLanguageService(
+  cmdline: ts.ParsedCommandLine,
+  host: CompilerHost
+): ts.LanguageService {
+  return ts.createLanguageService({
+    getScriptFileNames: () => cmdline.fileNames,
+    getDefaultLibFileName: () => ts.getDefaultLibFileName(cmdline.options),
+    getCurrentDirectory: () => host.getCurrentDirectory(),
+    getCompilationSettings: () => cmdline.options,
+    getScriptVersion: _ => '0',
+    getScriptSnapshot: fileName => {
+      const code = host.readFile(fileName);
+      if (!code) {
+        return undefined;
+      }
+      return ts.ScriptSnapshot.fromString(code);
+    },
+    resolveModuleNames: createResolver(host)
+  });
+}
+
 export class Compiler {
-  public static create(
-    host: CompilerHost,
+  private readonly navigation: Navigation;
+
+  private readonly generator: Generator;
+
+  private readonly services: ts.LanguageService;
+
+  constructor(
+    private readonly host: CompilerHost,
     root = host.getCurrentDirectory()
-  ): Compiler {
+  ) {
     const configFile = ts.findConfigFile(root, host.fileExists);
     if (!configFile) {
       throw new Error('Unable to find tsconfig.json');
@@ -44,39 +69,8 @@ export class Compiler {
       throw new Error('Errors in config file setup');
     }
 
-    const languageService = Compiler.createLanguageService(cmdline, host);
-    return new Compiler(host, languageService);
-  }
+    this.services = createLanguageService(cmdline, host);
 
-  private static createLanguageService(
-    cmdline: ts.ParsedCommandLine,
-    host: CompilerHost
-  ): ts.LanguageService {
-    return ts.createLanguageService({
-      getScriptFileNames: () => cmdline.fileNames,
-      getDefaultLibFileName: () => ts.getDefaultLibFileName(cmdline.options),
-      getCurrentDirectory: () => host.getCurrentDirectory(),
-      getCompilationSettings: () => cmdline.options,
-      getScriptVersion: _ => '0',
-      getScriptSnapshot: fileName => {
-        const code = host.readFile(fileName);
-        if (!code) {
-          return undefined;
-        }
-        return ts.ScriptSnapshot.fromString(code);
-      },
-      resolveModuleNames: createResolver(host)
-    });
-  }
-
-  private readonly navigation: Navigation;
-
-  private readonly generator: Generator;
-
-  private constructor(
-    private readonly host: CompilerHost,
-    private readonly services: ts.LanguageService
-  ) {
     this.navigation = new Navigation(this.services);
 
     // // enable to output diagnostics
@@ -155,18 +149,7 @@ export class Compiler {
           ) {
             return true;
           }
-          const parameters = getDecoratorParameters(
-            getDecorator('managed', node)!
-          );
-          if (parameters.length === 0) {
-            return true;
-          }
-          return !Boolean(
-            getValueFromObjectLiteral(
-              parameters[0] as ts.ObjectLiteralExpression,
-              'by'
-            )
-          );
+          return !Boolean(getDecoratorParameter(node, 'managed', 'by'));
         })
         .filter(node => {
           // todo: filter TSDI by reference instead of name
@@ -276,18 +259,10 @@ export class Compiler {
   ): Component[] {
     return externals
       .filter(external => {
-        const externalDecorator = getDecorator('managed', external)!;
-
-        const parameters = getDecoratorParameters(externalDecorator);
-        if (parameters.length > 0) {
-          // per type signature first parameter of provides is always
-          // object literal expression
-          const config = parameters[0] as ts.ObjectLiteralExpression;
-          const value = getValueFromObjectLiteral(config, 'by');
-          if (value && ts.isIdentifier(value)) {
-            const cls = findClosestClass(this.navigation.findDefinition(value));
-            return cls === container.node;
-          }
+        const by = getDecoratorParameter(external, 'managed', 'by');
+        if (by && ts.isIdentifier(by)) {
+          const cls = findClosestClass(this.navigation.findDefinition(by));
+          return cls === container.node;
         }
         return false;
       })

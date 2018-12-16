@@ -3,7 +3,7 @@ import { Compiler } from './compiler';
 
 const root = process.argv.length > 1 ? process.argv[2] : undefined;
 
-Compiler.create(ts.sys, root)
+new Compiler(ts.sys, root)
   .run()
   .then(() => {
     process.exit(0);

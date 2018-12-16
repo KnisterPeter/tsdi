@@ -156,7 +156,7 @@ export async function runCompiler(
     throw new Error(diagnostic.messageText.toString());
   };
 
-  return Compiler.create(host, host.getCurrentDirectory()).run();
+  return new Compiler(host, host.getCurrentDirectory()).run();
 }
 
 function transpile(input: string): string {
