@@ -3,13 +3,21 @@ workflow "Build and Test on push" {
   resolves = ["Test"]
 }
 
-action "Install" {
-  uses = "docker://culturehq/actions-yarn:latest"
+action "Install yarn" {
+  uses = "docker://node:10"
   args = "install"
+  runs = "yarn"
+}
+
+action "Install" {
+  uses = "docker://node:10"
+  runs = "yarn"
+  needs = ["Install yarn"]
 }
 
 action "Test" {
-  uses = "docker://culturehq/actions-yarn:latest"
-  needs = ["Install"]
+  uses = "docker://node:10"
+  runs = "yarn"
   args = "test"
+  needs = ["Install"]
 }
