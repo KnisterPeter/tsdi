@@ -8,16 +8,9 @@ workflow "Build and Test on push" {
   ]
 }
 
-action "Install yarn" {
-  uses = "docker://node:10"
-  args = "install"
-  runs = "yarn"
-}
-
 action "Install (node 10)" {
   uses = "docker://node:10"
   runs = "yarn"
-  needs = ["Install yarn"]
 }
 
 action "Test (node 10)" {
@@ -36,14 +29,12 @@ action "Linter" {
 
 action "Install (node 8)" {
   uses = "docker://node:8"
-  needs = ["Install yarn"]
   runs = "yarn"
   args = "install"
 }
 
 action "Install (node 6)" {
   uses = "docker://node:6"
-  needs = ["Install yarn"]
   runs = "yarn"
   args = "install"
 }
