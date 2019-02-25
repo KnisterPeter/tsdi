@@ -49,7 +49,7 @@ action "Test (node 11)" {
 action "Coverage" {
   uses = "docker://node:11"
   runs = "bash -c"
-  args = "yarn codecov --disable=detect --commit=$GITHUB_SHA --branch=${GITHUB_REF#refs/heads/} --slug $GITHUB_REPOSITORY"
+  args = ["yarn codecov --disable=detect --commit=$GITHUB_SHA --branch=${GITHUB_REF#refs/heads/} --slug $GITHUB_REPOSITORY"]
   needs = ["Test (node 11)"]
   secrets = ["CODECOV_TOKEN"]
 }
