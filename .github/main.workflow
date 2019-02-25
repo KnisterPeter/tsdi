@@ -2,28 +2,28 @@ workflow "Build and Test (node 11)" {
   on = "push"
   resolves = [
     "Linter",
-    "Coverage",
+    "Coverage (node 11)",
   ]
 }
 
 workflow "Build and Test (node 10)" {
   on = "push"
   resolves = [
-    "Test (node 10)",
+    "Coverage (node 10)",
   ]
 }
 
 workflow "Build and Test (node 8)" {
   on = "push"
   resolves = [
-    "Test (node 8)",
+    "Coverage (node 8)",
   ]
 }
 
 workflow "Build and Test (node 6)" {
   on = "push"
   resolves = [
-    "Test (node 6)",
+    "Coverage (node 6)",
   ]
 }
 
@@ -46,10 +46,10 @@ action "Test (node 11)" {
   needs = ["Install (node 11)"]
 }
 
-action "Coverage" {
+action "Coverage (node 11)" {
   uses = "docker://node:11"
   runs = "bash -c"
-  args = ["yarn codecov --disable=detect --commit=$GITHUB_SHA --branch=${GITHUB_REF#refs/heads/} --slug $GITHUB_REPOSITORY"]
+  args = ["yarn codecov --disable=detect --commit=$GITHUB_SHA --branch=${GITHUB_REF#refs/heads/}"]
   needs = ["Test (node 11)"]
   secrets = ["CODECOV_TOKEN"]
 }
@@ -66,6 +66,13 @@ action "Test (node 10)" {
   needs = ["Install (node 10)"]
 }
 
+action "Coverage (node 10)" {
+  uses = "docker://node:10"
+  runs = "bash -c"
+  args = ["yarn codecov --disable=detect --commit=$GITHUB_SHA --branch=${GITHUB_REF#refs/heads/}"]
+  needs = ["Test (node 10)"]
+  secrets = ["CODECOV_TOKEN"]
+}
 action "Install (node 8)" {
   uses = "docker://node:8"
   runs = "yarn"
@@ -79,6 +86,14 @@ action "Test (node 8)" {
   args = "test --runInBand"
 }
 
+action "Coverage (node 8)" {
+  uses = "docker://node:8"
+  runs = "bash -c"
+  args = ["yarn codecov --disable=detect --commit=$GITHUB_SHA --branch=${GITHUB_REF#refs/heads/}"]
+  needs = ["Test (node 8)"]
+  secrets = ["CODECOV_TOKEN"]
+}
+
 action "Install (node 6)" {
   uses = "docker://node:6"
   runs = "yarn"
@@ -90,4 +105,12 @@ action "Test (node 6)" {
   needs = ["Install (node 6)"]
   runs = "yarn"
   args = "test --runInBand"
+}
+
+action "Coverage (node 6)" {
+  uses = "docker://node:6"
+  runs = "bash -c"
+  args = ["yarn codecov --disable=detect --commit=$GITHUB_SHA --branch=${GITHUB_REF#refs/heads/}"]
+  needs = ["Test (node 6)"]
+  secrets = ["CODECOV_TOKEN"]
 }
