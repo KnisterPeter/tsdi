@@ -51,6 +51,7 @@ action "Coverage" {
   runs = "yarn"
   args = "coverage"
   needs = ["Test (node 11)"]
+  secrets = ["CODECOV_TOKEN"]
 }
 
 action "Install (node 10)" {
