@@ -4,8 +4,26 @@ workflow "Build and Test on push" {
     "Linter",
     "Coverage",
     "Test (node 11)",
+  ]
+}
+
+workflow "Build and Test (node 10)" {
+  on = "push"
+  resolves = [
     "Test (node 10)",
+  ]
+}
+
+workflow "Build and Test (node 8)" {
+  on = "push"
+  resolves = [
     "Test (node 8)",
+  ]
+}
+
+workflow "Build and Test (node 6)" {
+  on = "push"
+  resolves = [
     "Test (node 6)",
   ]
 }
