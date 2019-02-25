@@ -1,9 +1,8 @@
-workflow "Build and Test on push" {
+workflow "Build and Test (node 11)" {
   on = "push"
   resolves = [
     "Linter",
     "Coverage",
-    "Test (node 11)",
   ]
 }
 
@@ -35,13 +34,6 @@ action "Linter" {
   needs = ["Install (node 11)"]
 }
 
-action "Coverage" {
-  uses = "docker://node:11"
-  runs = "yarn"
-  args = "coverage"
-  needs = ["Install (node 11)"]
-}
-
 action "Install (node 11)" {
   uses = "docker://node:11"
   runs = "yarn"
@@ -52,6 +44,13 @@ action "Test (node 11)" {
   runs = "yarn"
   args = "test --runInBand"
   needs = ["Install (node 11)"]
+}
+
+action "Coverage" {
+  uses = "docker://node:11"
+  runs = "yarn"
+  args = "coverage"
+  needs = ["Test (node 11)"]
 }
 
 action "Install (node 10)" {
