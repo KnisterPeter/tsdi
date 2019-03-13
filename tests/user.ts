@@ -1,4 +1,4 @@
-import { Component, Initialize, Inject } from '..';
+import { Component, Initialize, Inject } from '../lib';
 import { Dependency } from './dependency';
 
 @Component()

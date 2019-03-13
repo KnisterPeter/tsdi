@@ -10,7 +10,7 @@ import {
   Inject,
   inject,
   TSDI
-} from '..';
+} from '../lib';
 import { Cyclic1 } from './cyclic1';
 import { Dependency } from './dependency';
 import { EagerComponent1 } from './eager1';
