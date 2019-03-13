@@ -9,7 +9,7 @@ import { terser } from 'rollup-plugin-terser';
  * @type rollup.RollupFileOptions
  */
 const config = {
-  input: 'dist/esm/lib/index.js',
+  input: 'dist/esm/index.js',
   output: {
     file: 'dist/umd/tsdi.js',
     format: 'umd',

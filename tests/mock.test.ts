@@ -1,4 +1,4 @@
-import { TSDI, component, inject, initialize } from '../lib/tsdi';
+import { component, initialize, inject, TSDI } from '..';
 
 let origWarn: (...args: any[]) => void;
 

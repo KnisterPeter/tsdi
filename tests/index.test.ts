@@ -10,7 +10,7 @@ import {
   Inject,
   inject,
   TSDI
-} from '../lib/tsdi';
+} from '..';
 import { Cyclic1 } from './cyclic1';
 import { Dependency } from './dependency';
 import { EagerComponent1 } from './eager1';
@@ -310,7 +310,6 @@ describe('TSDI', () => {
 
       class NonSingletonObject {}
 
-      // @ts-ignore
       @Component()
       // @ts-ignore
       class FactoryComponentWithSingletonFactory {
@@ -329,7 +328,6 @@ describe('TSDI', () => {
 
       class NonSingletonObject {}
 
-      // @ts-ignore
       @Component()
       // @ts-ignore
       class FactoryComponentWithNonSingletonFactory {

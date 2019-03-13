@@ -1,15 +1,57 @@
-import * as ts from 'typescript';
-import { Compiler } from './compiler';
+#!/usr/bin/env node
 
-const root = process.argv.length > 1 ? process.argv[2] : undefined;
+import { Command, flags } from '@oclif/command';
+import figlet from 'figlet';
+import { writeFileSync } from 'fs';
+import kebabCase from 'kebab-case';
+import { join } from 'path';
+import { Compiler } from '.';
 
-Compiler.create(ts.sys, root)
-  .run()
-  .then(() => {
-    process.exit(0);
-  })
-  .catch(e => {
-    setImmediate(() => {
-      throw e;
+class CompilerCommand extends Command {
+  public static description = 'The TSDI compiler cli';
+
+  public static flags = {
+    project: flags.string({
+      name: 'p',
+      description: 'Path to a projects tsconfig.json',
+      default: 'tsconfig.json',
+      required: true
+    }),
+    'out-dir': flags.string({
+      name: 'o',
+      description: 'Output folder to write containers to',
+      default: '.',
+      required: true
+    }),
+    'std-out': flags.boolean({
+      description:
+        'Print containers to stdout intead of write them to the filesystem',
+      default: false,
+      required: false
+    })
+  };
+
+  public async run(): Promise<any> {
+    const { flags } = this.parse(CompilerCommand);
+
+    new Compiler(flags.project).getContainers().forEach(container => {
+      const code = container.generate(flags['out-dir']);
+      if (flags['std-out']) {
+        console.log(code);
+      } else {
+        const fileName = kebabCase(container.implName).replace(/^-/, '');
+        const fullFilePath = join(flags['out-dir'], fileName + '.ts');
+        writeFileSync(fullFilePath, code);
+        console.error(
+          `Written container ${container.name} (${
+            container.implName
+          }) to ${fullFilePath}`
+        );
+      }
     });
-  });
+  }
+}
+
+console.error(figlet.textSync('TSDI', { horizontalLayout: 'full' }));
+// tslint:disable-next-line:no-var-requires no-implicit-dependencies
+(CompilerCommand.run() as Promise<any>).catch(require('@oclif/errors/handle'));

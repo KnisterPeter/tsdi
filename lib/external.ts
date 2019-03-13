@@ -1,4 +1,5 @@
 import debug from './debug';
+import { addTsdiMarker } from './marker';
 import { TSDI } from './tsdi';
 
 const log = debug('tsdi');
@@ -14,6 +15,7 @@ export function External<TFunction extends Function>(
 ): ClassDecorator | TFunction {
   const decorate = (target: TFunction) => {
     log(`@External ${target.name}`);
+    addTsdiMarker(target);
     const constructor = function InjectedConstructor(
       this: any,
       ...args: any[]
@@ -28,6 +30,7 @@ export function External<TFunction extends Function>(
       ? Object.setPrototypeOf(constructor, target)
       : ((constructor as any).__proto__ = target);
     constructor.prototype = target.prototype;
+
     return constructor as any;
   };
 

@@ -1,9 +1,19 @@
-import { ComponentOrFactoryMetadata, FactoryMetadata } from './tsdi';
+import {
+  ComponentOrFactoryMetadata,
+  FactoryMetadata,
+  InterfaceMetadata
+} from './tsdi';
 
 export function isFactoryMetadata(
   metadata: ComponentOrFactoryMetadata
 ): metadata is FactoryMetadata {
   return Boolean((metadata as FactoryMetadata).rtti);
+}
+
+export function isInterfaceMetadata(
+  metadata: ComponentOrFactoryMetadata
+): metadata is InterfaceMetadata {
+  return typeof (metadata as InterfaceMetadata).fn === 'symbol';
 }
 
 export function findIndexOf<T>(

@@ -1,6 +1,7 @@
 import debug from './debug';
 import { addKnownComponent } from './global-state';
 import { getNamedOptions } from './helper';
+import { addTsdiMarker } from './marker';
 import { IComponentOptions } from './tsdi';
 
 const log = debug('tsdi');
@@ -19,6 +20,7 @@ export function Component<TFunction extends object>(
     optionsOrString: IComponentOptions | string = {}
   ) => {
     log(`@Component ${(target as any).name}`);
+    addTsdiMarker(target);
     const options = getNamedOptions<IComponentOptions>(optionsOrString);
     addKnownComponent({
       fn: target as any,
