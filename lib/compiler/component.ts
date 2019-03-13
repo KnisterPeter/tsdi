@@ -75,9 +75,6 @@ export class Component {
     if (this.node.getConstructors().length === 0) {
       return [];
     }
-    if (this.node.getConstructors().length > 1) {
-      throw new Error('TSDI does not support constructor overloading');
-    }
 
     const parameters = this.node.getConstructors()[0].getParameters();
 
@@ -95,7 +92,10 @@ export class Component {
           type: new Component(this.container, node)
         };
       }
-      throw new Error('Illegal node type for component: ' + node.print());
+      throw new Error(
+        'Only interfaces or classes are valid types for constructor injection. ' +
+          `But for [${parameter.getName()}] got '${node.print()}' instead`
+      );
     });
   }
 
