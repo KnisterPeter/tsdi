@@ -1,4 +1,4 @@
-import { managed, TSDI } from '..';
+import { managed, TSDI } from '../lib';
 
 describe('TSDI without reflection should be configurable', () => {
   let tsdi: TSDI;

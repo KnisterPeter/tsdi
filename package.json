@@ -18,15 +18,15 @@
     "clean": "rimraf dist",
     "prebuild": "yarn clean",
     "build": "yarn build:cjs && yarn build:esm && yarn build:umd",
-    "build:cjs": "tsc --sourceMap --module commonjs --outDir dist",
-    "build:esm": "tsc --sourceMap --module esnext --outDir dist/esm",
+    "build:cjs": "tsc --project ./tsconfig.build.json --sourceMap --module commonjs --outDir dist",
+    "build:esm": "tsc --project ./tsconfig.build.json --sourceMap --module esnext --outDir dist/esm",
     "build:umd": "rollup -c",
     "pretest": "yarn build",
     "test": "jest",
     "prerelease": "git checkout master && git pull origin master && yarn test && yarn build",
     "release": "standard-version",
     "postrelease": "git push --follow-tags origin master && npm publish",
-    "precoverage": "yarn clean && tsc --inlineSourceMap",
+    "precoverage": "yarn clean && tsc --project ./tsconfig.build.json --inlineSourceMap",
     "coverage": "codecov",
     "build:watch": "yarn build:cjs -- --watch",
     "test:watch": "yarn jest --watch --coverage=no"
@@ -96,31 +96,26 @@
     ]
   },
   "jest": {
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
-    },
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "preset": "ts-jest",
     "testPathIgnorePatterns": [
       "/node_modules/",
       "/dist/"
     ],
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json",
-      "node"
-    ],
     "collectCoverage": true,
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "lib/compiler/cli.ts",
+      "lib/compiler/decorators.ts"
+    ],
     "collectCoverageFrom": [
       "lib/**"
     ],
-    "coveragePathIgnorePatterns": [
-      "/node_modules/",
-      "/lib/compiler/cli.ts",
-      "/lib/compiler/decorators.ts"
-    ]
+    "globals": {
+      "ts-jest": {
+        "tsConfig": "tsconfig.build.json",
+        "isolatedModules": false
+      }
+    }
   },
   "renovate": {
     "extends": [

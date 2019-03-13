@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "declaration": true,
+    "noEmit": true,
     "target": "es2015",
     "module": "esnext",
-    "rootDir": "lib",
+    "rootDir": ".",
     "outDir": "dist/esm",
     "lib": ["dom", "es2015", "es2016", "es2017", "es2018", "esnext"],
     "strict": true,

@@ -7,7 +7,7 @@ import {
   Inject,
   inject,
   TSDI
-} from '..';
+} from '../lib';
 import { User } from './user';
 
 describe('TSDI when creating a container instance with external classes', () => {
