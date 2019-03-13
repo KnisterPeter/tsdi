@@ -1,4 +1,4 @@
-import { component, inject } from '../lib/';
+import { component, inject } from '..';
 import { EagerComponent2 } from './eager2';
 
 @component({ eager: true })

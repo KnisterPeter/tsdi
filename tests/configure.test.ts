@@ -1,5 +1,4 @@
-import { TSDI } from '../lib';
-import { managed } from '../lib/compiler';
+import { managed, TSDI } from '..';
 
 describe('TSDI without reflection should be configurable', () => {
   let tsdi: TSDI;
@@ -20,8 +19,8 @@ describe('TSDI without reflection should be configurable', () => {
 
     class Dependency {}
 
-    tsdi.configure(Dependency);
-    tsdi.configure(Class, {
+    tsdi.configureAndMark(Dependency);
+    tsdi.configureAndMark(Class, {
       constructorDependencies: [Dependency],
       propertyDependencies: [{ property: 'dependency', type: Dependency }]
     });
@@ -42,9 +41,9 @@ describe('TSDI without reflection should be configurable', () => {
       }
     }
 
-    tsdi.configure(Dependency);
-    tsdi.configure(Provider);
-    tsdi.configure(Component, {
+    tsdi.configureAndMark(Dependency);
+    tsdi.configureAndMark(Provider);
+    tsdi.configureAndMark(Component, {
       provider: {
         class: Provider,
         method: 'provide',

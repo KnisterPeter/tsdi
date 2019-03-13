@@ -68,11 +68,14 @@ export function Inject(
       parameters = [];
       Reflect.defineMetadata('component:parameters', parameters, target);
     }
-    parameters.push({
-      options,
-      index: parameterIndex,
-      rtti: Reflect.getMetadata('design:paramtypes', target)[parameterIndex]
-    });
+    const designParamtypes = Reflect.getMetadata('design:paramtypes', target);
+    if (designParamtypes) {
+      parameters.push({
+        options,
+        index: parameterIndex,
+        rtti: designParamtypes[parameterIndex]
+      });
+    }
   };
 
   if (args.length > 1) {

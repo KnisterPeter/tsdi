@@ -4,7 +4,8 @@ module.exports = function(wallaby) {
       'tsconfig.json',
       'lib/**/*.ts',
       'tests/**/*.ts',
-      '!tests/**/*.test.ts',
+      '!tests/**/*test.ts',
+      'tests/harness/**',
       // tslib is required for testing module resolution
       {
         pattern: 'node_modules/tslib/**',
@@ -13,7 +14,7 @@ module.exports = function(wallaby) {
         ignore: false
       }
     ],
-    tests: ['tests/**/*.test.ts'],
+    tests: ['tests/**/*test.ts'],
     testFramework: 'jest',
     env: {
       type: 'node'

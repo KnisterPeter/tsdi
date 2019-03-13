@@ -1,5 +1,6 @@
 import debug from './debug';
 import { addKnownComponent } from './global-state';
+import { addTsdiMarker } from './marker';
 import { IFactoryOptions } from './tsdi';
 
 const log = debug('tsdi');
@@ -20,11 +21,22 @@ export function Factory(...args: any[]): MethodDecorator | void {
         (target as any)[propertyKey].name
       );
     }
+    const rtti = Reflect.getMetadata('design:returntype', target, propertyKey);
+    if (rtti) {
+      addTsdiMarker(rtti);
+    } else {
+      console.warn(
+        `Unable to get return type of ${
+          (target as any).name
+        }#${propertyKey.toString()}(); In order to use @factory you need to emit metadata ` +
+          '(see https://tsdi.js.org/docs/en/getting-started.html#compiler-configuration)'
+      );
+    }
     addKnownComponent({
       target,
       property: propertyKey.toString(),
       options,
-      rtti: Reflect.getMetadata('design:returntype', target, propertyKey)
+      rtti
     });
   };
 

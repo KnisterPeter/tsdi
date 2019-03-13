@@ -1,15 +1,15 @@
+import { addTsdiMarker } from '../marker';
 import { TSDI } from '../tsdi';
 
 export function managed(configuration: { by: any }): ClassDecorator;
 export function managed<T extends { new (...args: any[]): {} }>(
   constructor: T
 ): T;
+export function managed(configuration: {
+  lazy?: boolean;
+}): (proto: any, prop: string) => void;
 export function managed(proto: any, prop: string): void;
-export function managed(
-  target: any,
-  prop?: string,
-  _descr?: PropertyDescriptor
-): any {
+export function managed(target: any, prop?: string): any {
   const decorator = (by: any, target: any, prop?: string) => {
     // handle decorated property
     if (target && prop) {
@@ -17,10 +17,8 @@ export function managed(
     }
 
     // handle decorated class
-    const constructor = function InjectedConstructor(
-      this: any,
-      ...args: any[]
-    ): any {
+    addTsdiMarker(target);
+    const constructor = function InjectedConstructor(...args: any[]): any {
       const instance = new target(...args);
       if (by || !TSDI.creating) {
         TSDI.creating = false;
@@ -52,30 +50,46 @@ export function managed(
 export function meta(_options: {
   singleton?: boolean;
   scope?: string;
-}): ClassDecorator {
+  eager?: boolean;
+}): any {
   return () => undefined;
 }
 
+export function provides(target: object, propertyKey: string): void;
+/**
+ * @deprecated
+ */
+export function provides(_option?: { singleton?: boolean }): MethodDecorator;
 export function provides(_option?: { singleton?: boolean }): MethodDecorator {
   return () => undefined;
 }
 
-export function unit(_target: any): void {
-  //
+export function unit(target: any): void {
+  addTsdiMarker(target);
 }
 
-export function container(_config: { units: any[] }): any {
+export function container(config: { units: any[] }): ClassDecorator;
+// tslint:disable-next-line:ban-types
+export function container<T extends Function>(target: T): void;
+export function container(config: any): ClassDecorator | void {
+  if (typeof config !== 'function') {
+    return () => undefined;
+  }
+}
+
+export function postConstruct(target: object, propertyKey: string): void;
+export function postConstruct(): MethodDecorator;
+export function postConstruct(): MethodDecorator | void {
   return () => undefined;
 }
 
-export function initialize(target: object, propertyKey: string): void;
-export function initialize(): MethodDecorator;
-export function initialize(): MethodDecorator | void {
+// todo: remove when ready
+export const initialize = postConstruct;
+
+export function preDestroy(target: object, propertyKey: string): void;
+export function preDestroy(): MethodDecorator;
+export function preDestroy(): MethodDecorator | void {
   return () => undefined;
 }
 
-export function destroy(target: object, propertyKey: string): void;
-export function destroy(): MethodDecorator;
-export function destroy(): MethodDecorator | void {
-  return () => undefined;
-}
+export const destroy = preDestroy;

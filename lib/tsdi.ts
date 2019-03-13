@@ -1,7 +1,11 @@
 import 'reflect-metadata';
 import debug from './debug';
 import { addListener, ComponentListener, removeListener } from './global-state';
-import { findIndexOf, isFactoryMetadata } from './helper';
+import { findIndexOf, isFactoryMetadata, isInterfaceMetadata } from './helper';
+import { addTsdiMarker, getTsdiMarker } from './marker';
+
+// note: work around an issue with custom require in tests/jest/global scope
+const ReflectObject = Reflect.getMetadata ? Reflect : (global as any).Reflect;
 
 const log = debug('tsdi');
 
@@ -54,10 +58,18 @@ export type ComponentMetadata = {
     dependencies: Constructable<any>[];
   };
   constructorDependencies?: Constructable<any>[];
-  propertyDependencies?: { property: string; type: Constructable<any> }[];
+  propertyDependencies?: {
+    property: string;
+    type: Constructable<any> | symbol;
+    meta?: {
+      lazy?: boolean;
+    };
+  }[];
   initializer?: string;
   disposer?: string;
 };
+
+export type InterfaceMetadata = ComponentMetadata & { fn: symbol };
 
 /** @internal */
 export type FactoryMetadata = {
@@ -76,6 +88,38 @@ export interface LifecycleListener {
   onCreate?(component: any): void;
   onDestroy?(component: any): void;
 }
+
+interface ExternalConfigurationWithProvider {
+  provider?: {
+    class: Constructable<any>;
+    method: string;
+    dependencies: Constructable<any>[];
+  };
+}
+
+interface ExternalConfigurationWithoutProvider {
+  constructorDependencies?: Constructable<any>[];
+}
+
+export type ExternalConfiguration = (
+  | ExternalConfigurationWithoutProvider
+  | ExternalConfigurationWithProvider) & {
+  propertyDependencies?: {
+    property: string;
+    type: Constructable<any> | symbol;
+    meta?: {
+      lazy?: boolean;
+      dynamic?: boolean;
+    };
+  }[];
+  meta?: {
+    singleton?: boolean;
+    scope?: string;
+    eager?: boolean;
+  };
+  initializer?: string;
+  disposer?: string;
+};
 
 export class TSDI {
   /**
@@ -205,7 +249,7 @@ export class TSDI {
         if (!isFactoryMetadata(metadata) && metadata.disposer) {
           return metadata.disposer;
         }
-        return Reflect.getMetadata(
+        return ReflectObject.getMetadata(
           'component:destroy',
           isFactoryMetadata(metadata) ? metadata.rtti : metadata.fn.prototype
         );
@@ -235,7 +279,7 @@ export class TSDI {
           const constructorDependencies = this.getConstructorParameterMetadata(
             metadata.fn
           );
-          const initializer = Reflect.getMetadata(
+          const initializer = ReflectObject.getMetadata(
             'component:init',
             metadata.fn.prototype
           );
@@ -284,12 +328,14 @@ export class TSDI {
 
       this.markAsyncInitializer(componentMetadata);
 
-      log(
-        'registerComponent %o',
+      const componentName = (() =>
         isFactoryMetadata(componentMetadata)
           ? (componentMetadata.rtti as any).name
-          : (componentMetadata.fn as any).name
-      );
+          : isInterfaceMetadata(componentMetadata)
+          ? componentMetadata.fn
+          : (componentMetadata.fn as any).name)();
+      log('registerComponent %o', componentName);
+
       this.components.push(componentMetadata);
       if (componentMetadata.options.eager) {
         const idx = this.components.length - 1;
@@ -303,26 +349,29 @@ export class TSDI {
   private markAsyncInitializer(
     componentMetadata: ComponentOrFactoryMetadata
   ): void {
+    if (isInterfaceMetadata(componentMetadata)) {
+      return;
+    }
     if (!isFactoryMetadata(componentMetadata)) {
-      const isAsync = Reflect.getMetadata(
+      const isAsync = ReflectObject.getMetadata(
         'component:init:async',
         componentMetadata.fn.prototype
       ) as boolean;
       const injects: InjectMetadata[] =
-        Reflect.getMetadata(
+        ReflectObject.getMetadata(
           'component:injects',
           componentMetadata.fn.prototype
         ) || [];
       const hasAsyncInitializers = injects.some(
         inject =>
           inject.type &&
-          (Reflect.getMetadata(
+          (ReflectObject.getMetadata(
             'component:init:async',
             inject.type.prototype
           ) as boolean)
       );
       if (!isAsync && hasAsyncInitializers) {
-        Reflect.defineMetadata(
+        ReflectObject.defineMetadata(
           'component:init:async',
           true,
           componentMetadata.fn.prototype
@@ -333,11 +382,11 @@ export class TSDI {
 
   public register(component: Constructable<any>, name?: string): void {
     const options: IComponentOptions =
-      Reflect.getMetadata('component:options', component) || {};
+      ReflectObject.getMetadata('component:options', component) || {};
     const constructorDependencies = this.getConstructorParameterMetadata(
       component
     );
-    const initializer = Reflect.getMetadata(
+    const initializer = ReflectObject.getMetadata(
       'component:init',
       component.prototype
     );
@@ -354,20 +403,18 @@ export class TSDI {
   }
 
   private getComponentMetadataIndex(
-    component: Constructable<any> | undefined,
+    component: Constructable<any> | symbol | undefined,
     name?: string
   ): number {
     for (let i = 0, n = this.components.length; i < n; i++) {
+      const lookup = this.components[i];
       if (name) {
-        if (name === this.components[i].options.name) {
+        if (name === lookup.options.name) {
           return i;
         }
       } else {
         if (
-          this.isComponentMetadataIndexFromComponentOrFactory(
-            component,
-            this.components[i]
-          )
+          this.isComponentMetadataIndexFromComponentOrFactory(component, lookup)
         ) {
           return i;
         }
@@ -377,18 +424,32 @@ export class TSDI {
   }
 
   private isComponentMetadataIndexFromComponentOrFactory(
-    component: Constructable<any> | undefined,
+    component: Constructable<any> | symbol | undefined,
     metadata: ComponentOrFactoryMetadata
   ): boolean {
+    const isMatchingSymbol = () =>
+      typeof component === 'symbol' &&
+      isInterfaceMetadata(metadata) &&
+      metadata.fn === component;
+    const isMatchingConstructor = () => {
+      const marker = getTsdiMarker(component);
+      return (
+        marker !== undefined &&
+        getTsdiMarker((metadata as ComponentMetadata).fn) ===
+          getTsdiMarker(component)
+      );
+    };
+    const isMatchingFactory = () =>
+      isFactoryMetadata(metadata) && metadata.rtti === component;
+
     return (
       typeof component !== 'undefined' &&
-      ((metadata as ComponentMetadata).fn === component ||
-        (isFactoryMetadata(metadata) && metadata.rtti === component))
+      (isMatchingSymbol() || isMatchingConstructor() || isMatchingFactory())
     );
   }
 
   private throwComponentNotFoundError(
-    component?: Constructable<any>,
+    component?: Constructable<any> | symbol,
     name?: string,
     additionalInfo?: string
   ): void {
@@ -453,12 +514,12 @@ export class TSDI {
     value: Promise<void> | undefined
   ): void {
     if (value) {
-      Reflect.defineMetadata('tsdi:initialize:promise', value, instance);
+      ReflectObject.defineMetadata('tsdi:initialize:promise', value, instance);
     }
   }
 
   private getInitializerPromise(instance: any): Promise<void> | undefined {
-    return Reflect.getMetadata('tsdi:initialize:promise', instance);
+    return ReflectObject.getMetadata('tsdi:initialize:promise', instance);
   }
 
   private createComponent<T>(metadata: ComponentMetadata, idx: number): T {
@@ -469,7 +530,11 @@ export class TSDI {
         `required scope '${metadata.options.scope}' is not enabled`
       );
     }
-    log('create %o with %o', (metadata.fn as any).name, metadata.options);
+    log(
+      'create %o with %o',
+      (metadata.fn as any).name || metadata.fn,
+      metadata.options
+    );
 
     const instanciate = () => {
       if (metadata.provider) {
@@ -526,14 +591,14 @@ export class TSDI {
   private waitForInjectInitializers(
     metadata: ComponentMetadata
   ): Promise<any> | undefined {
-    const injects: InjectMetadata[] = Reflect.getMetadata(
+    const injects: InjectMetadata[] = ReflectObject.getMetadata(
       'component:injects',
       metadata.fn.prototype
     );
     if (injects) {
       const hasAsyncInitializers = injects.some(
         inject =>
-          Reflect.getMetadata(
+          ReflectObject.getMetadata(
             'component:init:async',
             inject.type.prototype
           ) as boolean
@@ -561,7 +626,7 @@ export class TSDI {
   private getConstructorParameterMetadata(
     component: Constructable<any>
   ): Constructable<any>[] | undefined {
-    const parameterMetadata: ParameterMetadata[] = Reflect.getMetadata(
+    const parameterMetadata: ParameterMetadata[] = ReflectObject.getMetadata(
       'component:parameters',
       component
     );
@@ -590,7 +655,7 @@ export class TSDI {
     this.injectIntoInstance(instance, true, metadata);
     const init: string =
       metadata.initializer ||
-      Reflect.getMetadata('component:init', target.prototype);
+      ReflectObject.getMetadata('component:init', target.prototype);
     if (init) {
       instance[init].call(instance);
     }
@@ -639,16 +704,25 @@ export class TSDI {
     if (componentMetadata.propertyDependencies) {
       const container = this;
       componentMetadata.propertyDependencies.forEach(dependency => {
-        Object.defineProperty(instance, dependency.property, {
-          configurable: true,
-          enumerable: true,
-          get(): any {
-            return container.get(dependency.type);
-          }
-        });
+        const lazy = dependency.meta && dependency.meta.lazy;
+        if (lazy !== false) {
+          Object.defineProperty(instance, dependency.property, {
+            configurable: true,
+            enumerable: true,
+            get(): any {
+              return container.get(dependency.type);
+            }
+          });
+        } else {
+          Object.defineProperty(instance, dependency.property, {
+            configurable: true,
+            enumerable: true,
+            value: this.get(dependency.type)
+          });
+        }
       });
     } else {
-      const injects: InjectMetadata[] = Reflect.getMetadata(
+      const injects: InjectMetadata[] = ReflectObject.getMetadata(
         'component:injects',
         componentMetadata.fn.prototype
       );
@@ -730,7 +804,7 @@ export class TSDI {
     const [metadata] = this.getInjectComponentMetadata(inject);
     const async = isFactoryMetadata(metadata)
       ? false
-      : (Reflect.getMetadata(
+      : (ReflectObject.getMetadata(
           'component:init:async',
           metadata.fn.prototype
         ) as boolean);
@@ -897,10 +971,14 @@ export class TSDI {
     }
   }
 
-  public get<T>(componentOrHint: string | Constructable<T>): T;
-  public get<T>(component: Constructable<T>, hint: string): T;
-  public get<T>(componentOrHint: Constructable<T> | string, hint?: string): T {
-    let component: Constructable<T> | undefined;
+  public get<T>(componentOrHint: string | Constructable<T> | symbol): T;
+  public get<T>(component: Constructable<T> | symbol, hint: string): T;
+  public get<T>(
+    componentOrHint: Constructable<T> | string | symbol,
+    hint?: string
+  ): T {
+    log('> get %s', componentOrHint);
+    let component: Constructable<T> | symbol | undefined;
     if (typeof componentOrHint === 'string') {
       hint = componentOrHint as any;
       component = undefined;
@@ -910,12 +988,13 @@ export class TSDI {
 
     const idx = this.getComponentMetadataIndex(component, hint);
     const metadata = this.components[idx];
+    log('> get %s : metadata %o', componentOrHint, metadata);
     if (!metadata) {
       this.throwComponentNotFoundError(component, hint);
     }
     const instance = this.getOrCreate<T>(metadata, idx);
-    if (!isFactoryMetadata(metadata)) {
-      const isAsync = Reflect.getMetadata(
+    if (!isInterfaceMetadata(metadata) && !isFactoryMetadata(metadata)) {
+      const isAsync = ReflectObject.getMetadata(
         'component:init:async',
         metadata.fn.prototype
       ) as boolean;
@@ -926,6 +1005,7 @@ export class TSDI {
         );
       }
     }
+    log('< get %s -> %o', componentOrHint, instance);
     return instance;
   }
 
@@ -959,6 +1039,28 @@ export class TSDI {
   }
 
   /**
+   * This method is a low-level container configuration API.
+   * You should rarely need this one if you let the compiler create your configuration.
+   */
+  public configure(
+    component: Constructable<any> | symbol,
+    config: ExternalConfiguration = {}
+  ): void {
+    this.registerComponent({
+      // fixme: this is a hack so we are allowed to add symbols here
+      // as components
+      fn: component as any,
+      options: config.meta || {},
+      provider: (config as ExternalConfigurationWithProvider).provider,
+      constructorDependencies: (config as ExternalConfigurationWithoutProvider)
+        .constructorDependencies,
+      propertyDependencies: config.propertyDependencies,
+      initializer: config.initializer,
+      disposer: config.disposer
+    });
+  }
+
+  /**
    * This method could be used to statically describe a dependency
    * tree of an application. It states which components are
    * required to be injected into constuctor and properties of
@@ -971,39 +1073,25 @@ export class TSDI {
    * @param constructorDependencies The construtor dependencies
    * @param propertyDependencies The property dependencies
    */
-  public configure(
-    component: Constructable<any>,
-    config: {
-      provider?: {
-        class: Constructable<any>;
-        method: string;
-        dependencies: Constructable<any>[];
-      };
-      constructorDependencies?: Constructable<any>[];
-      propertyDependencies?: {
-        property: string;
-        type: Constructable<any>;
-      }[];
-      meta?: {
-        singleton?: boolean;
-        scope?: string;
-      };
-      initializer?: string;
-      disposer?: string;
-    } = {}
+  public configureAndMark(
+    component: Constructable<any> | symbol,
+    config: ExternalConfiguration = {}
   ): void {
-    this.registerComponent({
-      fn: component,
-      options: config.meta || {},
-      provider: config.provider,
-      constructorDependencies: config.constructorDependencies,
-      propertyDependencies: config.propertyDependencies,
-      initializer: config.initializer,
-      disposer: config.disposer
-    });
+    this.configure(component, config);
+    addTsdiMarker(component);
   }
 }
+addTsdiMarker(TSDI);
 
+export {
+  container,
+  managed,
+  meta,
+  postConstruct,
+  preDestroy,
+  provides,
+  unit
+} from './compiler/decorators';
 export { component, Component } from './component';
 export { destroy, Destroy } from './destroy';
 export { external, External } from './external';

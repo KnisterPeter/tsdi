@@ -1,227 +1,333 @@
-import { basename, dirname, relative, sep } from 'path';
 import * as prettier from 'prettier';
-import * as ts from 'typescript';
-import { Component } from './types';
+import {
+  Directory,
+  GetAccessorDeclarationStructure,
+  ImportDeclarationStructure,
+  Scope
+} from 'ts-morph';
+import { Component } from './component';
+import { Container } from './container';
+import { Compiler } from './index';
+import { Unit } from './unit';
 
-export interface ContainerBuilder {
-  base: ts.ClassDeclaration;
-  /**
-   * @internal
-   */
-  addAbstractMembers(nodes: ReadonlyArray<ts.ClassElement>): this;
-  /**
-   * @internal
-   */
-  addComponents(...nodes: Component[]): this;
-  build(): Promise<string>;
+type ImportTracker = (name: string | [string, string]) => string;
+
+function writeArray(fn: () => string[]): string {
+  return `[${fn().join(',')}]`;
+}
+
+function writeObject(fn: string | (() => string)): string {
+  return `{${typeof fn === 'string' ? fn : fn()}}`;
+}
+
+function writeProperty(key: string, value: string | (() => string)): string {
+  return `${key}: ${typeof value === 'string' ? value : value()},`;
+}
+
+function writePropertyIf(
+  condition: any,
+  key: string,
+  value: () => string
+): string {
+  return condition ? writeProperty(key, value) : '';
 }
 
 export class Generator {
-  public buildContainer(base: ts.ClassDeclaration): ContainerBuilder {
-    if (!base.name) {
-      throw new Error(
-        'Anonymous classes are not valid for container definition'
-      );
-    }
-    const baseName = base.name.text;
-    const getter: [string, string][] = [];
-    const components: Component[] = [];
-    const imports: [string, string][] = [
-      [baseName, `.${sep}${basename(base.getSourceFile().fileName)}`]
-    ];
+  constructor(private readonly compiler: Compiler) {}
 
-    const getComponentConfiguration = (component: Component): string => {
-      let code = '';
+  public createContainer(
+    container: Container<any>,
+    targetDirectoryPath: string
+  ): string {
+    const targetDirectory = this.compiler.project.createDirectory(
+      targetDirectoryPath
+    );
 
-      const shouldEmit = (expr: any) =>
-        Boolean(typeof expr === 'function' ? expr() : expr);
-
-      const emitString = (input: any) => {
-        code += "'";
-        code += input;
-        code += "'";
-      };
-
-      const emitObjectIf = (expr: any, fn: () => void) => {
-        if (shouldEmit(expr)) {
-          code += '{';
-          fn();
-          code += '}';
+    const imports = this.getImports(container, targetDirectory);
+    const trackedImports: Set<string> = new Set();
+    const trackImport = (name: string | [string, string]) => {
+      if (Array.isArray(name)) {
+        if (name[0] === name[1]) {
+          trackedImports.add(name[1]);
         }
-      };
-
-      const emitPropertyIf = (expr: any, name: string, fn: () => void) => {
-        if (shouldEmit(expr)) {
-          code += name;
-          code += ':';
-          fn();
-          code += ',';
-        }
-      };
-
-      const emitArrayIf = <T>(expr: any, items: T[], fn: (item: T) => void) => {
-        if (shouldEmit(expr)) {
-          code += '[';
-          items.forEach(item => {
-            fn(item);
-            code += ',';
-          });
-          code += ']';
-        }
-      };
-
-      const hasProvider = () => component.provider;
-      const hasConstructorDependencies = () =>
-        component.constructorDependencies.length > 0;
-      const hasPropertyDependencies = () =>
-        component.propertyDependencies.length > 0;
-      const hasSingleton = () => typeof component.meta.singleton === 'boolean';
-      const hasScope = () => typeof component.meta.scope !== 'undefined';
-      const hasMeta = () => hasSingleton();
-      const hasInitializer = () => component.initializer;
-      const hasDisposer = () => component.disposer;
-
-      emitObjectIf(true, () => {
-        emitPropertyIf(hasProvider, 'provider', () => {
-          emitObjectIf(true, () => {
-            emitPropertyIf(true, 'class', () => {
-              code += component.provider!.class.name!.getText();
-            });
-            emitPropertyIf(true, 'method', () => {
-              emitString(component.provider!.method);
-            });
-            emitPropertyIf(true, 'dependencies', () => {
-              emitArrayIf(true, component.provider!.parameters, parameter => {
-                code += parameter.name!.getText();
-              });
-            });
-          });
-        });
-        emitPropertyIf(
-          hasConstructorDependencies,
-          'constructorDependencies',
-          () => {
-            emitArrayIf(true, component.constructorDependencies, dependency => {
-              code += dependency.name!.getText();
-            });
-          }
-        );
-        emitPropertyIf(hasPropertyDependencies, 'propertyDependencies', () => {
-          emitArrayIf(true, component.propertyDependencies, dependency => {
-            emitObjectIf(true, () => {
-              emitPropertyIf(true, 'property', () => {
-                emitString(dependency.property);
-              });
-              emitPropertyIf(true, 'type', () => {
-                code += dependency.type.name!.getText();
-              });
-            });
-          });
-        });
-        emitPropertyIf(hasMeta, 'meta', () => {
-          emitObjectIf(true, () => {
-            emitPropertyIf(hasSingleton, 'singleton', () => {
-              code += Boolean(component.meta.singleton);
-            });
-            emitPropertyIf(hasScope, 'scope', () => {
-              emitString(component.meta.scope);
-            });
-          });
-        });
-        emitPropertyIf(hasInitializer, 'initializer', () => {
-          emitString(component.initializer);
-        });
-        emitPropertyIf(hasDisposer, 'disposer', () => {
-          emitString(component.disposer);
-        });
-      });
-
-      return code;
+        return name[0];
+      } else {
+        trackedImports.add(name);
+      }
+      return name;
     };
 
-    return {
-      base,
-      addAbstractMembers(nodes: ts.ClassElement[]): any {
-        nodes.map(node => {
-          if (ts.isPropertyDeclaration(node)) {
-            getter.push([node.name.getText(), node.type!.getText()]);
-          } else {
-            throw new Error('Unknown class element');
+    const sourceFile = targetDirectory.createSourceFile(
+      '__tsdi-temp-container-file.ts'
+    );
+
+    sourceFile.addClass({
+      name: container.implName,
+      isExported: true,
+      extends: trackImport(container.importName),
+      properties: [
+        {
+          scope: Scope.Private,
+          isReadonly: true,
+          name: '_tsdi',
+          type: 'TSDI'
+        }
+      ],
+      ctors: [
+        {
+          bodyText: writer => {
+            writer.writeLine('super()');
+            writer.writeLine(
+              `this._tsdi = new TSDI(${trackImport(container.importName)});`
+            );
+            container.components.forEach(component => {
+              if (component.name === 'TSDI') {
+                return;
+              }
+              writer.writeLine(
+                this.writeComponentConfiguration(component, trackImport)
+              );
+            });
           }
-        });
-        return this;
-      },
-      addComponents(...nodes: Component[]): any {
-        nodes.forEach(node => {
-          if (!node.type.name) {
-            throw new Error(
-              `Anonymous classes as components are not supported`
+        }
+      ],
+      getAccessors: container.entryPoints.map<GetAccessorDeclarationStructure>(
+        (entry: { name: string; type: Component }) => ({
+          scope: Scope.Public,
+          name: entry.name,
+          returnType: trackImport(entry.type.importName),
+          bodyText: writer => {
+            writer.writeLine(
+              `return this._tsdi.get(${trackImport(entry.type.symbol)});`
             );
           }
-          components.push(node);
-          imports.push([
-            node.type.name.getText(),
-            `.${sep}${relative(
-              dirname(base.getSourceFile().fileName),
-              node.type.getSourceFile().fileName
-            )}`
-          ]);
-        });
-        return this;
-      },
-      async build(): Promise<string> {
-        return prettier.format(
-          `
-          // tslint:disable
-          //
-          // This is a generated file.
-          // DO NOT EDIT!
-          //
-          import { TSDI } from 'tsdi';
-          ${imports
-            .map(
-              ([name, path]) =>
-                `import { ${name} } from '${path.replace(/\.tsx?/, '')}';`
-            )
-            .join('\n')}
+        })
+      ),
+      methods: [
+        {
+          scope: Scope.Public,
+          name: 'close',
+          returnType: 'void',
+          bodyText: `this._tsdi.close();`
+        }
+      ]
+    });
 
-          export class TSDI${baseName} extends ${baseName} {
-            private readonly tsdi: TSDI;
-
-            constructor() {
-              super();
-              this.tsdi = new TSDI(${baseName});
-              ${components
-                .map(component => {
-                  if (!component.type.name) {
-                    throw new Error(
-                      `Anonymous classes as components are not supported`
-                    );
-                  }
-
-                  const config = getComponentConfiguration(component);
-                  return `this.tsdi.configure(${component.type.name.getText()}, ${config});`;
-                })
-                .join('\n')}
-            }
-
-            ${getter
-              .map(([name, type]) => {
-                return `
-                  public get ${name}(): ${type} {
-                    return this.tsdi.get(${type});
-                  }
-                `;
-              })
-              .join('\n')}
-          }
-        `,
+    sourceFile.addImportDeclarations([
+      {
+        namedImports: [
           {
-            ...(await prettier.resolveConfig(base.getSourceFile().fileName)),
-            ...{ parser: 'typescript' }
+            name: 'TSDI'
           }
-        );
-      }
+        ],
+        moduleSpecifier: 'tsdi'
+      },
+      ...Object.keys(imports).map<ImportDeclarationStructure>(importPath => ({
+        namedImports: imports[importPath]
+          .filter(names => trackedImports.has(names[1]))
+          .map(names => ({
+            name: names[0],
+            alias: names[1]
+          })),
+        moduleSpecifier: importPath
+      }))
+    ]);
+
+    try {
+      return prettier.format('// tslint:disable\n' + sourceFile.print(), {
+        ...prettier.resolveConfig.sync(this.compiler.tsConfigFilePath),
+        ...{ parser: 'typescript' }
+      });
+    } finally {
+      sourceFile.deleteImmediatelySync();
+    }
+  }
+
+  private getComponentInfo(
+    container: Container<any>,
+    targetDirectory: Directory
+  ): {
+    component: Component | Unit;
+    name: string;
+    importPath: string;
+  }[] {
+    return container.components.reduce(
+      (infos, component) => {
+        const list = [...infos];
+        const provider = component.configuration.provider;
+        if (provider) {
+          list.push({
+            component: provider.unit,
+            name: provider.class,
+            importPath: targetDirectory.getRelativePathAsModuleSpecifierTo(
+              provider.unit.node.getSourceFile()
+            )
+          });
+        }
+        if (component.constructorDependencies) {
+          component.constructorDependencies.forEach(dependency => {
+            list.push({
+              component: dependency.type,
+              name: dependency.type.name,
+              importPath: targetDirectory.getRelativePathAsModuleSpecifierTo(
+                dependency.type.node.getSourceFile()
+              )
+            });
+          });
+        }
+        if (component.propertyDependencies) {
+          component.propertyDependencies.forEach(dependency => {
+            list.push({
+              component: dependency.type,
+              name: dependency.type.name,
+              importPath: targetDirectory.getRelativePathAsModuleSpecifierTo(
+                dependency.type.node.getSourceFile()
+              )
+            });
+          });
+        }
+        list.push({
+          component,
+          name: component.name,
+          importPath: targetDirectory.getRelativePathAsModuleSpecifierTo(
+            component.node.getSourceFile()
+          )
+        });
+        return list;
+      },
+      [] as { component: Component | Unit; name: string; importPath: string }[]
+    );
+  }
+
+  private getImports(
+    container: Container<any>,
+    targetDirectory: Directory
+  ): { [x: string]: string[][] } {
+    const containerImportSpecifier = targetDirectory.getRelativePathAsModuleSpecifierTo(
+      container.clazz.getSourceFile()
+    );
+
+    const componentInfo = this.getComponentInfo(container, targetDirectory);
+
+    const imports = {
+      [containerImportSpecifier]: [[container.name, container.importName]]
     };
+    componentInfo.forEach(entry => {
+      if (entry.name === 'TSDI') {
+        return;
+      }
+      if (!imports[entry.importPath]) {
+        imports[entry.importPath] = [];
+      }
+      if (
+        !imports[entry.importPath].find(
+          data => data[1] === entry.component.importName
+        )
+      ) {
+        imports[entry.importPath].push([
+          entry.name,
+          entry.component.importName
+        ]);
+      }
+    });
+
+    return imports;
+  }
+
+  private writeComponentConfiguration(
+    component: Component,
+    trackImport: ImportTracker
+  ): string {
+    const config = component.configuration;
+    return `this._tsdi.configure(${trackImport(
+      component.symbol
+    )}, ${writeObject(`
+        ${this.writeComponentProvider(config, trackImport)}
+        ${this.writeComponentConstructorDependencies(config, trackImport)}
+        ${this.writeComponentPropertyDependencies(config, trackImport)}
+        ${this.writeComponentMeta(config)}
+        ${writePropertyIf(
+          config.initializer,
+          'initializer',
+          () => `'${config.initializer!}'`
+        )}
+        ${writePropertyIf(
+          config.disposer,
+          'disposer',
+          () => `'${config.disposer!}'`
+        )}
+      `)});
+    `;
+  }
+
+  private writeComponentProvider(
+    config: Component['configuration'],
+    trackImport: ImportTracker
+  ): string {
+    return writePropertyIf(config.provider, 'provider', () =>
+      writeObject(`
+      ${writeProperty('class', trackImport(config.provider!.unit.importName))}
+      ${writeProperty('method', `'${config.provider!.method}'`)}
+      ${writeProperty(
+        'dependencies',
+        writeArray(() => config.provider!.dependencies.map(trackImport))
+      )}
+    `)
+    );
+  }
+
+  private writeComponentConstructorDependencies(
+    config: Component['configuration'],
+    trackImport: ImportTracker
+  ): string {
+    return writePropertyIf(
+      config.constructorDependencies,
+      'constructorDependencies',
+      () => writeArray(() => config.constructorDependencies!.map(trackImport))
+    );
+  }
+
+  private writeComponentPropertyDependencies(
+    config: Component['configuration'],
+    trackImport: ImportTracker
+  ): string {
+    return writePropertyIf(
+      config.propertyDependencies,
+      'propertyDependencies',
+      () =>
+        writeArray(() =>
+          config.propertyDependencies.map(dependency =>
+            writeObject(`
+              ${writeProperty('property', `'${dependency.property}'`)}
+              ${writeProperty('type', trackImport(dependency.type))}
+              ${writePropertyIf(dependency.meta, 'meta', () =>
+                writeObject(`
+                  ${writePropertyIf(
+                    dependency.meta!.lazy !== undefined,
+                    'lazy',
+                    () => String(dependency.meta!.lazy)
+                  )}
+                `)
+              )}
+            `)
+          )
+        )
+    );
+  }
+
+  private writeComponentMeta(config: Component['configuration']): string {
+    return writePropertyIf(config.meta, 'meta', () =>
+      writeObject(`
+      ${writePropertyIf(config.meta!.singleton !== undefined, 'singleton', () =>
+        String(config.meta!.singleton)
+      )}
+      ${writePropertyIf(config.meta!.scope !== undefined, 'scope', () =>
+        String(config.meta!.scope)
+      )}
+      ${writePropertyIf(config.meta!.eager !== undefined, 'eager', () =>
+        String(config.meta!.eager)
+      )}
+    `)
+    );
   }
 }

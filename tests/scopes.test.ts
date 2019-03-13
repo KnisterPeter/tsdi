@@ -1,5 +1,4 @@
-import { TSDI } from '../lib';
-import { managed } from '../lib/compiler';
+import { managed, TSDI } from '..';
 
 test('Allow scopes to be configured statically', () => {
   @managed
