@@ -136,7 +136,10 @@ export class Component {
           meta
         };
       }
-      throw new Error('Illegal node type for component: ' + node.print());
+      throw new Error(
+        'Only interfaces or classes are valid types for property injection. ' +
+          `But for [${property.getName()}] got '${node.print()}' instead`
+      );
     });
   }
 
