@@ -362,9 +362,6 @@ class LegacyComponent extends Component {
     if (this.node.getConstructors().length === 0) {
       return [];
     }
-    if (this.node.getConstructors().length > 1) {
-      throw new Error('TSDI does not support constructor overloading');
-    }
 
     const parameters = this.node.getConstructors()[0].getParameters();
 
