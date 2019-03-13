@@ -35,7 +35,7 @@ action "Install (node 11)" {
 action "Test (node 11)" {
   uses = "docker://node:11"
   runs = "yarn"
-  args = "test --runInBand"
+  args = "test --logHeapUsage"
   needs = ["Install (node 11)"]
 }
 
@@ -55,7 +55,7 @@ action "Install (node 10)" {
 action "Test (node 10)" {
   uses = "docker://node:10"
   runs = "yarn"
-  args = "test --runInBand"
+  args = "test --logHeapUsage"
   needs = ["Install (node 10)"]
 }
 
@@ -76,7 +76,7 @@ action "Test (node 8)" {
   uses = "docker://node:8"
   needs = ["Install (node 8)"]
   runs = "yarn "
-  args = "test --runInBand"
+  args = "test --logHeapUsage"
 }
 
 action "Coverage (node 8)" {
