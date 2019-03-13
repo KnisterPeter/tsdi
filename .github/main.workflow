@@ -20,13 +20,6 @@ workflow "Build and Test (node 8)" {
   ]
 }
 
-workflow "Build and Test (node 6)" {
-  on = "push"
-  resolves = [
-    "Coverage (node 6)",
-  ]
-}
-
 action "Linter" {
   uses = "docker://node:11"
   runs = "yarn"
@@ -91,26 +84,5 @@ action "Coverage (node 8)" {
   runs = "bash -c"
   args = ["yarn codecov --disable=detect --commit=$GITHUB_SHA --branch=${GITHUB_REF#refs/heads/}"]
   needs = ["Test (node 8)"]
-  secrets = ["CODECOV_TOKEN"]
-}
-
-action "Install (node 6)" {
-  uses = "docker://node:6"
-  runs = "yarn"
-  args = "install"
-}
-
-action "Test (node 6)" {
-  uses = "docker://node:6"
-  needs = ["Install (node 6)"]
-  runs = "yarn"
-  args = "test --runInBand"
-}
-
-action "Coverage (node 6)" {
-  uses = "docker://node:6"
-  runs = "bash -c"
-  args = ["yarn codecov --disable=detect --commit=$GITHUB_SHA --branch=${GITHUB_REF#refs/heads/}"]
-  needs = ["Test (node 6)"]
   secrets = ["CODECOV_TOKEN"]
 }
