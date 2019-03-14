@@ -20,6 +20,11 @@ import { findDeclarationForIdentifier } from './util';
 export class Compiler {
   public project: Project;
 
+  public readonly componentRegistry: {
+    container: Container<any>;
+    component: Component;
+  }[] = [];
+
   private _idGen = 1;
 
   /**
