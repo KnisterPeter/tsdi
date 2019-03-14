@@ -22,7 +22,7 @@
     "build:esm": "tsc --project ./tsconfig.build.json --sourceMap --module esnext --outDir dist/esm",
     "build:umd": "rollup -c",
     "pretest": "yarn build",
-    "test": "jest",
+    "test": "jest --logHeapUsage",
     "prerelease": "git checkout master && git pull origin master && yarn test && yarn build",
     "release": "standard-version",
     "postrelease": "git push --follow-tags origin master && npm publish",
