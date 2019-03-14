@@ -13,7 +13,7 @@ class CompilerCommand extends Command {
   public static flags = {
     project: flags.string({
       name: 'p',
-      description: 'Path to a projects tsconfig.json',
+      description: "Path to a project's tsconfig.json",
       default: 'tsconfig.json',
       required: true
     }),
@@ -25,7 +25,7 @@ class CompilerCommand extends Command {
     }),
     'std-out': flags.boolean({
       description:
-        'Print containers to stdout intead of write them to the filesystem',
+        'Print containers to stdout instead of write them to the filesystem',
       default: false,
       required: false
     })
