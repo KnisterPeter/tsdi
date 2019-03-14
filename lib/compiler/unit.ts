@@ -1,13 +1,12 @@
-import {
-  ClassDeclaration,
-  MethodDeclaration,
-  SyntaxKind,
-  TypeGuards
-} from 'ts-morph';
-import { meta, provides } from '../tsdi';
+import { ClassDeclaration, SyntaxKind, TypeGuards } from 'ts-morph';
+import { provides } from '../tsdi';
 import { Component } from './component';
 import { Container } from './container';
-import { findDeclarationForIdentifier } from './util';
+import {
+  findDeclarationForIdentifier,
+  getBooleanDecoratorProperty,
+  getStringDecoratorProperty
+} from './util';
 
 export interface Unit {
   node: ClassDeclaration;
@@ -40,8 +39,12 @@ export class UnitImpl implements Unit {
       .getInstanceMethods()
       .filter(method => Boolean(method.getDecorator(provides.name)));
     return providerMethods.map(method => {
-      const singleton = this.isSingleton(method);
-      const scope = this.getScope(method);
+      const singleton = getBooleanDecoratorProperty(
+        method,
+        'meta',
+        'singleton'
+      );
+      const scope = getStringDecoratorProperty(method, 'meta', 'scope');
       const meta = (() => {
         if (singleton !== undefined || scope !== undefined) {
           return {
@@ -128,51 +131,5 @@ export class UnitImpl implements Unit {
       method: info.method,
       dependencies: info.dependencies.map(dependency => dependency.symbol)
     };
-  }
-
-  // tslint:disable-next-line:cyclomatic-complexity
-  private isSingleton(method: MethodDeclaration): boolean | undefined {
-    // todo: check if its the correct meta decorator
-    const metaDecorator = method.getDecorator(meta.name);
-    if (!metaDecorator) {
-      return undefined;
-    }
-    const metaArguments = metaDecorator.getArguments();
-    const metaConfig = metaArguments[0];
-    if (!TypeGuards.isObjectLiteralExpression(metaConfig)) {
-      throw new Error('Invalid meta configuration: ' + metaDecorator.print());
-    }
-    const property = metaConfig.getProperty('singleton');
-    if (!property || !TypeGuards.isPropertyAssignment(property)) {
-      return undefined;
-    }
-    const value = property.getInitializer();
-    if (!value || !TypeGuards.isBooleanLiteral(value)) {
-      return undefined;
-    }
-    return value.getKind() === SyntaxKind.TrueKeyword;
-  }
-
-  // tslint:disable-next-line:cyclomatic-complexity
-  private getScope(method: MethodDeclaration): string | undefined {
-    // todo: check if its the correct meta decorator
-    const metaDecorator = method.getDecorator(meta.name);
-    if (!metaDecorator) {
-      return undefined;
-    }
-    const metaArguments = metaDecorator.getArguments();
-    const metaConfig = metaArguments[0];
-    if (!TypeGuards.isObjectLiteralExpression(metaConfig)) {
-      throw new Error('Invalid meta configuration: ' + metaDecorator.print());
-    }
-    const property = metaConfig.getProperty('scope');
-    if (!property || !TypeGuards.isPropertyAssignment(property)) {
-      return undefined;
-    }
-    const value = property.getInitializer();
-    if (!value || !TypeGuards.isStringLiteral(value)) {
-      return undefined;
-    }
-    return value.getText();
   }
 }
