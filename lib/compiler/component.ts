@@ -16,11 +16,6 @@ import {
 export class Component {
   private static SymbolId = 0;
 
-  private static readonly registry: {
-    container: Container<any>;
-    component: Component;
-  }[] = [];
-
   public get name(): string {
     if (TypeGuards.isInterfaceDeclaration(this.node)) {
       return this.node.getName();
@@ -277,7 +272,8 @@ export class Component {
     }
 
     // -- singleton check
-    const existing = Component.registry
+    const registry = this.container.compiler.componentRegistry;
+    const existing = registry
       .filter(entry => entry.container === container)
       .find(entry => entry.component.node === node);
     if (existing) {
@@ -287,11 +283,11 @@ export class Component {
 
     if (this.convertToLegacyComponent()) {
       const legacy = new LegacyComponent(container, node);
-      Component.registry.push({ container, component: legacy });
+      registry.push({ container, component: legacy });
       return legacy;
     }
     this.validate();
-    Component.registry.push({ container, component: this });
+    registry.push({ container, component: this });
   }
 
   protected validate(): void {
