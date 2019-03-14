@@ -23,7 +23,7 @@ class CompilerCommand extends Command {
       default: '.',
       required: true
     }),
-    'std-out': flags.boolean({
+    stdout: flags.boolean({
       description:
         'Print containers to stdout instead of write them to the filesystem',
       default: false,
@@ -36,7 +36,7 @@ class CompilerCommand extends Command {
 
     new Compiler(flags.project).getContainers().forEach(container => {
       const code = container.generate(flags['out-dir']);
-      if (flags['std-out']) {
+      if (flags.stdout) {
         process.stdout.write(code);
       } else {
         const fileName = kebabCase(container.implName).replace(/^-/, '');
