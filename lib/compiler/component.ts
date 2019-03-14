@@ -361,6 +361,9 @@ class LegacyComponent extends Component {
 
     const parameters = this.node.getConstructors()[0].getParameters();
 
+    // todo: handle legacy constructor parameters correctly
+    // this means in legacy it was possible to have parameters
+    // which are not injected
     return parameters.map(parameter => {
       const identifier = parameter
         .getTypeNodeOrThrow()
