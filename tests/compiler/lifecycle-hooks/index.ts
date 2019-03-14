@@ -1,4 +1,4 @@
-import { container, managed, postConstruct, preDestroy } from '../../..';
+import { afterConstruct, beforeDestroy, container, managed } from '../../..';
 
 @managed
 export class State {
@@ -10,12 +10,12 @@ export class State {
 export class Test {
   constructor(public state: State) {}
 
-  @postConstruct
+  @afterConstruct
   protected init(): void {
     this.state.init = true;
   }
 
-  @preDestroy
+  @beforeDestroy
   protected dispose(): void {
     this.state.dispose = true;
   }

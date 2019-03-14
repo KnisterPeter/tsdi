@@ -1,7 +1,7 @@
 import { join } from 'path';
 import { Compiler } from '../../../lib/compiler';
 
-test('Compiler should support lifecycle postConstruct hook', () => {
+test('Compiler should support lifecycle afterConstruct hook', () => {
   const compiler = new Compiler(join(__dirname, 'tsconfig.json'));
   const container = compiler.getContainer<import('.').Container>('Container');
 
@@ -10,7 +10,7 @@ test('Compiler should support lifecycle postConstruct hook', () => {
   expect(instance.test.state.init).toBeTruthy();
 });
 
-test('Compiler should support lifecycle preDestroy hook', () => {
+test('Compiler should support lifecycle beforeDestroy hook', () => {
   const compiler = new Compiler(join(__dirname, 'tsconfig.json'));
   const container = compiler.getContainer<import('.').Container>('Container');
 

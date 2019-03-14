@@ -1,4 +1,4 @@
-import { container, managed, meta, postConstruct } from '../../..';
+import { afterConstruct, container, managed, meta } from '../../..';
 
 let eagerCalled = false;
 
@@ -9,7 +9,7 @@ export function getResult(): any {
 @managed
 @meta({ eager: true })
 export class Test {
-  @postConstruct
+  @afterConstruct
   protected init(): void {
     eagerCalled = true;
   }

@@ -1084,11 +1084,11 @@ export class TSDI {
 addTsdiMarker(TSDI);
 
 export {
+  afterConstruct,
+  beforeDestroy,
   container,
   managed,
   meta,
-  postConstruct,
-  preDestroy,
   provides,
   unit
 } from './compiler/decorators';
