@@ -650,7 +650,7 @@ export class TSDI {
       throw new Error('Unable to inject into external factory');
     }
 
-    const parameters = this.getExternalConstructorParameters(metadata, target);
+    const parameters = this.getExternalConstructorParameters(target);
     const instance = new target(...args, ...parameters);
     this.injectIntoInstance(instance, true, metadata);
     const init: string =
@@ -662,13 +662,7 @@ export class TSDI {
     return instance;
   }
 
-  private getExternalConstructorParameters(
-    metadata: ComponentMetadata,
-    target: any
-  ): any[] {
-    if (metadata.constructorDependencies) {
-      return this.getConstructorParameters(metadata);
-    }
+  private getExternalConstructorParameters(target: any): any[] {
     return this.getConstructorParameters({
       fn: target,
       constructorDependencies: this.getConstructorParameterMetadata(target),
