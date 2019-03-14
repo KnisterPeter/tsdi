@@ -42,6 +42,5 @@ export class ContainerImpl extends C1_Container {
   public close(): void {
     this._tsdi.close();
   }
-}
-`);
+}`);
 });

@@ -37,7 +37,7 @@ class CompilerCommand extends Command {
     new Compiler(flags.project).getContainers().forEach(container => {
       const code = container.generate(flags['out-dir']);
       if (flags['std-out']) {
-        console.log(code);
+        process.stdout.write(code);
       } else {
         const fileName = kebabCase(container.implName).replace(/^-/, '');
         const fullFilePath = join(flags['out-dir'], fileName + '.ts');
