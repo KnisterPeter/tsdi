@@ -11,7 +11,7 @@ test('Compiler should respect out-dir setting and write paths relative to folder
       './tsconfig.json',
       '--out-dir',
       './gen',
-      '--std-out'
+      '--stdout'
     ],
     { cwd: __dirname }
   );
