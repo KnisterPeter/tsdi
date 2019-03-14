@@ -3,7 +3,7 @@
 import { Command, flags } from '@oclif/command';
 import figlet from 'figlet';
 import { writeFileSync } from 'fs';
-import kebabCase from 'kebab-case';
+import kebabCase from 'lodash.kebabcase';
 import { join } from 'path';
 import { Compiler } from '.';
 
