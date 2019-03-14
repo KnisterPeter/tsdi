@@ -77,19 +77,19 @@ export function container(config: any): ClassDecorator | void {
   }
 }
 
-export function postConstruct(target: object, propertyKey: string): void;
-export function postConstruct(): MethodDecorator;
-export function postConstruct(): MethodDecorator | void {
+export function afterConstruct(target: object, propertyKey: string): void;
+export function afterConstruct(): MethodDecorator;
+export function afterConstruct(): MethodDecorator | void {
   return () => undefined;
 }
 
 // todo: remove when ready
-export const initialize = postConstruct;
+export const initialize = afterConstruct;
 
-export function preDestroy(target: object, propertyKey: string): void;
-export function preDestroy(): MethodDecorator;
-export function preDestroy(): MethodDecorator | void {
+export function beforeDestroy(target: object, propertyKey: string): void;
+export function beforeDestroy(): MethodDecorator;
+export function beforeDestroy(): MethodDecorator | void {
   return () => undefined;
 }
 
-export const destroy = preDestroy;
+export const destroy = beforeDestroy;

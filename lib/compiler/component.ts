@@ -138,28 +138,28 @@ export class Component {
     });
   }
 
-  public get postConstruct(): string | undefined {
+  public get afterConstruct(): string | undefined {
     if (TypeGuards.isInterfaceDeclaration(this.node)) {
       return undefined;
     }
-    // todo: check if its the correct postConstruct decorator
+    // todo: check if its the correct afterConstruct decorator
     const method = this.node
       .getMethods()
-      .find(method => Boolean(method.getDecorator('postConstruct')));
+      .find(method => Boolean(method.getDecorator('afterConstruct')));
     if (!method) {
       return undefined;
     }
     return method.getName();
   }
 
-  public get preDestroy(): string | undefined {
+  public get beforeDestroy(): string | undefined {
     if (TypeGuards.isInterfaceDeclaration(this.node)) {
       return undefined;
     }
-    // todo: check if its the correct preDestroy decorator
+    // todo: check if its the correct beforeDestroy decorator
     const method = this.node
       .getMethods()
-      .find(method => Boolean(method.getDecorator('preDestroy')));
+      .find(method => Boolean(method.getDecorator('beforeDestroy')));
     if (!method) {
       return undefined;
     }
@@ -249,8 +249,8 @@ export class Component {
         meta: dependency.meta
       })),
       meta: providerConfiguration ? providerConfiguration.meta : meta,
-      initializer: this.postConstruct,
-      disposer: this.preDestroy
+      initializer: this.afterConstruct,
+      disposer: this.beforeDestroy
     };
   }
 
@@ -426,7 +426,7 @@ class LegacyComponent extends Component {
     });
   }
 
-  public get postConstruct(): string | undefined {
+  public get afterConstruct(): string | undefined {
     if (TypeGuards.isInterfaceDeclaration(this.node)) {
       return undefined;
     }
@@ -440,7 +440,7 @@ class LegacyComponent extends Component {
     return method.getName();
   }
 
-  public get preDestroy(): string | undefined {
+  public get beforeDestroy(): string | undefined {
     if (TypeGuards.isInterfaceDeclaration(this.node)) {
       return undefined;
     }
