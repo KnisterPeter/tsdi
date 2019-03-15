@@ -5,9 +5,9 @@ import {
   Decorator,
   FunctionDeclaration,
   InterfaceDeclaration,
+  KindToNodeMappings,
   MethodDeclaration,
   Project,
-  PropertyDeclaration,
   ReferenceEntry,
   SourceFile,
   SyntaxKind,
@@ -18,7 +18,7 @@ import { Component } from './component';
 import { Container } from './container';
 import { Generator } from './generator';
 import { Runtime } from './runtime';
-import { findDeclarationForIdentifier } from './util';
+import { DecorableNode, findDeclarationForIdentifier } from './util';
 
 export class Compiler {
   public project: Project;
@@ -54,22 +54,9 @@ export class Compiler {
   }
 
   public getContainers(): Container<any>[] {
-    const containerFunction = this.getDecoratorFunction('container');
-    const references = containerFunction
-      .findReferences()
-      .reduce(
-        (refs, ref) => [...refs, ...ref.getReferences()],
-        [] as ReferenceEntry[]
-      )
-      .filter(ref => !ref.isDefinition());
-    if (references.length === 0) {
-      throw new Error('No container found');
-    }
-
-    const clazzes = references.map(reference =>
-      reference
-        .getNode()
-        .getFirstAncestorByKindOrThrow(SyntaxKind.ClassDeclaration)
+    const clazzes = this.getDecoratedByKind(
+      'container',
+      SyntaxKind.ClassDeclaration
     );
     if (clazzes.length === 0) {
       throw new Error('No container found');
@@ -81,9 +68,6 @@ export class Compiler {
     const containers = this.getContainers().filter(
       container => container.name === name
     );
-    if (containers.length === 0) {
-      throw new Error('No container found');
-    }
     if (containers.length > 1) {
       throw new Error(
         `Multiple containers with name '${name}' found. Container name must be unique`
@@ -93,8 +77,21 @@ export class Compiler {
   }
 
   public getComponents(container: Container<any>): Component[] {
-    const managed = this.getDecoratorFunction('managed');
-    const references = managed
+    const clazzes = this.getDecoratedByKind(
+      'managed',
+      SyntaxKind.ClassDeclaration
+    );
+    return Array.from(
+      new Set(clazzes.map(clazz => new Component(container, clazz)))
+    );
+  }
+
+  private getDecoratedByKind<TKind extends SyntaxKind>(
+    decoratorName: string,
+    kind: TKind
+  ): KindToNodeMappings[TKind][] {
+    const decoratorFunction = this.getDecoratorFunction(decoratorName);
+    const references = decoratorFunction
       .findReferences()
       .reduce(
         (refs, ref) => [...refs, ...ref.getReferences()],
@@ -105,16 +102,8 @@ export class Compiler {
       return [];
     }
 
-    const clazzes = references.map(reference =>
-      reference
-        .getNode()
-        .getFirstAncestorByKindOrThrow(SyntaxKind.ClassDeclaration)
-    );
-    if (clazzes.length === 0) {
-      throw new Error('No container found');
-    }
-    return Array.from(
-      new Set(clazzes.map(clazz => new Component(container, clazz)))
+    return references.map(reference =>
+      reference.getNode().getFirstAncestorByKindOrThrow(kind)
     );
   }
 
@@ -259,7 +248,7 @@ export class Compiler {
   }
 
   public getDecorator(
-    node: ClassDeclaration | PropertyDeclaration | MethodDeclaration,
+    node: DecorableNode,
     name: string
   ): Decorator | undefined {
     const decoratorNode = node.getDecorator(name);
