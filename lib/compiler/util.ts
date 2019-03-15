@@ -11,6 +11,12 @@ import {
   TypeGuards
 } from 'ts-morph';
 
+export type DecorableNode =
+  | ClassDeclaration
+  | PropertyDeclaration
+  | MethodDeclaration
+  | ParameterDeclaration;
+
 export function findDeclarationForIdentifier(
   identifier: Identifier
 ): Node<ts.Node> {
@@ -29,11 +35,7 @@ export function findDeclarationForIdentifier(
 
 // tslint:disable-next-line:cyclomatic-complexity
 export function getDecoratorPropertyInitializer<TKind extends SyntaxKind>(
-  node:
-    | ClassDeclaration
-    | PropertyDeclaration
-    | MethodDeclaration
-    | ParameterDeclaration,
+  node: DecorableNode,
   decoratorName: string,
   propertyName: string,
   kind?: TKind
@@ -57,11 +59,7 @@ export function getDecoratorPropertyInitializer<TKind extends SyntaxKind>(
 }
 
 export function getBooleanDecoratorProperty(
-  node:
-    | ClassDeclaration
-    | PropertyDeclaration
-    | MethodDeclaration
-    | ParameterDeclaration,
+  node: DecorableNode,
   decoratorName: string,
   propertyName: string
 ): boolean | undefined {
@@ -77,11 +75,7 @@ export function getBooleanDecoratorProperty(
 }
 
 export function getStringDecoratorProperty(
-  node:
-    | ClassDeclaration
-    | PropertyDeclaration
-    | MethodDeclaration
-    | ParameterDeclaration,
+  node: DecorableNode,
   decoratorName: string,
   propertyName: string
 ): string | undefined {
