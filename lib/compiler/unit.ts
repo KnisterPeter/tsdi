@@ -1,5 +1,4 @@
 import { ClassDeclaration, SyntaxKind, TypeGuards } from 'ts-morph';
-import { provides } from '../tsdi';
 import { Component } from './component';
 import { Container } from './container';
 import {
@@ -34,10 +33,11 @@ export class UnitImpl implements Unit {
     method: string;
     dependencies: Component[];
   }[] {
-    // todo: check if its the correct provides decorator
     const providerMethods = this.node
       .getInstanceMethods()
-      .filter(method => Boolean(method.getDecorator(provides.name)));
+      .filter(method =>
+        Boolean(this.container.compiler.getDecorator(method, 'provides'))
+      );
     return providerMethods.map(method => {
       const singleton = getBooleanDecoratorProperty(
         method,
