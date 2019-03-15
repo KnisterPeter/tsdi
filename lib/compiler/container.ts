@@ -82,21 +82,23 @@ export class Container<T> {
       ...this.entryPoints.map(entryPoint => entryPoint.type),
       ...this.units.map(unit => unit.unitComponent)
     ];
-    const list: Component[] = [];
+    const list = new Set<Component>();
 
     while (pending.length > 0) {
       const component = pending.shift();
       if (component) {
-        list.push(component);
+        list.add(component);
         pending.push(
-          ...component.constructorDependencies.map(
-            dependency => dependency.type
-          ),
-          ...component.propertyDependencies.map(dependency => dependency.type)
+          ...component.constructorDependencies
+            .map(dependency => dependency.type)
+            .filter(component => !list.has(component)),
+          ...component.propertyDependencies
+            .map(dependency => dependency.type)
+            .filter(component => !list.has(component))
         );
       }
     }
-    return list;
+    return Array.from(list);
   }
 
   public get externals(): Component[] {
