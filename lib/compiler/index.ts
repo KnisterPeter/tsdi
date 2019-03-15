@@ -2,9 +2,12 @@ import { dirname, join } from 'path';
 import resolveFrom from 'resolve-from';
 import {
   ClassDeclaration,
+  Decorator,
+  FunctionDeclaration,
   InterfaceDeclaration,
   MethodDeclaration,
   Project,
+  PropertyDeclaration,
   ReferenceEntry,
   SourceFile,
   SyntaxKind,
@@ -51,8 +54,7 @@ export class Compiler {
   }
 
   public getContainers(): Container<any>[] {
-    const decoratorsFile = this.findDecoratorsFile();
-    const containerFunction = decoratorsFile.getFunctionOrThrow('container');
+    const containerFunction = this.getDecoratorFunction('container');
     const references = containerFunction
       .findReferences()
       .reduce(
@@ -91,8 +93,7 @@ export class Compiler {
   }
 
   public getComponents(container: Container<any>): Component[] {
-    const decoratorsFile = this.findDecoratorsFile();
-    const managed = decoratorsFile.getFunctionOrThrow('managed');
+    const managed = this.getDecoratorFunction('managed');
     const references = managed
       .findReferences()
       .reduce(
@@ -255,6 +256,45 @@ export class Compiler {
     } catch (e) {
       return dirname(dirname(__dirname));
     }
+  }
+
+  public getDecorator(
+    node: ClassDeclaration | PropertyDeclaration | MethodDeclaration,
+    name: string
+  ): Decorator | undefined {
+    const decoratorNode = node.getDecorator(name);
+    if (decoratorNode) {
+      const identifier = decoratorNode.getFirstDescendantByKind(
+        SyntaxKind.Identifier
+      );
+      if (identifier) {
+        const definitionNodes = identifier
+          .findReferences()
+          .reduce(
+            (refs, ref) => [...refs, ...ref.getReferences()],
+            [] as ReferenceEntry[]
+          )
+          .filter(ref => ref.isDefinition())
+          .map(ref =>
+            ref.getNode().getFirstAncestorByKind(SyntaxKind.FunctionDeclaration)
+          )
+          .filter(Boolean);
+
+        const decoratorFunction = this.getDecoratorFunction(name);
+
+        if (definitionNodes.includes(decoratorFunction)) {
+          return decoratorNode;
+        }
+      }
+    }
+    return undefined;
+  }
+
+  /**
+   * @internal
+   */
+  public getDecoratorFunction(name: string): FunctionDeclaration {
+    return this.findDecoratorsFile().getFunctionOrThrow(name);
   }
 
   private findDecoratorsFile(): SourceFile {

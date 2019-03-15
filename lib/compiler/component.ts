@@ -63,8 +63,7 @@ export class Component {
     if (TypeGuards.isInterfaceDeclaration(this.node)) {
       return [];
     }
-    // todo: check if its the correct managed decorator
-    if (!this.node.getDecorator('managed')) {
+    if (!this.container.compiler.getDecorator(this.node, 'managed')) {
       return [];
     }
     if (this.node.getConstructors().length === 0) {
@@ -102,10 +101,11 @@ export class Component {
     if (TypeGuards.isInterfaceDeclaration(this.node)) {
       return [];
     }
-    // todo: check if its the correct managed decorator
     const managedProperties = this.node
       .getProperties()
-      .filter(property => property.getDecorator('managed'));
+      .filter(property =>
+        this.container.compiler.getDecorator(property, 'managed')
+      );
     return managedProperties.map(property => {
       const identifier = property
         .getTypeNodeOrThrow()
@@ -142,10 +142,11 @@ export class Component {
     if (TypeGuards.isInterfaceDeclaration(this.node)) {
       return undefined;
     }
-    // todo: check if its the correct afterConstruct decorator
     const method = this.node
       .getMethods()
-      .find(method => Boolean(method.getDecorator('afterConstruct')));
+      .find(method =>
+        Boolean(this.container.compiler.getDecorator(method, 'afterConstruct'))
+      );
     if (!method) {
       return undefined;
     }
@@ -156,10 +157,11 @@ export class Component {
     if (TypeGuards.isInterfaceDeclaration(this.node)) {
       return undefined;
     }
-    // todo: check if its the correct beforeDestroy decorator
     const method = this.node
       .getMethods()
-      .find(method => Boolean(method.getDecorator('beforeDestroy')));
+      .find(method =>
+        Boolean(this.container.compiler.getDecorator(method, 'beforeDestroy'))
+      );
     if (!method) {
       return undefined;
     }
@@ -302,12 +304,14 @@ export class Component {
   }
 
   private isComponentOrExternalClass(): boolean {
-    // todo: check if its the correct component or external decorator
-    return Boolean(
-      TypeGuards.isClassDeclaration(this.node) &&
-        (this.node.getDecorator('component') ||
-          this.node.getDecorator('external'))
-    );
+    if (TypeGuards.isInterfaceDeclaration(this.node)) {
+      return false;
+    }
+    // todo: check if its the correct legacy component decorator
+    const component = this.node.getDecorator('component');
+    // todo: check if its the correct legacy external decorator
+    const external = this.node.getDecorator('external');
+    return Boolean(component || external);
   }
 
   private convertToLegacyComponent(): boolean {
@@ -326,11 +330,12 @@ export class Component {
   }
 
   private isManaged(): boolean {
-    // todo: check if its the correct managed, component and unit decorator
-    return Boolean(
-      TypeGuards.isInterfaceDeclaration(this.node) ||
-        (this.node.getDecorator('managed') || this.node.getDecorator('unit'))
-    );
+    if (TypeGuards.isInterfaceDeclaration(this.node)) {
+      return true;
+    }
+    const managed = this.container.compiler.getDecorator(this.node, 'managed');
+    const unit = this.container.compiler.getDecorator(this.node, 'unit');
+    return Boolean(managed || unit);
   }
 }
 
@@ -378,7 +383,14 @@ class LegacyComponent extends Component {
           type: new Component(this.container, node)
         };
       }
-      throw new Error('Illegal node type for component: ' + node.print());
+      throw new Error(
+        `Invalid node on [${
+          this.name
+        }] for constructor parameter '${parameter.print()}' (${parameter
+          .getSourceFile()
+          .getFilePath()}:${parameter.getStartLineNumber(false)})
+${node.print({ removeComments: true })}`
+      );
     });
   }
 
@@ -390,7 +402,7 @@ class LegacyComponent extends Component {
     if (TypeGuards.isInterfaceDeclaration(this.node)) {
       return [];
     }
-    // todo: check if its the correct inject decorator
+    // todo: check if its the correct legacy inject decorator
     const managedProperties = this.node
       .getProperties()
       .filter(property => property.getDecorator('inject'));
@@ -433,7 +445,7 @@ class LegacyComponent extends Component {
     if (TypeGuards.isInterfaceDeclaration(this.node)) {
       return undefined;
     }
-    // todo: check if its the correct initialize decorator
+    // todo: check if its the correct legacy initialize decorator
     const method = this.node
       .getMethods()
       .find(method => Boolean(method.getDecorator('initialize')));
@@ -447,7 +459,7 @@ class LegacyComponent extends Component {
     if (TypeGuards.isInterfaceDeclaration(this.node)) {
       return undefined;
     }
-    // todo: check if its the correct destroy decorator
+    // todo: check if its the correct legacy destroy decorator
     const method = this.node
       .getMethods()
       .find(method => Boolean(method.getDecorator('destroy')));
