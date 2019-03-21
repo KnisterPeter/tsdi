@@ -41,4 +41,3 @@ export function External<TFunction extends Function>(
     return decorate(target);
   } as ClassDecorator;
 }
-export const external = External;

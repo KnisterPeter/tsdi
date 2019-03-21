@@ -19,4 +19,3 @@ export function Initialize(...args: any[]): MethodDecorator | void {
     decorate(target, propertyKey);
   };
 }
-export const initialize = Initialize;

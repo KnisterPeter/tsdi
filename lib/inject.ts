@@ -100,4 +100,3 @@ export function Inject(
     }
   };
 }
-export const inject = Inject;

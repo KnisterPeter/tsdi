@@ -1086,9 +1086,9 @@ export {
   provides,
   unit
 } from './compiler/decorators';
-export { component, Component } from './component';
-export { destroy, Destroy } from './destroy';
-export { external, External } from './external';
-export { factory, Factory } from './factory';
-export { initialize, Initialize } from './initialize';
-export { inject, Inject } from './inject';
+export { Component as component, Component } from './component';
+export { Destroy as destroy, Destroy } from './destroy';
+export { External as external, External } from './external';
+export { Factory as factory, Factory } from './factory';
+export { Initialize as initialize, Initialize } from './initialize';
+export { Inject as inject, Inject } from './inject';

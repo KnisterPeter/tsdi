@@ -11,14 +11,13 @@ import {
   ReferenceEntry,
   SourceFile,
   SyntaxKind,
-  TypeGuards,
-  VariableDeclaration
+  TypeGuards
 } from 'ts-morph';
 import { Component } from './component';
 import { Container } from './container';
 import { Generator } from './generator';
 import { Runtime } from './runtime';
-import { DecorableNode, findDeclarationForIdentifier } from './util';
+import { DecorableNode, findDeclarationForIdentifier, isDefined } from './util';
 
 export class Compiler {
   public project: Project;
@@ -111,84 +110,47 @@ export class Compiler {
    * @internal
    */
   public getLegacyComponents(container: Container<any>): Component[] {
-    const decoratorsFile = this.findLegacyDecoratorsFile('component');
-    const component = decoratorsFile.getExportedDeclarations()[2] as VariableDeclaration;
-    const references = component
-      .findReferences()
-      .reduce(
-        (refs, ref) => [...refs, ...ref.getReferences()],
-        [] as ReferenceEntry[]
+    const components = this.getLegacyDecoratorFunction('Component')
+      .findReferencesAsNodes()
+      .map(node => node.getFirstAncestorByKind(SyntaxKind.Decorator))
+      .filter(isDefined)
+      .map(decorator =>
+        decorator.getFirstAncestorByKind(SyntaxKind.ClassDeclaration)
       )
-      .filter(ref => !ref.isDefinition());
-    if (references.length === 0) {
-      return [];
-    }
-
-    const clazzes = references.map(reference =>
-      reference
-        .getNode()
-        .getFirstAncestorByKindOrThrow(SyntaxKind.ClassDeclaration)
-    );
-    if (clazzes.length === 0) {
-      return [];
-    }
-    return Array.from(
-      new Set(clazzes.map(clazz => new Component(container, clazz)))
-    );
+      .filter(isDefined)
+      .map(clazz => new Component(container, clazz));
+    return Array.from(new Set(components));
   }
 
   /**
    * @internal
    */
   public getLegacyExternals(container: Container<any>): Component[] {
-    const decoratorsFile = this.findLegacyDecoratorsFile('external');
-    const external = decoratorsFile.getExportedDeclarations()[2] as VariableDeclaration;
-    const references = external
-      .findReferences()
-      .reduce(
-        (refs, ref) => [...refs, ...ref.getReferences()],
-        [] as ReferenceEntry[]
+    const components = this.getLegacyDecoratorFunction('External')
+      .findReferencesAsNodes()
+      .map(node => node.getFirstAncestorByKind(SyntaxKind.Decorator))
+      .filter(isDefined)
+      .map(decorator =>
+        decorator.getFirstAncestorByKind(SyntaxKind.ClassDeclaration)
       )
-      .filter(ref => !ref.isDefinition());
-    if (references.length === 0) {
-      return [];
-    }
-
-    const clazzes = references.map(reference =>
-      reference
-        .getNode()
-        .getFirstAncestorByKindOrThrow(SyntaxKind.ClassDeclaration)
-    );
-    if (clazzes.length === 0) {
-      return [];
-    }
-    return Array.from(
-      new Set(clazzes.map(clazz => new Component(container, clazz)))
-    );
+      .filter(isDefined)
+      .map(clazz => new Component(container, clazz));
+    return Array.from(new Set(components));
   }
 
   public getLegacyFactoryNodes(): {
     method: MethodDeclaration;
     node: ClassDeclaration | InterfaceDeclaration;
   }[] {
-    const decoratorsFile = this.findLegacyDecoratorsFile('factory');
-    const factory = decoratorsFile.getExportedDeclarations()[2] as VariableDeclaration;
-    const references = factory
-      .findReferences()
-      .reduce(
-        (refs, ref) => [...refs, ...ref.getReferences()],
-        [] as ReferenceEntry[]
+    return this.getLegacyDecoratorFunction('Factory')
+      .findReferencesAsNodes()
+      .map(node => node.getFirstAncestorByKind(SyntaxKind.Decorator))
+      .filter(isDefined)
+      .map(decorator =>
+        decorator.getFirstAncestorByKind(SyntaxKind.MethodDeclaration)
       )
-      .filter(ref => !ref.isDefinition());
-    if (references.length === 0) {
-      return [];
-    }
-
-    return references
-      .map(reference => {
-        const method = reference
-          .getNode()
-          .getFirstAncestorByKindOrThrow(SyntaxKind.MethodDeclaration);
+      .filter(isDefined)
+      .map(method => {
         return {
           method,
           identifier: method
@@ -284,6 +246,15 @@ export class Compiler {
    */
   public getDecoratorFunction(name: string): FunctionDeclaration {
     return this.findDecoratorsFile().getFunctionOrThrow(name);
+  }
+
+  /**
+   * @internal
+   */
+  public getLegacyDecoratorFunction(name: string): FunctionDeclaration {
+    return this.findLegacyDecoratorsFile(name.toLowerCase()).getFunctionOrThrow(
+      name
+    );
   }
 
   private findDecoratorsFile(): SourceFile {
