@@ -110,7 +110,7 @@ export class Compiler {
    * @internal
    */
   public getLegacyComponents(container: Container<any>): Component[] {
-    const components = this.getLegacyDecoratorFunction('Component')
+    const components = this.getDecoratorFunction('Component')
       .findReferencesAsNodes()
       .map(node => node.getFirstAncestorByKind(SyntaxKind.Decorator))
       .filter(isDefined)
@@ -126,7 +126,7 @@ export class Compiler {
    * @internal
    */
   public getLegacyExternals(container: Container<any>): Component[] {
-    const components = this.getLegacyDecoratorFunction('External')
+    const components = this.getDecoratorFunction('External')
       .findReferencesAsNodes()
       .map(node => node.getFirstAncestorByKind(SyntaxKind.Decorator))
       .filter(isDefined)
@@ -142,7 +142,7 @@ export class Compiler {
     method: MethodDeclaration;
     node: ClassDeclaration | InterfaceDeclaration;
   }[] {
-    return this.getLegacyDecoratorFunction('Factory')
+    return this.getDecoratorFunction('Factory')
       .findReferencesAsNodes()
       .map(node => node.getFirstAncestorByKind(SyntaxKind.Decorator))
       .filter(isDefined)
@@ -213,27 +213,15 @@ export class Compiler {
     node: DecorableNode,
     name: string
   ): Decorator | undefined {
-    const decoratorNode = node.getDecorator(name);
+    const decoratorNode =
+      node.getDecorator(name) || node.getDecorator(name.toLowerCase());
     if (decoratorNode) {
       const identifier = decoratorNode.getFirstDescendantByKind(
         SyntaxKind.Identifier
       );
       if (identifier) {
-        const definitionNodes = identifier
-          .findReferences()
-          .reduce(
-            (refs, ref) => [...refs, ...ref.getReferences()],
-            [] as ReferenceEntry[]
-          )
-          .filter(ref => ref.isDefinition())
-          .map(ref =>
-            ref.getNode().getFirstAncestorByKind(SyntaxKind.FunctionDeclaration)
-          )
-          .filter(Boolean);
-
         const decoratorFunction = this.getDecoratorFunction(name);
-
-        if (definitionNodes.includes(decoratorFunction)) {
+        if (decoratorFunction.findReferencesAsNodes().includes(identifier)) {
           return decoratorNode;
         }
       }
@@ -241,20 +229,19 @@ export class Compiler {
     return undefined;
   }
 
-  /**
-   * @internal
-   */
-  public getDecoratorFunction(name: string): FunctionDeclaration {
+  private getDecoratorFunction(name: string): FunctionDeclaration {
+    switch (name.toLowerCase()) {
+      case 'component':
+      case 'destroy':
+      case 'external':
+      case 'factory':
+      case 'initialize':
+      case 'inject':
+        return this.findLegacyDecoratorsFile(
+          name.toLowerCase()
+        ).getFunctionOrThrow(name);
+    }
     return this.findDecoratorsFile().getFunctionOrThrow(name);
-  }
-
-  /**
-   * @internal
-   */
-  public getLegacyDecoratorFunction(name: string): FunctionDeclaration {
-    return this.findLegacyDecoratorsFile(name.toLowerCase()).getFunctionOrThrow(
-      name
-    );
   }
 
   private findDecoratorsFile(): SourceFile {

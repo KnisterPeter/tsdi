@@ -10,6 +10,7 @@ import {
   ts,
   TypeGuards
 } from 'ts-morph';
+import { Compiler } from '.';
 
 export type DecorableNode =
   | ClassDeclaration
@@ -39,13 +40,13 @@ export function findDeclarationForIdentifier(
 
 // tslint:disable-next-line:cyclomatic-complexity
 export function getDecoratorPropertyInitializer<TKind extends SyntaxKind>(
+  compiler: Compiler,
   node: DecorableNode,
   decoratorName: string,
   propertyName: string,
   kind?: TKind
 ): KindToExpressionMappings[TKind] | undefined {
-  // todo: check if its the correct decorator
-  const decorator = node.getDecorator(decoratorName);
+  const decorator = compiler.getDecorator(node, decoratorName);
   if (!decorator || !decorator.isDecoratorFactory()) {
     return undefined;
   }
@@ -63,11 +64,13 @@ export function getDecoratorPropertyInitializer<TKind extends SyntaxKind>(
 }
 
 export function getBooleanDecoratorProperty(
+  compiler: Compiler,
   node: DecorableNode,
   decoratorName: string,
   propertyName: string
 ): boolean | undefined {
   const value = getDecoratorPropertyInitializer(
+    compiler,
     node,
     decoratorName,
     propertyName
@@ -79,11 +82,13 @@ export function getBooleanDecoratorProperty(
 }
 
 export function getStringDecoratorProperty(
+  compiler: Compiler,
   node: DecorableNode,
   decoratorName: string,
   propertyName: string
 ): string | undefined {
   const value = getDecoratorPropertyInitializer(
+    compiler,
     node,
     decoratorName,
     propertyName

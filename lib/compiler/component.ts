@@ -35,28 +35,40 @@ export class Component {
     return [this.importName, this.importName];
   }
 
-  // tslint:disable-next-line:cyclomatic-complexity
   public get singleton(): boolean | undefined {
     if (TypeGuards.isInterfaceDeclaration(this.node)) {
       return undefined;
     }
-    return getBooleanDecoratorProperty(this.node, 'meta', 'singleton');
+    return getBooleanDecoratorProperty(
+      this.container.compiler,
+      this.node,
+      'meta',
+      'singleton'
+    );
   }
 
-  // tslint:disable-next-line:cyclomatic-complexity
   public get scope(): string | undefined {
     if (TypeGuards.isInterfaceDeclaration(this.node)) {
       return undefined;
     }
-    return getStringDecoratorProperty(this.node, 'meta', 'scope');
+    return getStringDecoratorProperty(
+      this.container.compiler,
+      this.node,
+      'meta',
+      'scope'
+    );
   }
 
-  // tslint:disable-next-line:cyclomatic-complexity
   public get eager(): boolean | undefined {
     if (TypeGuards.isInterfaceDeclaration(this.node)) {
       return undefined;
     }
-    return getBooleanDecoratorProperty(this.node, 'meta', 'eager');
+    return getBooleanDecoratorProperty(
+      this.container.compiler,
+      this.node,
+      'meta',
+      'eager'
+    );
   }
 
   public get constructorDependencies(): { name: string; type: Component }[] {
@@ -116,7 +128,12 @@ export class Component {
         TypeGuards.isInterfaceDeclaration(node)
       ) {
         const meta = (() => {
-          const lazy = getBooleanDecoratorProperty(property, 'managed', 'lazy');
+          const lazy = getBooleanDecoratorProperty(
+            this.container.compiler,
+            property,
+            'managed',
+            'lazy'
+          );
           if (lazy !== undefined) {
             return {
               lazy
@@ -168,12 +185,12 @@ export class Component {
     return method.getName();
   }
 
-  // tslint:disable-next-line:cyclomatic-complexity
   public get by(): Container<any> | undefined {
     if (TypeGuards.isInterfaceDeclaration(this.node)) {
       return undefined;
     }
     const value = getDecoratorPropertyInitializer(
+      this.container.compiler,
       this.node,
       'managed',
       'by',
@@ -307,11 +324,10 @@ export class Component {
     if (TypeGuards.isInterfaceDeclaration(this.node)) {
       return false;
     }
-    // todo: check if its the correct legacy component decorator
-    const component = this.node.getDecorator('component');
-    // todo: check if its the correct legacy external decorator
-    const external = this.node.getDecorator('external');
-    return Boolean(component || external);
+    return Boolean(
+      this.container.compiler.getDecorator(this.node, 'Component') ||
+        this.container.compiler.getDecorator(this.node, 'External')
+    );
   }
 
   private convertToLegacyComponent(): boolean {
@@ -340,20 +356,28 @@ export class Component {
 }
 
 class LegacyComponent extends Component {
-  // tslint:disable-next-line:cyclomatic-complexity
   public get singleton(): boolean | undefined {
     if (TypeGuards.isInterfaceDeclaration(this.node)) {
       return undefined;
     }
-    return getBooleanDecoratorProperty(this.node, 'component', 'singleton');
+    return getBooleanDecoratorProperty(
+      this.container.compiler,
+      this.node,
+      'Component',
+      'singleton'
+    );
   }
 
-  // tslint:disable-next-line:cyclomatic-complexity
   public get scope(): string | undefined {
     if (TypeGuards.isInterfaceDeclaration(this.node)) {
       return undefined;
     }
-    return getStringDecoratorProperty(this.node, 'component', 'scope');
+    return getStringDecoratorProperty(
+      this.container.compiler,
+      this.node,
+      'Component',
+      'scope'
+    );
   }
 
   public get constructorDependencies(): { name: string; type: Component }[] {
@@ -402,10 +426,12 @@ ${node.print({ removeComments: true })}`
     if (TypeGuards.isInterfaceDeclaration(this.node)) {
       return [];
     }
-    // todo: check if its the correct legacy inject decorator
     const managedProperties = this.node
       .getProperties()
-      .filter(property => property.getDecorator('inject'));
+      .filter(property =>
+        this.container.compiler.getDecorator(property, 'Inject')
+      );
+
     return managedProperties.map(property => {
       const identifier = property
         .getTypeNodeOrThrow()
@@ -418,7 +444,12 @@ ${node.print({ removeComments: true })}`
         const meta = (() => {
           const lazy = (() => {
             try {
-              return getBooleanDecoratorProperty(property, 'inject', 'lazy');
+              return getBooleanDecoratorProperty(
+                this.container.compiler,
+                property,
+                'Inject',
+                'lazy'
+              );
             } catch (e) {
               return undefined;
             }
@@ -445,10 +476,11 @@ ${node.print({ removeComments: true })}`
     if (TypeGuards.isInterfaceDeclaration(this.node)) {
       return undefined;
     }
-    // todo: check if its the correct legacy initialize decorator
     const method = this.node
       .getMethods()
-      .find(method => Boolean(method.getDecorator('initialize')));
+      .find(method =>
+        Boolean(this.container.compiler.getDecorator(method, 'Initialize'))
+      );
     if (!method) {
       return undefined;
     }
@@ -459,10 +491,11 @@ ${node.print({ removeComments: true })}`
     if (TypeGuards.isInterfaceDeclaration(this.node)) {
       return undefined;
     }
-    // todo: check if its the correct legacy destroy decorator
     const method = this.node
       .getMethods()
-      .find(method => Boolean(method.getDecorator('destroy')));
+      .find(method =>
+        Boolean(this.container.compiler.getDecorator(method, 'Destroy'))
+      );
     if (!method) {
       return undefined;
     }
