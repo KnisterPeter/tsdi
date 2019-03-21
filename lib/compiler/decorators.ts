@@ -83,13 +83,8 @@ export function afterConstruct(): MethodDecorator | void {
   return () => undefined;
 }
 
-// todo: remove when ready
-export const initialize = afterConstruct;
-
 export function beforeDestroy(target: object, propertyKey: string): void;
 export function beforeDestroy(): MethodDecorator;
 export function beforeDestroy(): MethodDecorator | void {
   return () => undefined;
 }
-
-export const destroy = beforeDestroy;

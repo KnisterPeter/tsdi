@@ -40,11 +40,17 @@ export class UnitImpl implements Unit {
       );
     return providerMethods.map(method => {
       const singleton = getBooleanDecoratorProperty(
+        this.container.compiler,
         method,
         'meta',
         'singleton'
       );
-      const scope = getStringDecoratorProperty(method, 'meta', 'scope');
+      const scope = getStringDecoratorProperty(
+        this.container.compiler,
+        method,
+        'meta',
+        'scope'
+      );
       const meta = (() => {
         if (singleton !== undefined || scope !== undefined) {
           return {
