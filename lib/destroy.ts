@@ -15,4 +15,3 @@ export function Destroy(...args: any[]): MethodDecorator | void {
     decorate(target, propertyKey);
   };
 }
-export const destroy = Destroy;

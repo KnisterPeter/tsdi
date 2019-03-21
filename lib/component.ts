@@ -37,4 +37,3 @@ export function Component<TFunction extends object>(
     return decorate(target, args[0] || {});
   } as ClassDecorator;
 }
-export const component = Component;

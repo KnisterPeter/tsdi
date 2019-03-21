@@ -48,4 +48,3 @@ export function Factory(...args: any[]): MethodDecorator | void {
     decorate(target, propertyKey, options);
   };
 }
-export const factory = Factory;
