@@ -51,6 +51,7 @@
     "@types/lodash.kebabcase": "4.1.6",
     "@types/node": "9.6.22",
     "@types/prettier": "1.16.1",
+    "@types/webpack": "^4.4.26",
     "codecov": "3.2.0",
     "cz-conventional-changelog": "2.1.0",
     "execa": "1.0.0",
@@ -64,6 +65,7 @@
     "rollup-plugin-terser": "4.0.4",
     "standard-version": "5.0.2",
     "ts-jest": "24.0.1",
+    "ts-loader": "5.3.3",
     "tslint": "5.14.0"
   },
   "dependencies": {
@@ -76,7 +78,8 @@
     "reflect-metadata": "0.1.13",
     "resolve-from": "^4.0.0",
     "ts-morph": "^1.2.0",
-    "typescript": "3.4.1"
+    "typescript": "3.4.1",
+    "webpack": "4.29.6"
   },
   "lint-staged": {
     "lib/**/*.{ts,tsx}": [
