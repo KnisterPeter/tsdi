@@ -138,3 +138,25 @@ test('TSDICompilerPlugin should allow relative output path', done => {
     done();
   });
 });
+
+test('TSDICompilerPlugin should run without outputDir', async done => {
+  const containerImplFile = join(__dirname, 'container-impl.ts');
+  if (existsSync(containerImplFile)) {
+    unlinkSync(containerImplFile);
+  }
+
+  const compiler = webpack({
+    ...config,
+    plugins: [
+      new TSDICompilerPlugin({
+        tsdiModule: '../../../..'
+      })
+    ]
+  });
+  compiler.run(() => {
+    expect(existsSync(containerImplFile)).toBeTruthy();
+    unlinkSync(containerImplFile);
+
+    done();
+  });
+});
