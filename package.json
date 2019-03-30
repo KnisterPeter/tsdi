@@ -63,7 +63,7 @@
     "rollup-plugin-node-resolve": "4.0.1",
     "rollup-plugin-terser": "4.0.4",
     "standard-version": "5.0.2",
-    "ts-jest": "24.0.0",
+    "ts-jest": "24.0.1",
     "tslint": "5.14.0"
   },
   "dependencies": {
