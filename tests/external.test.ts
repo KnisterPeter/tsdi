@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import {
   Component,
   component,
@@ -8,7 +9,6 @@ import {
   inject,
   TSDI
 } from '../lib';
-import '../lib/compat';
 import { User } from './user';
 
 describe('TSDI when creating a container instance with external classes', () => {

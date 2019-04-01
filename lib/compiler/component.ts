@@ -300,7 +300,7 @@ export class Component {
     }
     // /-- singleton check
 
-    if (this.convertToLegacyComponent()) {
+    if (this.shouldConvertToLegacyComponent()) {
       const legacy = new LegacyComponent(container, node);
       registry.push({ container, component: legacy });
       return legacy;
@@ -330,7 +330,7 @@ export class Component {
     );
   }
 
-  private convertToLegacyComponent(): boolean {
+  private shouldConvertToLegacyComponent(): boolean {
     if (this instanceof LegacyComponent) {
       return false;
     }

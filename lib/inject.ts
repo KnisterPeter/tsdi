@@ -33,6 +33,9 @@ export function Inject(
     options: IInjectOptions
   ) => {
     log(`@Inject ${(target.constructor as any).name}#${String(propertyKey)}`);
+    if (!Reflect.getMetadata) {
+      return;
+    }
     const type: Constructable<any> = Reflect.getMetadata(
       'design:type',
       target,
@@ -60,6 +63,9 @@ export function Inject(
     options: IInjectOptions
   ) => {
     log(`@Inject ${String(propertyKey)}`);
+    if (!Reflect.getMetadata) {
+      return;
+    }
     let parameters: ParameterMetadata[] = Reflect.getMetadata(
       'component:parameters',
       target

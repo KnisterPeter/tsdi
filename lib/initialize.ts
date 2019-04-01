@@ -7,6 +7,9 @@ export function Initialize(): MethodDecorator;
 export function Initialize(...args: any[]): MethodDecorator | void {
   const decorate = (target: object, propertyKey: string | symbol) => {
     log('@Initialize %s#%s', (target.constructor as any).name, propertyKey);
+    if (!Reflect.defineMetadata) {
+      return;
+    }
     Reflect.defineMetadata('component:init', propertyKey, target);
 
     const isAsync =

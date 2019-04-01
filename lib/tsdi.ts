@@ -10,9 +10,6 @@ declare global {
   }
 }
 
-Reflect.defineMetadata = () => undefined;
-Reflect.getMetadata = () => undefined;
-
 // note: work around an issue with custom require in tests/jest/global scope
 const ReflectObject = Reflect.getMetadata ? Reflect : (global as any).Reflect;
 
@@ -259,10 +256,14 @@ export class TSDI {
         if (!isFactoryMetadata(metadata) && metadata.disposer) {
           return metadata.disposer;
         }
-        return ReflectObject.getMetadata(
-          'component:destroy',
-          isFactoryMetadata(metadata) ? metadata.rtti : metadata.fn.prototype
-        );
+        return ReflectObject.getMetadata
+          ? ReflectObject.getMetadata(
+              'component:destroy',
+              isFactoryMetadata(metadata)
+                ? metadata.rtti
+                : metadata.fn.prototype
+            )
+          : undefined;
       };
       const destroy = getDestroyCallback();
 
@@ -356,6 +357,7 @@ export class TSDI {
     }
   }
 
+  // tslint:disable-next-line:cyclomatic-complexity
   private markAsyncInitializer(
     componentMetadata: ComponentOrFactoryMetadata
   ): void {
@@ -363,22 +365,27 @@ export class TSDI {
       return;
     }
     if (!isFactoryMetadata(componentMetadata)) {
-      const isAsync = ReflectObject.getMetadata(
-        'component:init:async',
-        componentMetadata.fn.prototype
-      ) as boolean;
-      const injects: InjectMetadata[] =
-        ReflectObject.getMetadata(
-          'component:injects',
-          componentMetadata.fn.prototype
-        ) || [];
+      const isAsync = ReflectObject.getMetadata
+        ? (ReflectObject.getMetadata(
+            'component:init:async',
+            componentMetadata.fn.prototype
+          ) as boolean)
+        : false;
+      const injects: InjectMetadata[] = ReflectObject.getMetadata
+        ? ReflectObject.getMetadata(
+            'component:injects',
+            componentMetadata.fn.prototype
+          ) || []
+        : [];
       const hasAsyncInitializers = injects.some(
         inject =>
           inject.type &&
-          (ReflectObject.getMetadata(
-            'component:init:async',
-            inject.type.prototype
-          ) as boolean)
+          (ReflectObject.getMetadata
+            ? (ReflectObject.getMetadata(
+                'component:init:async',
+                inject.type.prototype
+              ) as boolean)
+            : false)
       );
       if (!isAsync && hasAsyncInitializers) {
         ReflectObject.defineMetadata(
@@ -601,10 +608,9 @@ export class TSDI {
   private waitForInjectInitializers(
     metadata: ComponentMetadata
   ): Promise<any> | undefined {
-    const injects: InjectMetadata[] = ReflectObject.getMetadata(
-      'component:injects',
-      metadata.fn.prototype
-    );
+    const injects: InjectMetadata[] = ReflectObject.getMetadata
+      ? ReflectObject.getMetadata('component:injects', metadata.fn.prototype)
+      : [];
     if (injects) {
       const hasAsyncInitializers = injects.some(
         inject =>
@@ -636,6 +642,9 @@ export class TSDI {
   private getConstructorParameterMetadata(
     component: Constructable<any>
   ): Constructable<any>[] | undefined {
+    if (!ReflectObject.getMetadata) {
+      return undefined;
+    }
     const parameterMetadata: ParameterMetadata[] = ReflectObject.getMetadata(
       'component:parameters',
       component
@@ -700,6 +709,7 @@ export class TSDI {
     this.runInitializer(instance, metadata);
   }
 
+  // tslint:disable-next-line:cyclomatic-complexity
   private injectIntoInstance(
     instance: any,
     externalInstance: boolean,
@@ -726,10 +736,12 @@ export class TSDI {
         }
       });
     } else {
-      const injects: InjectMetadata[] = ReflectObject.getMetadata(
-        'component:injects',
-        componentMetadata.fn.prototype
-      );
+      const injects: InjectMetadata[] = ReflectObject.getMetadata
+        ? ReflectObject.getMetadata(
+            'component:injects',
+            componentMetadata.fn.prototype
+          )
+        : [];
       if (injects) {
         for (const inject of injects) {
           log('injecting %s.%s', instance.constructor.name, inject.property);
@@ -976,6 +988,7 @@ export class TSDI {
 
   public get<T>(componentOrHint: string | Constructable<T> | symbol): T;
   public get<T>(component: Constructable<T> | symbol, hint: string): T;
+  // tslint:disable-next-line:cyclomatic-complexity
   public get<T>(
     componentOrHint: Constructable<T> | string | symbol,
     hint?: string
@@ -997,10 +1010,12 @@ export class TSDI {
     }
     const instance = this.getOrCreate<T>(metadata, idx);
     if (!isInterfaceMetadata(metadata) && !isFactoryMetadata(metadata)) {
-      const isAsync = ReflectObject.getMetadata(
-        'component:init:async',
-        metadata.fn.prototype
-      ) as boolean;
+      const isAsync = ReflectObject.getMetadata
+        ? (ReflectObject.getMetadata(
+            'component:init:async',
+            metadata.fn.prototype
+          ) as boolean)
+        : false;
       if (isAsync) {
         console.warn(
           `Component '${metadata.fn.name}' is marked as asynchronous. ` +
@@ -1095,9 +1110,3 @@ export {
   provides,
   unit
 } from './compiler/decorators';
-export { Component as component, Component } from './component';
-export { Destroy as destroy, Destroy } from './destroy';
-export { External as external, External } from './external';
-export { Factory as factory, Factory } from './factory';
-export { Initialize as initialize, Initialize } from './initialize';
-export { Inject as inject, Inject } from './inject';
