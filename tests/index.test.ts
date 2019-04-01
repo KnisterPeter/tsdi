@@ -11,6 +11,7 @@ import {
   inject,
   TSDI
 } from '../lib';
+import '../lib/compat';
 import { Cyclic1 } from './cyclic1';
 import { Dependency } from './dependency';
 import { EagerComponent1 } from './eager1';

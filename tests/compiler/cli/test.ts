@@ -1,9 +1,10 @@
 // tslint:disable-next-line:no-implicit-dependencies
-import execa = require('execa');
+import { sync as execa } from 'execa';
 
 jest.setTimeout(20000);
-test('Compiler should respect out-dir setting and write paths relative to folder', async () => {
-  const result = await execa(
+
+test('Compiler should respect out-dir setting and write paths relative to folder', () => {
+  const result = execa(
     process.argv[0],
     [
       '../../../dist/compiler/cli.js',

@@ -1,4 +1,5 @@
 import { debug } from './debug';
+
 const log = debug('tsdi');
 
 export function Initialize(target: object, propertyKey: string): void;

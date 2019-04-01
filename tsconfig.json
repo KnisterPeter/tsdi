@@ -5,7 +5,7 @@
     "module": "esnext",
     "rootDir": ".",
     "outDir": "dist/esm",
-    "lib": ["dom", "es2015", "es2016", "es2017", "es2018", "esnext"],
+    "lib": ["dom", "esnext"],
     "strict": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

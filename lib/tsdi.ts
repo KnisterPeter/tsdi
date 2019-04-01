@@ -1,8 +1,17 @@
-import 'reflect-metadata';
 import { debug } from './debug';
 import { addListener, ComponentListener, removeListener } from './global-state';
 import { findIndexOf, isFactoryMetadata, isInterfaceMetadata } from './helper';
 import { addTsdiMarker, getTsdiMarker } from './marker';
+
+declare global {
+  export namespace Reflect {
+    export function defineMetadata(...args: any[]): void;
+    export function getMetadata(...args: any[]): any;
+  }
+}
+
+Reflect.defineMetadata = () => undefined;
+Reflect.getMetadata = () => undefined;
 
 // note: work around an issue with custom require in tests/jest/global scope
 const ReflectObject = Reflect.getMetadata ? Reflect : (global as any).Reflect;
@@ -69,6 +78,7 @@ export type ComponentMetadata = {
   disposer?: string;
 };
 
+/** @internal */
 export type InterfaceMetadata = ComponentMetadata & { fn: symbol };
 
 /** @internal */
