@@ -76,7 +76,7 @@
     "reflect-metadata": "0.1.13",
     "resolve-from": "^4.0.0",
     "ts-morph": "^1.2.0",
-    "typescript": "3.3.4000"
+    "typescript": "3.4.1"
   },
   "lint-staged": {
     "lib/**/*.{ts,tsx}": [
