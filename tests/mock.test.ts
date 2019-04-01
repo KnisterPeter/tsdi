@@ -1,4 +1,5 @@
 import { component, initialize, inject, TSDI } from '../lib';
+import '../lib/compat';
 
 let origWarn: (...args: any[]) => void;
 
