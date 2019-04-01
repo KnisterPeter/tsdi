@@ -14,21 +14,21 @@ export interface Config {
 export default class TSDICompilerPlugin {
   constructor(private readonly config: Partial<Config> = {}) {}
 
-  private getOutputDir(compiler: webpack.Compiler): string {
+  private getOutputDir(context: string): string {
     if (this.config.outputDir) {
       return isAbsolute(this.config.outputDir)
         ? this.config.outputDir
-        : join(compiler.options.context || __dirname, this.config.outputDir);
+        : join(context, this.config.outputDir);
     }
-    return compiler.options.context || __dirname;
+    return context;
   }
 
   public apply(compiler: webpack.Compiler): void {
     const config: Config = {
       tsconfig:
         this.config.tsconfig ||
-        join(compiler.options.context || __dirname, 'tsconfig.json'),
-      outputDir: this.getOutputDir(compiler),
+        join(compiler.options.context!, 'tsconfig.json'),
+      outputDir: this.getOutputDir(compiler.options.context!),
       tsdiModule: this.config.tsdiModule || 'tsdi'
     };
 
