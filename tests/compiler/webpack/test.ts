@@ -34,7 +34,7 @@ const config: webpack.Configuration = {
   ]
 };
 
-jest.setTimeout(20000);
+jest.setTimeout(40000);
 
 beforeEach(() => {
   if (existsSync(containerImplFile)) {
