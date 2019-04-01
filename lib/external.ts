@@ -1,4 +1,4 @@
-import debug from './debug';
+import { debug } from './debug';
 import { addTsdiMarker } from './marker';
 import { TSDI } from './tsdi';
 

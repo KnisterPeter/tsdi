@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import debug from './debug';
+import { debug } from './debug';
 import { addListener, ComponentListener, removeListener } from './global-state';
 import { findIndexOf, isFactoryMetadata, isInterfaceMetadata } from './helper';
 import { addTsdiMarker, getTsdiMarker } from './marker';
