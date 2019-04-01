@@ -1,12 +1,12 @@
 import { readFileSync } from 'fs';
 import { dirname } from 'path';
-import { transpileModule, TranspileOptions } from 'typescript';
+import { ts } from 'ts-morph';
 import { RunningScriptOptions } from 'vm';
 import { Container } from './container';
 import { Compiler } from './index';
 
 export class Runtime {
-  private readonly transpileOptions: TranspileOptions;
+  private readonly transpileOptions: ts.TranspileOptions;
 
   private readonly containerRequireCache: { [name: string]: any } = {};
 
@@ -20,7 +20,7 @@ export class Runtime {
    * @internal
    */
   public createContainer<T>(container: Container<T>): T {
-    const output = transpileModule(container.code, this.transpileOptions);
+    const output = ts.transpileModule(container.code, this.transpileOptions);
     const code = output.outputText;
 
     const evaluatedExports = this.evaluateModule(
@@ -47,7 +47,7 @@ export class Runtime {
       return this.containerRequireCache[resolvedId];
     }
 
-    const code = transpileModule(
+    const code = ts.transpileModule(
       readFileSync(resolvedId).toString(),
       this.transpileOptions
     ).outputText;
