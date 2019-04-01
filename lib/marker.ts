@@ -1,5 +1,7 @@
+const marker = Symbol();
+
 export function addTsdiMarker(o: any): void {
-  Object.defineProperty(o, '__tsdi_marker__', {
+  Object.defineProperty(o, marker, {
     value: Symbol(),
     configurable: false,
     enumerable: false,
@@ -10,7 +12,7 @@ export function addTsdiMarker(o: any): void {
 export function findTsdiMarker(o: any): any {
   let proto = o;
   while (proto !== null) {
-    if (Object.getOwnPropertyDescriptor(proto, '__tsdi_marker__')) {
+    if (Object.getOwnPropertyDescriptor(proto, marker)) {
       break;
     }
     proto = Object.getPrototypeOf(proto);
@@ -20,5 +22,5 @@ export function findTsdiMarker(o: any): any {
 
 export function getTsdiMarker(o: any): symbol | undefined {
   const proto = findTsdiMarker(o);
-  return proto ? proto.__tsdi_marker__ : undefined;
+  return proto ? proto[marker] : undefined;
 }
