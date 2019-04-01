@@ -165,11 +165,11 @@ export class TSDI {
 
   private listener: ComponentListener | undefined;
 
-  private readonly properties: { [key: string]: any } = {};
+  private readonly properties = new Map<string, any>();
 
   private readonly lifecycleListeners: LifecycleListener[] = [];
 
-  private readonly scopes: { [name: string]: boolean } = {};
+  private readonly scopes = new Set<string>();
 
   constructor(criteria?: any) {
     if (!TSDI.customExternalContainerResolver) {
@@ -209,7 +209,7 @@ export class TSDI {
   }
 
   public addProperty(key: string, value: any): void {
-    this.properties[key] = value;
+    this.properties.set(key, value);
   }
 
   public close(): void {
@@ -619,7 +619,7 @@ export class TSDI {
   private hasEnteredScope(metadata: ComponentMetadata): boolean {
     return (
       !metadata.options.scope ||
-      Boolean(metadata.options.scope && this.scopes[metadata.options.scope])
+      Boolean(metadata.options.scope && this.scopes.has(metadata.options.scope))
     );
   }
 
@@ -723,11 +723,10 @@ export class TSDI {
       if (injects) {
         for (const inject of injects) {
           log('injecting %s.%s', instance.constructor.name, inject.property);
-          if (
-            inject.options.name &&
-            typeof this.properties[inject.options.name] !== 'undefined'
-          ) {
-            instance[inject.property] = this.properties[inject.options.name];
+          if (inject.options.name && this.properties.has(inject.options.name)) {
+            instance[inject.property] = this.properties.get(
+              inject.options.name
+            );
           } else {
             this.injectDependency(
               instance,
@@ -1013,10 +1012,10 @@ export class TSDI {
     const self = this;
     return {
       enter(): void {
-        self.scopes[name] = true;
+        self.scopes.add(name);
       },
       leave(): void {
-        delete self.scopes[name];
+        self.scopes.delete(name);
         self.components
           .filter(
             metadata =>
