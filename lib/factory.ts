@@ -21,6 +21,9 @@ export function Factory(...args: any[]): MethodDecorator | void {
         (target as any)[propertyKey].name
       );
     }
+    if (!Reflect.getMetadata) {
+      return;
+    }
     const rtti = Reflect.getMetadata('design:returntype', target, propertyKey);
     if (rtti) {
       addTsdiMarker(rtti);

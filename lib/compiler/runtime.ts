@@ -28,7 +28,8 @@ export class Runtime {
       `<${container.implName}.ts>`,
       {
         lineOffset: 2
-      }
+      },
+      {}
     );
 
     const constructor: { new (): T } = evaluatedExports[container.implName];
@@ -46,28 +47,33 @@ export class Runtime {
     if (this.containerRequireCache[resolvedId] !== undefined) {
       return this.containerRequireCache[resolvedId];
     }
+    this.containerRequireCache[resolvedId] = {};
 
     const code = ts.transpileModule(
       readFileSync(resolvedId).toString(),
       this.transpileOptions
     ).outputText;
-    const exports = this.evaluateModule(code, resolvedId);
+    this.evaluateModule(
+      code,
+      resolvedId,
+      {},
+      this.containerRequireCache[resolvedId]
+    );
 
-    this.containerRequireCache[resolvedId] = exports;
     return this.containerRequireCache[resolvedId];
   }
 
   private evaluateModule(
     code: string,
     filename: string,
-    options: RunningScriptOptions = {}
+    options: RunningScriptOptions = {},
+    exports: {}
   ): {
     [name: string]: new () => any;
   } {
     const { runInNewContext }: typeof import('vm') = require('vm');
     const { wrap }: typeof import('module') = require('module');
 
-    const exports = {};
     const sandbox: {
       console: typeof console;
       process: typeof process;

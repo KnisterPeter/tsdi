@@ -26,7 +26,9 @@ export function Component<TFunction extends object>(
       fn: target as any,
       options
     });
-    Reflect.defineMetadata('component:options', options, target);
+    if (Reflect.defineMetadata) {
+      Reflect.defineMetadata('component:options', options, target);
+    }
     return target;
   };
 

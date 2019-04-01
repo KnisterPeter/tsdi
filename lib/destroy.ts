@@ -6,6 +6,9 @@ export function Destroy(): MethodDecorator;
 export function Destroy(...args: any[]): MethodDecorator | void {
   const decorate = (target: object, propertyKey: symbol | string) => {
     log('@Destroy %s#%s', (target.constructor as any).name, propertyKey);
+    if (!Reflect.defineMetadata) {
+      return;
+    }
     Reflect.defineMetadata('component:destroy', propertyKey, target);
   };
   if (args.length > 0) {

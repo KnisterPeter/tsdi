@@ -89,7 +89,7 @@ export class Compiler {
     decoratorName: string,
     kind: TKind
   ): KindToNodeMappings[TKind][] {
-    const decoratorFunction = this.getDecoratorFunction(decoratorName);
+    const decoratorFunction = this.getDecoratorFunctionOrThrow(decoratorName);
     const references = decoratorFunction
       .findReferences()
       .reduce(
@@ -110,7 +110,13 @@ export class Compiler {
    * @internal
    */
   public getLegacyComponents(container: Container<any>): Component[] {
-    const components = this.getDecoratorFunction('Component')
+    const fn = this.getDecoratorFunction('Component');
+    if (!fn) {
+      // note: no legacy decorator function found.
+      // asume only compiler is used and legacy not available
+      return [];
+    }
+    const components = fn
       .findReferencesAsNodes()
       .map(node => node.getFirstAncestorByKind(SyntaxKind.Decorator))
       .filter(isDefined)
@@ -126,7 +132,13 @@ export class Compiler {
    * @internal
    */
   public getLegacyExternals(container: Container<any>): Component[] {
-    const components = this.getDecoratorFunction('External')
+    const fn = this.getDecoratorFunction('External');
+    if (!fn) {
+      // note: no legacy decorator function found.
+      // asume only compiler is used and legacy not available
+      return [];
+    }
+    const components = fn
       .findReferencesAsNodes()
       .map(node => node.getFirstAncestorByKind(SyntaxKind.Decorator))
       .filter(isDefined)
@@ -142,7 +154,13 @@ export class Compiler {
     method: MethodDeclaration;
     node: ClassDeclaration | InterfaceDeclaration;
   }[] {
-    return this.getDecoratorFunction('Factory')
+    const fn = this.getDecoratorFunction('Factory');
+    if (!fn) {
+      // note: no legacy decorator function found.
+      // asume only compiler is used and legacy not available
+      return [];
+    }
+    return fn
       .findReferencesAsNodes()
       .map(node => node.getFirstAncestorByKind(SyntaxKind.Decorator))
       .filter(isDefined)
@@ -220,7 +238,7 @@ export class Compiler {
         SyntaxKind.Identifier
       );
       if (identifier) {
-        const decoratorFunction = this.getDecoratorFunction(name);
+        const decoratorFunction = this.getDecoratorFunctionOrThrow(name);
         if (decoratorFunction.findReferencesAsNodes().includes(identifier)) {
           return decoratorNode;
         }
@@ -229,7 +247,15 @@ export class Compiler {
     return undefined;
   }
 
-  private getDecoratorFunction(name: string): FunctionDeclaration {
+  private getDecoratorFunctionOrThrow(name: string): FunctionDeclaration {
+    const fn = this.getDecoratorFunction(name);
+    if (!fn) {
+      throw new Error(`Unable to find function with name [${name}]`);
+    }
+    return fn;
+  }
+
+  private getDecoratorFunction(name: string): FunctionDeclaration | undefined {
     switch (name.toLowerCase()) {
       case 'component':
       case 'destroy':
@@ -237,11 +263,10 @@ export class Compiler {
       case 'factory':
       case 'initialize':
       case 'inject':
-        return this.findLegacyDecoratorsFile(
-          name.toLowerCase()
-        ).getFunctionOrThrow(name);
+        const file = this.findLegacyDecoratorsFile(name.toLowerCase());
+        return file && file.getFunction(name);
     }
-    return this.findDecoratorsFile().getFunctionOrThrow(name);
+    return this.findDecoratorsFile().getFunction(name);
   }
 
   private findDecoratorsFile(): SourceFile {
@@ -256,7 +281,7 @@ export class Compiler {
     return this.project.getSourceFileOrThrow(decoratorsFilePath);
   }
 
-  private findLegacyDecoratorsFile(name: string): SourceFile {
+  private findLegacyDecoratorsFile(name: string): SourceFile | undefined {
     const decoratorsFilePath = join(
       this.getTsdiRoot(),
       'dist',
@@ -264,6 +289,6 @@ export class Compiler {
       `${name}.d.ts`
     );
 
-    return this.project.getSourceFileOrThrow(decoratorsFilePath);
+    return this.project.getSourceFile(decoratorsFilePath);
   }
 }
