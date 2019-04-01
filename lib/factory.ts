@@ -1,4 +1,4 @@
-import debug from './debug';
+import { debug } from './debug';
 import { addKnownComponent } from './global-state';
 import { addTsdiMarker } from './marker';
 import { IFactoryOptions } from './tsdi';

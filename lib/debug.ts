@@ -12,7 +12,7 @@ const enabled = (() => {
 })();
 
 /* istanbul ignore next */
-const debug = (_: string) => {
+export const debug = (_: string) => {
   // tslint:disable-next-line:cyclomatic-complexity
   const log = (template: string | Error, ...args: any[]) => {
     if (!enabled) {
@@ -49,5 +49,3 @@ const debug = (_: string) => {
   log.enabled = enabled;
   return log;
 };
-
-export default debug;
