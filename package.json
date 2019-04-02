@@ -61,7 +61,7 @@
     "lint-staged": "8.1.5",
     "reflect-metadata": "0.1.13",
     "rimraf": "2.6.3",
-    "rollup": "1.7.4",
+    "rollup": "1.8.0",
     "rollup-plugin-analyzer": "3.0.0",
     "rollup-plugin-commonjs": "9.2.3",
     "rollup-plugin-node-resolve": "4.0.1",
