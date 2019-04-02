@@ -26,9 +26,9 @@ import {
 } from '../container';
 export class ContainerImpl extends C1_Container {
   private readonly _tsdi: TSDI;
-  constructor() {
+  constructor(impl = TSDI) {
     super();
-    this._tsdi = new TSDI(C1_Container);
+    this._tsdi = new impl(C1_Container);
     this._tsdi.configure(C2_Test, {
       constructorDependencies: [C3_Dependency],
       propertyDependencies: []

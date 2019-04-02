@@ -2,6 +2,7 @@ import { readFileSync } from 'fs';
 import { dirname } from 'path';
 import { ts } from 'ts-morph';
 import { RunningScriptOptions } from 'vm';
+import { TSDI } from '../tsdi';
 import { Container } from './container';
 import { Compiler } from './index';
 
@@ -19,7 +20,7 @@ export class Runtime {
   /**
    * @internal
    */
-  public createContainer<T>(container: Container<T>): T {
+  public createContainer<T>(container: Container<T>, impl?: typeof TSDI): T {
     const output = ts.transpileModule(container.code, this.transpileOptions);
     const code = output.outputText;
 
@@ -32,8 +33,9 @@ export class Runtime {
       {}
     );
 
-    const constructor: { new (): T } = evaluatedExports[container.implName];
-    return new constructor();
+    const constructor: { new (impl?: typeof TSDI): T } =
+      evaluatedExports[container.implName];
+    return new constructor(impl);
   }
 
   public require(id: string, from: string): any {

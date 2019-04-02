@@ -75,10 +75,11 @@ export class Generator {
       ],
       ctors: [
         {
+          parameters: [{ name: 'impl', initializer: 'TSDI' }],
           bodyText: writer => {
             writer.writeLine('super()');
             writer.writeLine(
-              `this._tsdi = new TSDI(${trackImport(container.importName)});`
+              `this._tsdi = new impl(${trackImport(container.importName)});`
             );
             container.components.forEach(component => {
               if (component.name === 'TSDI') {
