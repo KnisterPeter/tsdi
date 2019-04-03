@@ -1,6 +1,4 @@
-// tslint:disable-next-line:no-implicit-dependencies
-import 'reflect-metadata';
-import { component, initialize, inject, TSDI } from '../lib';
+import { component, initialize, inject, TSDI } from '../lib/legacy';
 
 let origWarn: (...args: any[]) => void;
 

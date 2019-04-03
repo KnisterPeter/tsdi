@@ -1,5 +1,3 @@
-// tslint:disable-next-line:no-implicit-dependencies
-import 'reflect-metadata';
 import {
   Component,
   component,
@@ -12,7 +10,7 @@ import {
   Inject,
   inject,
   TSDI
-} from '../lib';
+} from '../lib/legacy';
 import { Cyclic1 } from './cyclic1';
 import { Dependency } from './dependency';
 import { EagerComponent1 } from './eager1';

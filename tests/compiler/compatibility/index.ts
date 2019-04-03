@@ -1,5 +1,3 @@
-// tslint:disable-next-line:no-implicit-dependencies
-import 'reflect-metadata';
 import {
   component,
   container,
@@ -8,7 +6,7 @@ import {
   initialize,
   inject,
   TSDI
-} from '../../..';
+} from '../../../dist/legacy';
 
 let initTest = false;
 let destroyTest = false;

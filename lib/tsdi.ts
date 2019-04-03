@@ -39,7 +39,6 @@ export interface FactoryOptions {
   eager?: boolean;
 }
 
-/** @internal */
 export type InjectMetadata = {
   target: object;
   property: string;
@@ -89,8 +88,6 @@ export type FactoryMetadata = {
 /** @internal */
 export type ComponentOrFactoryMetadata = ComponentMetadata | FactoryMetadata;
 
-export type Mock<T> = { -readonly [P in keyof T]: T[P] };
-
 export interface LifecycleListener {
   onCreate?(component: any): void;
   onDestroy?(component: any): void;
@@ -136,9 +133,6 @@ export class TSDI {
 
   private static containerHolder: { criteria: any; container: TSDI }[] = [];
 
-  private static customExternalContainerResolver = false;
-  private static _externalContainerResolver: () => TSDI = () => undefined!;
-
   /**
    * @internal
    */
@@ -155,34 +149,17 @@ export class TSDI {
     return container.container;
   }
 
-  public static get externalContainerResolver(): () => TSDI {
-    return TSDI._externalContainerResolver;
-  }
-
-  public static set externalContainerResolver(fn: () => TSDI) {
-    TSDI.customExternalContainerResolver = true;
-    TSDI._externalContainerResolver = fn;
-  }
-
-  private autoMock: any[] | undefined = undefined;
-
   private readonly components: ComponentOrFactoryMetadata[] = [];
 
-  private instances: { [idx: number]: any } = {};
+  protected instances: { [idx: number]: any } = {};
 
   private listener: ComponentListener | undefined;
-
-  private readonly properties = new Map<string, any>();
 
   private readonly lifecycleListeners: LifecycleListener[] = [];
 
   private readonly scopes = new Set<string>();
 
   constructor(criteria?: any) {
-    if (!TSDI.customExternalContainerResolver) {
-      TSDI._externalContainerResolver = () => this;
-    }
-
     if (TSDI.containerHolder.find(holder => holder.criteria === criteria)) {
       console.warn('Already existing TSDI criteria', criteria);
     }
@@ -213,10 +190,6 @@ export class TSDI {
         l.onDestroy(component);
       }
     });
-  }
-
-  public addProperty(key: string, value: any): void {
-    this.properties.set(key, value);
   }
 
   public close(): void {
@@ -310,13 +283,6 @@ export class TSDI {
         addListener(this.listener);
       }
     }
-  }
-
-  public enableAutomock(...allowedDependencies: any[]): void {
-    console.warn(
-      '#enableAutomock is deprecated and should not be used. Instead use #override.'
-    );
-    this.autoMock = allowedDependencies;
   }
 
   private registerComponent(
@@ -419,7 +385,7 @@ export class TSDI {
     });
   }
 
-  private getComponentMetadataIndex(
+  protected getComponentMetadataIndex(
     component: Constructable<any> | symbol | undefined,
     name?: string
   ): number {
@@ -452,8 +418,7 @@ export class TSDI {
       const marker = getTsdiMarker(component);
       return (
         marker !== undefined &&
-        getTsdiMarker((metadata as ComponentMetadata).fn) ===
-          getTsdiMarker(component)
+        marker === getTsdiMarker((metadata as ComponentMetadata).fn)
       );
     };
     const isMatchingFactory = () =>
@@ -674,7 +639,9 @@ export class TSDI {
     this.injectIntoInstance(instance, true, metadata);
     const init: string =
       metadata.initializer ||
-      ReflectObject.getMetadata('component:init', target.prototype);
+      (ReflectObject.getMetadata
+        ? ReflectObject.getMetadata('component:init', target.prototype)
+        : undefined);
     if (init) {
       instance[init].call(instance);
     }
@@ -745,11 +712,7 @@ export class TSDI {
       if (injects) {
         for (const inject of injects) {
           log('injecting %s.%s', instance.constructor.name, inject.property);
-          if (inject.options.name && this.properties.has(inject.options.name)) {
-            instance[inject.property] = this.properties.get(
-              inject.options.name
-            );
-          } else {
+          if (!this.injectProperty(instance, inject)) {
             this.injectDependency(
               instance,
               externalInstance,
@@ -760,6 +723,10 @@ export class TSDI {
         }
       }
     }
+  }
+
+  protected injectProperty(_instance: any, _inject: InjectMetadata): boolean {
+    return false;
   }
 
   private injectDependency(
@@ -814,6 +781,9 @@ export class TSDI {
       );
     }
   }
+  protected injectAutoMock(_instance: any, _inject: InjectMetadata): boolean {
+    return false;
+  }
 
   private isAsyncInitializerDependency(inject: InjectMetadata): boolean {
     const [metadata] = this.getInjectComponentMetadata(inject);
@@ -835,67 +805,7 @@ export class TSDI {
     return async;
   }
 
-  private injectAutoMock(instance: any, inject: InjectMetadata): boolean {
-    if (!this.autoMock) {
-      return false;
-    }
-    const [injectMetadata] = this.getInjectComponentMetadata(inject);
-    if (injectMetadata) {
-      const constructor = isFactoryMetadata(injectMetadata)
-        ? injectMetadata.rtti
-        : injectMetadata.fn;
-      if (this.autoMock.indexOf(constructor) > -1) {
-        return false;
-      }
-      const automock = this.mock(constructor);
-      if (automock) {
-        instance[inject.property] = automock;
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private createAutoMock<T>(constructor: Constructable<T>): T | undefined {
-    if (!this.autoMock || this.autoMock.indexOf(constructor) > -1) {
-      return undefined;
-    }
-    const automock = {
-      __tsdi__mock__: 'This is a TSDI automock'
-    };
-    const proto = constructor.prototype;
-
-    Object.keys(Object.getOwnPropertyDescriptors(proto)).forEach(property => {
-      if (typeof proto[property] === 'function') {
-        (automock as any)[property] = function(...args: any[]): any {
-          return args;
-        };
-      }
-    });
-    if (automock) {
-      return automock as any;
-    }
-    return undefined;
-  }
-
-  public mock<T>(component: Constructable<T>): Mock<T> {
-    console.warn(
-      '#mock is deprecated and should not be used. Instead use #override.'
-    );
-    const idx = this.getComponentMetadataIndex(component);
-    if (!this.instances[idx]) {
-      const mock = this.createAutoMock(component);
-      if (!mock) {
-        throw new Error(
-          `Failed to create mock from ${(component as any).name}`
-        );
-      }
-      this.instances[idx] = mock;
-    }
-    return this.instances[idx] as T;
-  }
-
-  private getInjectComponentMetadata(
+  protected getInjectComponentMetadata(
     inject: InjectMetadata
   ): [ComponentOrFactoryMetadata, number] {
     let injectIdx = this.getComponentMetadataIndex(

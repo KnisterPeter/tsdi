@@ -1,6 +1,6 @@
 import { debug } from './debug';
+import { TSDI } from './legacy';
 import { addTsdiMarker } from './marker';
-import { TSDI } from './tsdi';
 
 const log = debug('tsdi');
 
