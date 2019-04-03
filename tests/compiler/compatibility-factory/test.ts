@@ -1,4 +1,5 @@
 import { join } from 'path';
+import { TSDI } from '../../../dist/legacy';
 import { Compiler } from '../../../lib/compiler';
 
 test('Compiler should support legacy factory decorators', () => {
@@ -12,7 +13,7 @@ test('Compiler should support legacy factory decorators', () => {
       msg = text;
     };
 
-    container.instantiate();
+    container.instantiate(TSDI);
   } finally {
     console.warn = consoleWarn;
   }

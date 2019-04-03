@@ -1,5 +1,3 @@
-// tslint:disable-next-line:no-implicit-dependencies
-import 'reflect-metadata';
 import {
   Component,
   component,
@@ -9,7 +7,7 @@ import {
   Inject,
   inject,
   TSDI
-} from '../lib';
+} from '../lib/legacy';
 import { User } from './user';
 
 describe('TSDI when creating a container instance with external classes', () => {

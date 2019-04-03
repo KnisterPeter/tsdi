@@ -1,6 +1,4 @@
-// tslint:disable-next-line:no-implicit-dependencies
-import 'reflect-metadata';
-import { component, container, factory } from '../../..';
+import { component, container, factory } from '../../../dist/legacy';
 
 let factoryExecuted = false;
 

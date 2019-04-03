@@ -1,4 +1,4 @@
-import { Component } from '../lib';
+import { Component } from '../lib/legacy';
 
 @Component()
 export class Dependency {

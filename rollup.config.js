@@ -19,6 +19,25 @@ const config = {
   },
   // @ts-ignore
   external: builtinModules,
+  // @ts-ignore
   plugins: [nodeResolve(), commonjs(), terser(), analyze()]
 };
-export default config;
+
+/**
+ * @type rollup.RollupOptions
+ */
+const configLegacy = {
+  input: 'dist/esm/legacy.js',
+  output: {
+    file: 'dist/umd/tsdi.legacy.js',
+    format: 'umd',
+    name: 'tsdi',
+    sourcemap: true
+  },
+  // @ts-ignore
+  external: builtinModules,
+  // @ts-ignore
+  plugins: [nodeResolve(), commonjs(), terser(), analyze()]
+};
+
+export default [config, configLegacy];

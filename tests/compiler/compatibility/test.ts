@@ -1,4 +1,5 @@
 import { join } from 'path';
+import { TSDI } from '../../../dist/legacy';
 import { Compiler } from '../../../lib/compiler';
 
 test('Compiler should support legacy decorators', () => {
@@ -8,7 +9,7 @@ test('Compiler should support legacy decorators', () => {
   const getResult = compiler.runtime.require('./index', __filename).getResult;
   const External = compiler.runtime.require('./index', __filename).External;
 
-  const instance = container.instantiate();
+  const instance = container.instantiate(TSDI);
 
   expect(instance.test).toBeInstanceOf(Component);
   expect(instance.test.dependency).toBe(instance.dependency);

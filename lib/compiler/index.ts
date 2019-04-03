@@ -278,7 +278,13 @@ export class Compiler {
       'decorators.d.ts'
     );
 
-    return this.project.getSourceFileOrThrow(decoratorsFilePath);
+    try {
+      return this.project.getSourceFileOrThrow(
+        decoratorsFilePath.replace('/esm/', '/')
+      );
+    } catch (e) {
+      return this.project.getSourceFileOrThrow(decoratorsFilePath);
+    }
   }
 
   private findLegacyDecoratorsFile(name: string): SourceFile | undefined {
@@ -289,6 +295,12 @@ export class Compiler {
       `${name}.d.ts`
     );
 
-    return this.project.getSourceFile(decoratorsFilePath);
+    try {
+      return this.project.getSourceFile(
+        decoratorsFilePath.replace('/esm/', '/')
+      );
+    } catch (e) {
+      return this.project.getSourceFile(decoratorsFilePath);
+    }
   }
 }
