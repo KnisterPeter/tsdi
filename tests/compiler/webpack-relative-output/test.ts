@@ -24,7 +24,7 @@ afterEach(() => {
   }
 });
 
-test('TSDICompilerPlugin should run compiler right before compilation starts', async done => {
+test('TSDICompilerPlugin should allow relative output path', done => {
   const config: webpack.Configuration = {
     context: __dirname,
     mode: 'production',
@@ -52,13 +52,16 @@ test('TSDICompilerPlugin should run compiler right before compilation starts', a
       })
     ]
   };
-
-  const compiler = webpack(config);
-  compiler.run((err, stats) => {
-    if (err || stats.hasErrors()) {
-      fail(err || stats.compilation.errors[0]);
-    }
-
+  const compiler = webpack({
+    ...config,
+    plugins: [
+      new TSDICompilerPlugin({
+        outputDir: 'src',
+        tsdiModule: '../../../..'
+      })
+    ]
+  });
+  compiler.run(() => {
     expect(existsSync(containerImplFile)).toBeTruthy();
 
     done();

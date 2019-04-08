@@ -24,7 +24,7 @@ afterEach(() => {
   }
 });
 
-test('TSDICompilerPlugin should run compiler right before compilation starts', async done => {
+test('TSDICompilerPlugin should rerun compiler in watch mode', async done => {
   const config: webpack.Configuration = {
     context: __dirname,
     mode: 'production',
@@ -52,14 +52,37 @@ test('TSDICompilerPlugin should run compiler right before compilation starts', a
       })
     ]
   };
+  let runs = 0;
 
   const compiler = webpack(config);
-  compiler.run((err, stats) => {
-    if (err || stats.hasErrors()) {
-      fail(err || stats.compilation.errors[0]);
-    }
+  let watcher: webpack.Compiler.Watching = undefined as any;
+  await new Promise(async (resolve2, reject) => {
+    // start compiler
+    await new Promise(resolve1 => {
+      watcher = compiler.watch({}, (err, stats) => {
+        runs++;
+        if (err || stats.hasErrors()) {
+          reject(err || stats.compilation.errors[0]);
+          return;
+        }
+        if (runs === 1) {
+          resolve1();
+        } else if (runs === 2) {
+          resolve2();
+        } else {
+          reject();
+        }
+      });
+    });
 
+    // after first build => invalidate
+    watcher.invalidate();
+  });
+
+  // after second build => close and assert
+  watcher.close(() => {
     expect(existsSync(containerImplFile)).toBeTruthy();
+    expect(runs).toBe(2);
 
     done();
   });
