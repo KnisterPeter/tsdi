@@ -24,7 +24,7 @@ afterEach(() => {
   }
 });
 
-test('TSDICompilerPlugin should run compiler right before compilation starts', async done => {
+test('TSDICompilerPlugin should keep watch ignore list', done => {
   const config: webpack.Configuration = {
     context: __dirname,
     mode: 'production',
@@ -53,13 +53,23 @@ test('TSDICompilerPlugin should run compiler right before compilation starts', a
     ]
   };
 
-  const compiler = webpack(config);
-  compiler.run((err, stats) => {
-    if (err || stats.hasErrors()) {
-      fail(err || stats.compilation.errors[0]);
-    }
-
-    expect(existsSync(containerImplFile)).toBeTruthy();
+  const compiler = webpack({
+    ...config,
+    plugins: [
+      new webpack.WatchIgnorePlugin(['/tmp']),
+      new TSDICompilerPlugin({
+        outputDir: join(__dirname, 'src'),
+        tsdiModule: '../../../..'
+      })
+    ]
+  });
+  compiler.run(() => {
+    expect((compiler as any).watchFileSystem.paths).toEqual(
+      expect.arrayContaining([
+        '/tmp',
+        join(__dirname, 'src', 'container-impl.ts')
+      ])
+    );
 
     done();
   });

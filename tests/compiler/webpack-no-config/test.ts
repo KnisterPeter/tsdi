@@ -4,7 +4,7 @@ import { join } from 'path';
 import webpack from 'webpack';
 import TSDICompilerPlugin from '../../../lib/compiler/webpack';
 
-const containerImplFile = join(__dirname, 'src', 'container-impl.ts');
+const containerImplFile = join(__dirname, 'container-impl.ts');
 const outputFile = join(__dirname, 'output.js');
 
 jest.setTimeout(40000);
@@ -24,7 +24,7 @@ afterEach(() => {
   }
 });
 
-test('TSDICompilerPlugin should run compiler right before compilation starts', async done => {
+test('TSDICompilerPlugin should run without outputDir', async done => {
   const config: webpack.Configuration = {
     context: __dirname,
     mode: 'production',
@@ -53,12 +53,15 @@ test('TSDICompilerPlugin should run compiler right before compilation starts', a
     ]
   };
 
-  const compiler = webpack(config);
-  compiler.run((err, stats) => {
-    if (err || stats.hasErrors()) {
-      fail(err || stats.compilation.errors[0]);
-    }
-
+  const compiler = webpack({
+    ...config,
+    plugins: [
+      new TSDICompilerPlugin({
+        tsdiModule: '../../../..'
+      })
+    ]
+  });
+  compiler.run(() => {
     expect(existsSync(containerImplFile)).toBeTruthy();
 
     done();
