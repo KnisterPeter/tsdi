@@ -1,6 +1,5 @@
 import { existsSync, unlinkSync } from 'fs';
 import { join } from 'path';
-// tslint:disable-next-line:no-implicit-dependencies
 import webpack from 'webpack';
 import TSDICompilerPlugin from '../../../lib/compiler/webpack';
 
