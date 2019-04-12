@@ -1,9 +1,9 @@
 import { writeFileSync } from 'fs';
 import kebabCase from 'lodash.kebabcase';
 import { isAbsolute, join } from 'path';
-// tslint:disable-next-line:no-implicit-dependencies
 import webpack from 'webpack';
 import { Compiler } from '.';
+import { isDefined } from './util';
 
 export interface Config {
   tsconfig: string;
@@ -32,25 +32,31 @@ export default class TSDICompilerPlugin {
       tsdiModule: this.config.tsdiModule || 'tsdi'
     };
 
-    compiler.hooks.thisCompilation.tap(TSDICompilerPlugin.name, () => {
+    compiler.hooks.thisCompilation.tap(TSDICompilerPlugin.name, compilation => {
       // generate containers
       const containerFiles = new Compiler(config.tsconfig)
         .getContainers()
         .map(container => {
-          const code = container.generate(config.outputDir);
-          const fullFilePath = join(
-            config.outputDir,
-            `${kebabCase(container.implName).replace(/^-/, '')}.ts`
-          );
-          writeFileSync(
-            fullFilePath,
-            code.replace(
-              /import { TSDI } from (["'])tsdi["'];/,
-              `import { TSDI } from $1${config.tsdiModule}$1;`
-            )
-          );
-          return fullFilePath;
-        });
+          try {
+            const code = container.generate(config.outputDir);
+            const fullFilePath = join(
+              config.outputDir,
+              `${kebabCase(container.implName).replace(/^-/, '')}.ts`
+            );
+            writeFileSync(
+              fullFilePath,
+              code.replace(
+                /import { TSDI } from (["'])tsdi["'];/,
+                `import { TSDI } from $1${config.tsdiModule}$1;`
+              )
+            );
+            return fullFilePath;
+          } catch (e) {
+            compilation.errors.push(e);
+            return undefined;
+          }
+        })
+        .filter(isDefined);
 
       // add container files to watch ignore list
       const paths: string[] | undefined = (
@@ -62,7 +68,7 @@ export default class TSDICompilerPlugin {
             paths.push(file);
           }
         });
-      } else {
+      } else if (containerFiles.length > 0) {
         new webpack.WatchIgnorePlugin(containerFiles).apply(compiler);
         compiler.hooks.afterEnvironment.call();
       }
