@@ -108,6 +108,10 @@
       "/node_modules/",
       "/dist/"
     ],
+    "watchPathIgnorePatterns": [
+      "<rootDir>/tests/compiler/webpack-.*/output.js",
+      "<rootDir>/tests/compiler/webpack-.*/src/container-impl.ts"
+    ],
     "collectCoverage": true,
     "coveragePathIgnorePatterns": [
       "/node_modules/",
