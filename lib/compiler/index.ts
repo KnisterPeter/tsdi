@@ -279,11 +279,11 @@ export class Compiler {
     );
 
     try {
+      return this.project.getSourceFileOrThrow(decoratorsFilePath);
+    } catch (e) {
       return this.project.getSourceFileOrThrow(
         decoratorsFilePath.replace('/esm/', '/')
       );
-    } catch (e) {
-      return this.project.getSourceFileOrThrow(decoratorsFilePath);
     }
   }
 
@@ -296,11 +296,11 @@ export class Compiler {
     );
 
     try {
+      return this.project.getSourceFileOrThrow(decoratorsFilePath);
+    } catch (e) {
       return this.project.getSourceFile(
         decoratorsFilePath.replace('/esm/', '/')
       );
-    } catch (e) {
-      return this.project.getSourceFile(decoratorsFilePath);
     }
   }
 }
