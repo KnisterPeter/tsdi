@@ -78,7 +78,7 @@
     "lodash.kebabcase": "^4.1.1",
     "prettier": "1.16.4",
     "reflect-metadata": "0.1.13",
-    "resolve-from": "^4.0.0",
+    "resolve-from": "^5.0.0",
     "ts-morph": "^1.2.0",
     "typescript": "3.4.3",
     "webpack": "4.29.6"
