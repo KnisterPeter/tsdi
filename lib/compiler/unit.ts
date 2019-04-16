@@ -120,11 +120,8 @@ export class UnitImpl implements Unit {
     private readonly container: Container<any>,
     public node: ClassDeclaration
   ) {
-    this.importName = `${
-      this.container.compiler.idGen
-    }_${this.node.getNameOrThrow()}`;
-
     this.compiler.logger.info(`Creating unit [${this.name}]`);
+    this.importName = this.unitComponent.importName;
   }
 
   public getProviderConfiguration(
