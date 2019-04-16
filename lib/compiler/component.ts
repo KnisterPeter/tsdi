@@ -4,6 +4,7 @@ import {
   SyntaxKind,
   TypeGuards
 } from 'ts-morph';
+import { Compiler } from '.';
 import { Container } from './container';
 import { Unit } from './unit';
 import {
@@ -95,7 +96,7 @@ export class Component {
       ) {
         return {
           name: parameter.getNameOrThrow(),
-          type: new Component(this.container, node)
+          type: new Component(this.compiler, this.container, node)
         };
       }
       throw new Error(
@@ -144,7 +145,7 @@ export class Component {
 
         return {
           name: property.getName(),
-          type: new Component(this.container, node),
+          type: new Component(this.compiler, this.container, node),
           meta
         };
       }
@@ -279,9 +280,11 @@ export class Component {
    * @internal
    */
   constructor(
+    protected readonly compiler: Compiler,
     protected container: Container<any>,
     public node: InterfaceDeclaration | ClassDeclaration
   ) {
+    this.compiler.logger.info(`Created component [${this.name}]`);
     if (this.name !== 'TSDI') {
       this.importName = `${
         this.container.compiler.idGen
@@ -301,7 +304,7 @@ export class Component {
     // /-- singleton check
 
     if (this.shouldConvertToLegacyComponent()) {
-      const legacy = new LegacyComponent(container, node);
+      const legacy = new LegacyComponent(this.compiler, container, node);
       registry.push({ container, component: legacy });
       return legacy;
     }
@@ -404,7 +407,7 @@ class LegacyComponent extends Component {
       ) {
         return {
           name: parameter.getNameOrThrow(),
-          type: new Component(this.container, node)
+          type: new Component(this.compiler, this.container, node)
         };
       }
       throw new Error(
@@ -464,7 +467,7 @@ ${node.print({ removeComments: true })}`
 
         return {
           name: property.getName(),
-          type: new Component(this.container, node),
+          type: new Component(this.compiler, this.container, node),
           meta
         };
       }
@@ -530,10 +533,11 @@ ${node.print({ removeComments: true })}`
   }
 
   constructor(
+    compiler: Compiler,
     container: Container<any>,
     node: InterfaceDeclaration | ClassDeclaration
   ) {
-    super(container, node);
+    super(compiler, container, node);
   }
 
   protected validate(): void {

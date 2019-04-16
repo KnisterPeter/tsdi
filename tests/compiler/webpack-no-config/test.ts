@@ -1,6 +1,7 @@
 import { existsSync, unlinkSync } from 'fs';
 import { join } from 'path';
 import webpack from 'webpack';
+import { Level } from '../../../lib/compiler/logger';
 import TSDICompilerPlugin from '../../../lib/compiler/webpack';
 
 const containerImplFile = join(__dirname, 'container-impl.ts');
@@ -46,20 +47,13 @@ test('TSDICompilerPlugin should run without outputDir', async done => {
     },
     plugins: [
       new TSDICompilerPlugin({
-        outputDir: join(__dirname, 'src'),
-        tsdiModule: '../../../..'
+        tsdiModule: '../../../..',
+        verbose: Level.none
       })
     ]
   };
 
-  const compiler = webpack({
-    ...config,
-    plugins: [
-      new TSDICompilerPlugin({
-        tsdiModule: '../../../..'
-      })
-    ]
-  });
+  const compiler = webpack(config);
   compiler.run(() => {
     expect(existsSync(containerImplFile)).toBeTruthy();
 

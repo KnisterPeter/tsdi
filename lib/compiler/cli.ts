@@ -6,19 +6,20 @@ import { writeFileSync } from 'fs';
 import kebabCase from 'lodash.kebabcase';
 import { join } from 'path';
 import { Compiler } from '.';
+import { getLevelNames, Level, Logger } from './logger';
 
 class CompilerCommand extends Command {
   public static description = 'The TSDI compiler cli';
 
   public static flags = {
     project: flags.string({
-      name: 'p',
+      char: 'p',
       description: "Path to a project's tsconfig.json",
       default: 'tsconfig.json',
       required: true
     }),
     'out-dir': flags.string({
-      name: 'o',
+      char: 'o',
       description: 'Output folder to write containers to',
       default: '.',
       required: true
@@ -28,27 +29,39 @@ class CompilerCommand extends Command {
         'Print containers to stdout instead of write them to the filesystem',
       default: false,
       required: false
+    }),
+    verbose: flags.enum({
+      description: 'The logging or verbosity level',
+      char: 'v',
+      options: getLevelNames(),
+      default: Level.info,
+      parse: (value: Level) => Level[value]
     })
   };
 
   public async run(): Promise<any> {
     const { flags } = this.parse(CompilerCommand);
 
-    new Compiler(flags.project).getContainers().forEach(container => {
-      const code = container.generate(flags['out-dir']);
-      if (flags.stdout) {
-        process.stdout.write(code);
-      } else {
-        const fileName = kebabCase(container.implName).replace(/^-/, '');
-        const fullFilePath = join(flags['out-dir'], fileName + '.ts');
-        writeFileSync(fullFilePath, code);
-        console.error(
-          `Written container ${container.name} (${
-            container.implName
-          }) to ${fullFilePath}`
-        );
-      }
-    });
+    new Compiler(
+      flags.project,
+      new Logger(flags.stdout ? Level.none : flags.verbose)
+    )
+      .getContainers()
+      .forEach(container => {
+        const code = container.generate(flags['out-dir']);
+        if (flags.stdout) {
+          process.stdout.write(code);
+        } else {
+          const fileName = kebabCase(container.implName).replace(/^-/, '');
+          const fullFilePath = join(flags['out-dir'], fileName + '.ts');
+          writeFileSync(fullFilePath, code);
+          console.error(
+            `Written container ${container.name} (${
+              container.implName
+            }) to ${fullFilePath}`
+          );
+        }
+      });
   }
 }
 

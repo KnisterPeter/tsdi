@@ -3,12 +3,14 @@ import kebabCase from 'lodash.kebabcase';
 import { isAbsolute, join } from 'path';
 import webpack from 'webpack';
 import { Compiler } from '.';
+import { Level, Logger } from './logger';
 import { isDefined } from './util';
 
 export interface Config {
   tsconfig: string;
   outputDir: string;
   tsdiModule: string;
+  verbose: Level;
 }
 
 export default class TSDICompilerPlugin {
@@ -29,12 +31,16 @@ export default class TSDICompilerPlugin {
         this.config.tsconfig ||
         join(compiler.options.context!, 'tsconfig.json'),
       outputDir: this.getOutputDir(compiler.options.context!),
-      tsdiModule: this.config.tsdiModule || 'tsdi'
+      tsdiModule: this.config.tsdiModule || 'tsdi',
+      verbose: Level[this.config.verbose || Level.info]
     };
 
     compiler.hooks.thisCompilation.tap(TSDICompilerPlugin.name, compilation => {
       // generate containers
-      const containerFiles = new Compiler(config.tsconfig)
+      const containerFiles = new Compiler(
+        config.tsconfig,
+        new Logger(config.verbose)
+      )
         .getContainers()
         .map(container => {
           try {

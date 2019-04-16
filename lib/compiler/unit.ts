@@ -1,4 +1,5 @@
 import { ClassDeclaration, SyntaxKind, TypeGuards } from 'ts-morph';
+import { Compiler } from '.';
 import { Component } from './component';
 import { Container } from './container';
 import {
@@ -88,11 +89,11 @@ export class UnitImpl implements Unit {
             }
             return node;
           })
-          .map(node => new Component(this.container, node));
+          .map(node => new Component(this.compiler, this.container, node));
 
         return {
           meta,
-          component: new Component(this.container, node),
+          component: new Component(this.compiler, this.container, node),
           method: method.getName(),
           dependencies
         };
@@ -106,7 +107,7 @@ export class UnitImpl implements Unit {
   }
 
   public get unitComponent(): Component {
-    return new Component(this.container, this.node);
+    return new Component(this.compiler, this.container, this.node);
   }
 
   public importName: string;
@@ -115,9 +116,11 @@ export class UnitImpl implements Unit {
    * @internal
    */
   constructor(
+    private readonly compiler: Compiler,
     private readonly container: Container<any>,
     public node: ClassDeclaration
   ) {
+    this.compiler.logger.info(`Created unit [${this.name}]`);
     this.importName = `${
       this.container.compiler.idGen
     }_${this.node.getNameOrThrow()}`;

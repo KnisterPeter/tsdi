@@ -1,6 +1,7 @@
 import { existsSync, unlinkSync } from 'fs';
 import { join } from 'path';
 import webpack from 'webpack';
+import { Level } from '../../../lib/compiler/logger';
 import TSDICompilerPlugin from '../../../lib/compiler/webpack';
 
 const containerImplFile = join(__dirname, 'src', 'container-impl.ts');
@@ -46,20 +47,13 @@ test('TSDICompilerPlugin should allow relative output path', done => {
     },
     plugins: [
       new TSDICompilerPlugin({
-        outputDir: join(__dirname, 'src'),
-        tsdiModule: '../../../..'
+        outputDir: 'src',
+        tsdiModule: '../../../..',
+        verbose: Level.none
       })
     ]
   };
-  const compiler = webpack({
-    ...config,
-    plugins: [
-      new TSDICompilerPlugin({
-        outputDir: 'src',
-        tsdiModule: '../../../..'
-      })
-    ]
-  });
+  const compiler = webpack(config);
   compiler.run(() => {
     expect(existsSync(containerImplFile)).toBeTruthy();
 
