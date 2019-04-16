@@ -11,7 +11,8 @@ import {
   findDeclarationForIdentifier,
   getBooleanDecoratorProperty,
   getDecoratorPropertyInitializer,
-  getStringDecoratorProperty
+  getStringDecoratorProperty,
+  isEqualNodes
 } from './util';
 
 export class Component {
@@ -284,7 +285,6 @@ export class Component {
     protected container: Container<any>,
     public node: InterfaceDeclaration | ClassDeclaration
   ) {
-    this.compiler.logger.info(`Created component [${this.name}]`);
     if (this.name !== 'TSDI') {
       this.importName = `${
         this.container.compiler.idGen
@@ -293,23 +293,32 @@ export class Component {
       this.importName = 'TSDI';
     }
 
-    // -- singleton check
     const registry = this.container.compiler.componentRegistry;
-    const existing = registry
-      .filter(entry => entry.container === container)
-      .find(entry => entry.component.node === node);
+    const existing = this.getSingltonComponent();
     if (existing) {
-      return existing.component;
+      return existing;
     }
-    // /-- singleton check
 
     if (this.shouldConvertToLegacyComponent()) {
+      this.compiler.logger.info(`Creating legacy component [${this.name}]`);
       const legacy = new LegacyComponent(this.compiler, container, node);
       registry.push({ container, component: legacy });
       return legacy;
+    } else if (!(this instanceof LegacyComponent)) {
+      this.compiler.logger.info(`Creating component [${this.name}]`);
+      registry.push({ container, component: this });
     }
     this.validate();
-    registry.push({ container, component: this });
+  }
+
+  private getSingltonComponent(): Component | undefined {
+    const existing = this.container.compiler.componentRegistry
+      .filter(entry => entry.container === this.container)
+      .find(entry => isEqualNodes(entry.component.node, this.node));
+    if (existing) {
+      return existing.component;
+    }
+    return undefined;
   }
 
   protected validate(): void {

@@ -149,7 +149,7 @@ export class Container<T> {
    * @internal
    */
   constructor(public compiler: Compiler, public clazz: ClassDeclaration) {
-    this.compiler.logger.info(`Created container [${this.name}]`);
+    this.compiler.logger.info(`Creating container [${this.name}]`);
     this.importName = `${this.compiler.idGen}_Container`;
   }
 
