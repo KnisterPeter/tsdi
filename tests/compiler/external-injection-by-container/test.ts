@@ -1,8 +1,12 @@
 import { join } from 'path';
 import { Compiler } from '../../../lib/compiler';
+import { Level, Logger } from '../../../lib/compiler/logger';
 
 test('Compiler should support external component per container injection', () => {
-  const compiler = new Compiler(join(__dirname, 'tsconfig.json'));
+  const compiler = new Compiler(
+    join(__dirname, 'tsconfig.json'),
+    new Logger(Level.none)
+  );
   const container1 = compiler.getContainer<import('.').Container1>(
     'Container1'
   );

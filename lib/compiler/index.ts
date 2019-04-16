@@ -16,6 +16,7 @@ import {
 import { Component } from './component';
 import { Container } from './container';
 import { Generator } from './generator';
+import { Level, Logger } from './logger';
 import { Runtime } from './runtime';
 import { DecorableNode, findDeclarationForIdentifier, isDefined } from './util';
 
@@ -46,7 +47,10 @@ export class Compiler {
    */
   public runtime: Runtime;
 
-  constructor(public tsConfigFilePath: string) {
+  constructor(
+    public tsConfigFilePath: string,
+    public logger = new Logger(Level.error)
+  ) {
     this.project = new Project({ tsConfigFilePath });
     this.generator = new Generator(this);
     this.runtime = new Runtime(this);
@@ -81,7 +85,7 @@ export class Compiler {
       SyntaxKind.ClassDeclaration
     );
     return Array.from(
-      new Set(clazzes.map(clazz => new Component(container, clazz)))
+      new Set(clazzes.map(clazz => new Component(this, container, clazz)))
     );
   }
 
@@ -124,7 +128,7 @@ export class Compiler {
         decorator.getFirstAncestorByKind(SyntaxKind.ClassDeclaration)
       )
       .filter(isDefined)
-      .map(clazz => new Component(container, clazz));
+      .map(clazz => new Component(this, container, clazz));
     return Array.from(new Set(components));
   }
 
@@ -146,7 +150,7 @@ export class Compiler {
         decorator.getFirstAncestorByKind(SyntaxKind.ClassDeclaration)
       )
       .filter(isDefined)
-      .map(clazz => new Component(container, clazz));
+      .map(clazz => new Component(this, container, clazz));
     return Array.from(new Set(components));
   }
 
@@ -212,9 +216,9 @@ export class Compiler {
         SyntaxKind.ClassDeclaration
       );
       return {
-        factory: new Component(container, classNode),
+        factory: new Component(this, container, classNode),
         method,
-        component: new Component(container, node)
+        component: new Component(this, container, node)
       };
     });
   }

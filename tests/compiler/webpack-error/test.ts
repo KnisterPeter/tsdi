@@ -1,6 +1,7 @@
 import { existsSync, unlinkSync } from 'fs';
 import { join } from 'path';
 import webpack from 'webpack';
+import { Level } from '../../../lib/compiler/logger';
 import TSDICompilerPlugin from '../../../lib/compiler/webpack';
 
 const containerImplFile = join(__dirname, 'src', 'container-impl.ts');
@@ -47,7 +48,8 @@ test('TSDICompilerPlugin should add errors to webpack', async done => {
     plugins: [
       new TSDICompilerPlugin({
         outputDir: join(__dirname, 'src'),
-        tsdiModule: '../../../..'
+        tsdiModule: '../../../..',
+        verbose: Level.none
       })
     ]
   };

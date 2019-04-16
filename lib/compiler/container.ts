@@ -31,7 +31,7 @@ export class Container<T> {
       ) {
         return {
           name: property.getName(),
-          type: new Component(this, node)
+          type: new Component(this.compiler, this, node)
         };
       }
       throw new Error('Illegal node type for component: ' + node.print());
@@ -66,7 +66,7 @@ export class Container<T> {
         }
         const node = findDeclarationForIdentifier(element);
         if (TypeGuards.isClassDeclaration(node)) {
-          return new UnitImpl(this, node);
+          return new UnitImpl(this.compiler, this, node);
         } else {
           throw new Error('Illegal node type for unit: ' + node.print());
         }
@@ -149,6 +149,7 @@ export class Container<T> {
    * @internal
    */
   constructor(public compiler: Compiler, public clazz: ClassDeclaration) {
+    this.compiler.logger.info(`Created container [${this.name}]`);
     this.importName = `${this.compiler.idGen}_Container`;
   }
 
