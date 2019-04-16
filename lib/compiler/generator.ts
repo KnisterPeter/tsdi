@@ -240,9 +240,9 @@ export class Generator {
     trackImport: ImportTracker
   ): string {
     const config = component.configuration;
-    return `this._tsdi.configure(${trackImport(
-      component.symbol
-    )}, ${writeObject(`
+    return `this._tsdi.${
+      config.configureAndMark ? 'configureAndMark' : 'configure'
+    }(${trackImport(component.symbol)}, ${writeObject(`
         ${this.writeComponentProvider(config, trackImport)}
         ${this.writeComponentConstructorDependencies(config, trackImport)}
         ${this.writeComponentPropertyDependencies(config, trackImport)}

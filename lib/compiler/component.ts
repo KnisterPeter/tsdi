@@ -77,7 +77,10 @@ export class Component {
     if (TypeGuards.isInterfaceDeclaration(this.node)) {
       return [];
     }
-    if (!this.container.compiler.getDecorator(this.node, 'managed')) {
+    if (
+      !this.container.compiler.getDecorator(this.node, 'managed') &&
+      !this.container.compiler.getDecorator(this.node, 'unit')
+    ) {
       return [];
     }
     if (this.node.getConstructors().length === 0) {
@@ -223,6 +226,7 @@ export class Component {
   }
 
   public get configuration(): {
+    configureAndMark: boolean;
     provider?: ReturnType<Unit['getProviderConfiguration']>;
     constructorDependencies?: [string, string][];
     propertyDependencies: {
@@ -257,6 +261,7 @@ export class Component {
 
     const providerConfiguration = this.providerConfiguration;
     return {
+      configureAndMark: Boolean(!this.isManaged() && providerConfiguration),
       provider: providerConfiguration,
       constructorDependencies:
         this.constructorDependencies.length > 0
@@ -323,11 +328,15 @@ export class Component {
 
   protected validate(): void {
     if (!this.isManaged()) {
-      // todo: check TSDI ast node instead of name
-      if (this.name !== 'TSDI') {
-        throw new Error(
-          `Managed dependency [${this.name}] is missing @managed decorator`
-        );
+      // check of component is provided by a factory (then we don't require @managed)
+      const config = this.providerConfiguration;
+      if (!config) {
+        // todo: check TSDI ast node instead of name
+        if (this.name !== 'TSDI') {
+          throw new Error(
+            `Managed dependency [${this.name}] is missing @managed decorator`
+          );
+        }
       }
     }
   }
