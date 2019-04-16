@@ -12,6 +12,23 @@ import {
 } from 'ts-morph';
 import { Compiler } from '.';
 
+export function isEqualNodes(node1: Node, node2: Node): boolean {
+  const n1 = node1.compilerNode;
+  const n2 = node2.compilerNode;
+
+  if (n1.getSourceFile().fileName !== n2.getSourceFile().fileName) {
+    return false;
+  }
+  if (n1.kind !== n2.kind) {
+    return false;
+  }
+  if (n1.pos !== n2.pos) {
+    return false;
+  }
+
+  return true;
+}
+
 export type DecorableNode =
   | ClassDeclaration
   | PropertyDeclaration
