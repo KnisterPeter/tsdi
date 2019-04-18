@@ -76,7 +76,6 @@
     "@oclif/plugin-help": "^2.1.6",
     "figlet": "^1.2.1",
     "lodash.kebabcase": "^4.1.1",
-    "mobx": "^5.9.4",
     "prettier": "1.17.0",
     "reflect-metadata": "0.1.13",
     "resolve-from": "^5.0.0",
