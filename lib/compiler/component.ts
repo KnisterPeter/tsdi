@@ -206,7 +206,11 @@ export class Component {
     }
     const node = findDeclarationForIdentifier(value);
     if (!TypeGuards.isClassDeclaration(node)) {
-      throw new Error('Illegal node type for container: ' + node.print());
+      throw new Error(
+        `Illegal reference for 'by' value on container [${
+          this.name
+        }]: ${value.print()}`
+      );
     }
     return this.container.compiler
       .getContainers()
