@@ -1,0 +1,8 @@
+{
+  "name": "tsdi-legacy",
+  "version": "0.0.0",
+  "private": true,
+  "main": "../dist/legacy.js",
+  "module": "../dist/esm/legacy.js",
+  "types": "../dist/esm/legacy.d.ts"
+}
