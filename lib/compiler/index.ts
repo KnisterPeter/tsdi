@@ -7,6 +7,7 @@ import {
   InterfaceDeclaration,
   KindToNodeMappings,
   MethodDeclaration,
+  Node,
   Project,
   ReferenceEntry,
   SourceFile,
@@ -22,6 +23,8 @@ import { DecorableNode, findDeclarationForIdentifier, isDefined } from './util';
 
 export class Compiler {
   public project: Project;
+
+  public readonly singletonInstances: ({ node: Node })[] = [];
 
   public readonly componentRegistry: {
     container: Container<any>;

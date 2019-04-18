@@ -3,11 +3,11 @@ import { Compiler } from '.';
 import { container } from '../tsdi';
 import { Component } from './component';
 import { UnitImpl } from './unit';
-import { findDeclarationForIdentifier } from './util';
+import { findDeclarationForIdentifier, isEqualNodes } from './util';
 
 export class Container<T> {
   public get name(): string {
-    return this.clazz.getNameOrThrow();
+    return this.node.getNameOrThrow();
   }
 
   public get implName(): string {
@@ -15,7 +15,7 @@ export class Container<T> {
   }
 
   public get entryPoints(): { name: string; type: Component }[] {
-    const properties = this.clazz
+    const properties = this.node
       .getProperties()
       .filter(property => property.isAbstract());
 
@@ -45,15 +45,15 @@ export class Container<T> {
     if (this._units) {
       return this._units;
     }
-    const containerDecorator = this.clazz.getDecorator(container.name);
+    const containerDecorator = this.node.getDecorator(container.name);
     if (containerDecorator && containerDecorator.isDecoratorFactory()) {
       const options = containerDecorator.getArguments()[0];
       if (!TypeGuards.isObjectLiteralExpression(options)) {
-        throw new Error('Invalid container decorator: ' + this.clazz.print());
+        throw new Error('Invalid container decorator: ' + this.node.print());
       }
       const unitsProperty = options.getProperty('units');
       if (!unitsProperty || !TypeGuards.isPropertyAssignment(unitsProperty)) {
-        throw new Error('Invalid container units: ' + this.clazz.print());
+        throw new Error('Invalid container units: ' + this.node.print());
       }
       const unitsArray = unitsProperty.getInitializerIfKindOrThrow(
         SyntaxKind.ArrayLiteralExpression
@@ -126,7 +126,7 @@ export class Container<T> {
       return filterInternals(
         all
           .filter(component => component.by)
-          .filter(component => component.by!.clazz === this.clazz)
+          .filter(component => component.by!.node === this.node)
       );
     }
     return filterInternals(all);
@@ -148,9 +148,18 @@ export class Container<T> {
   /**
    * @internal
    */
-  constructor(public compiler: Compiler, public clazz: ClassDeclaration) {
-    this.compiler.logger.info(`Creating container [${this.name}]`);
+  constructor(public compiler: Compiler, public node: ClassDeclaration) {
     this.importName = `${this.compiler.idGen}_Container`;
+
+    const existing = this.compiler.singletonInstances.find(entry =>
+      isEqualNodes(entry.node, this.node)
+    );
+    if (existing) {
+      return existing as any;
+    }
+
+    this.compiler.logger.info(`Creating container [${this.name}]`);
+    this.compiler.singletonInstances.push(this);
   }
 
   public generate(targetDirectoryPath: string): string {

@@ -205,7 +205,7 @@ export class Generator {
     targetDirectory: Directory
   ): { [x: string]: string[][] } {
     const containerImportSpecifier = targetDirectory.getRelativePathAsModuleSpecifierTo(
-      container.clazz.getSourceFile()
+      container.node.getSourceFile()
     );
 
     const componentInfo = this.getComponentInfo(container, targetDirectory);
