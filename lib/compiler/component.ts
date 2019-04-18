@@ -210,7 +210,7 @@ export class Component {
     }
     return this.container.compiler
       .getContainers()
-      .find(container => container.clazz === node);
+      .find(container => container.node === node);
   }
 
   protected get providerConfiguration():

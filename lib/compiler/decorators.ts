@@ -55,13 +55,8 @@ export function meta(_options: {
   return () => undefined;
 }
 
-export function provides(target: object, propertyKey: string): void;
-/**
- * @deprecated
- */
-export function provides(_option?: { singleton?: boolean }): MethodDecorator;
-export function provides(_option?: { singleton?: boolean }): MethodDecorator {
-  return () => undefined;
+export function provides(_target: object, _propertyKey: string): void {
+  //
 }
 
 export function unit(target: any): void {

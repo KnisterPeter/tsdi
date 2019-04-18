@@ -5,7 +5,8 @@ import { Container } from './container';
 import {
   findDeclarationForIdentifier,
   getBooleanDecoratorProperty,
-  getStringDecoratorProperty
+  getStringDecoratorProperty,
+  isEqualNodes
 } from './util';
 
 export interface Unit {
@@ -120,8 +121,17 @@ export class UnitImpl implements Unit {
     private readonly container: Container<any>,
     public node: ClassDeclaration
   ) {
-    this.compiler.logger.info(`Creating unit [${this.name}]`);
     this.importName = this.unitComponent.importName;
+
+    const existing = this.compiler.singletonInstances.find(entry =>
+      isEqualNodes(entry.node, this.node)
+    );
+    if (existing) {
+      return existing as any;
+    }
+
+    this.compiler.logger.info(`Creating unit [${this.name}]`);
+    this.compiler.singletonInstances.push(this);
   }
 
   public getProviderConfiguration(
