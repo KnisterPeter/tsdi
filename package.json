@@ -58,7 +58,7 @@
     "execa": "1.0.0",
     "husky": "2.2.0",
     "jest": "24.7.1",
-    "lint-staged": "8.1.5",
+    "lint-staged": "8.1.6",
     "rimraf": "2.6.3",
     "rollup": "1.10.1",
     "rollup-plugin-analyzer": "3.0.0",
