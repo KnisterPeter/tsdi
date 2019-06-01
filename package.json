@@ -61,7 +61,7 @@
     "lint-staged": "8.1.7",
     "rimraf": "2.6.3",
     "rollup": "1.12.4",
-    "rollup-plugin-analyzer": "3.0.0",
+    "rollup-plugin-analyzer": "3.0.1",
     "rollup-plugin-commonjs": "10.0.0",
     "rollup-plugin-node-resolve": "5.0.1",
     "rollup-plugin-terser": "5.0.0",
