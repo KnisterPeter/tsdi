@@ -52,7 +52,7 @@
     "@types/node": "9.6.22",
     "@types/prettier": "1.16.4",
     "@types/resolve-from": "4.0.0",
-    "@types/webpack": "4.32.0",
+    "@types/webpack": "4.32.1",
     "codecov": "3.5.0",
     "cz-conventional-changelog": "2.1.0",
     "execa": "2.0.3",
@@ -81,7 +81,7 @@
     "resolve-from": "^5.0.0",
     "ts-morph": "^1.2.0",
     "typescript": "3.4.5",
-    "webpack": "4.36.1"
+    "webpack": "4.37.0"
   },
   "lint-staged": {
     "lib/**/*.{ts,tsx}": [
