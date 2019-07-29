@@ -460,16 +460,18 @@
   integrity sha512-shAmDyaQC4H92APFoIaVDHCx5bStIocgvbwQyxPRrbUY20V1EYTbSDchWbuwlMG3V17cprZhA6+78JfB+3DTPw==
 
 "@oclif/command@^1.5.11", "@oclif/command@^1.5.13":
-  version "1.5.17"
-  resolved "https://registry.yarnpkg.com/@oclif/command/-/command-1.5.17.tgz#a3eabe1c159b4e8e47dbc11e7810a4c0b5b2eab2"
-  integrity sha512-it745U06qMKA5j3xEnMB/V9HkOTr2l42Q6MXNcGxj06Y7mhvahEQOYmj2NDWO6oRadyRRAtlEjZv82cenN0RlQ==
+  version "1.5.18"
+  resolved "https://registry.yarnpkg.com/@oclif/command/-/command-1.5.18.tgz#57125b501fafa155ad280bf8dc9f36a911c44f11"
+  integrity sha512-sfLb5UUCwyQ0w9LyQ1/3DUuD/RWnPZk6uvcK5P7pqD65WgRJaOPCqzuNZyb56kPsj6FftRp1UudApNKd7U0KBQ==
   dependencies:
+    "@oclif/config" "^1"
     "@oclif/errors" "^1.2.2"
     "@oclif/parser" "^3.8.3"
+    "@oclif/plugin-help" "^2"
     debug "^4.1.1"
     semver "^5.6.0"
 
-"@oclif/config@^1.12.9":
+"@oclif/config@^1", "@oclif/config@^1.12.9":
   version "1.13.2"
   resolved "https://registry.yarnpkg.com/@oclif/config/-/config-1.13.2.tgz#c1dc25296bf06c039fd5fb0b90e4132be2213b2a"
   integrity sha512-RUOKeuAaopo3zrA5hcgE0PT2lbAUT72+eJdqTlWyI9sbPrGHZgUwV+vrL6Qal7ywWYDkL0vrKd1YS4yXtKIDKw==
@@ -503,7 +505,7 @@
     chalk "^2.4.2"
     tslib "^1.9.3"
 
-"@oclif/plugin-help@^2.1.6":
+"@oclif/plugin-help@^2", "@oclif/plugin-help@^2.1.6":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@oclif/plugin-help/-/plugin-help-2.2.0.tgz#8dfc1c80deae47a205fbc70b018747ba93f31cc3"
   integrity sha512-56iIgE7NQfwy/ZrWrvrEfJGb5rrMUt409yoQGw4feiU101UudA1btN1pbUbcKBr7vY9KFeqZZcftXEGxOp7zBg==
@@ -5961,9 +5963,9 @@ semver@6.1.1:
   integrity sha512-rWYq2e5iYW+fFe/oPPtYJxYgjBm8sC4rmoGdUOgBB7VnwKt6HrL793l2voH1UlsyYZpJ4g0wfjnTEO1s1NP2eQ==
 
 semver@^6.0.0:
-  version "6.2.0"
-  resolved "https://registry.yarnpkg.com/semver/-/semver-6.2.0.tgz#4d813d9590aaf8a9192693d6c85b9344de5901db"
-  integrity sha512-jdFC1VdUGT/2Scgbimf7FSx9iJLXoqfglSF+gJeuNWVpiE37OIbc1jywR/GJyFdz3mnkz2/id0L0J/cr0izR5A==
+  version "6.3.0"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-6.3.0.tgz#ee0a64c8af5e8ceea67687b133761e1becbd1d3d"
+  integrity sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw==
 
 serialize-javascript@^1.7.0:
   version "1.7.0"
