@@ -81,7 +81,7 @@
     "resolve-from": "^5.0.0",
     "ts-morph": "^1.2.0",
     "typescript": "3.4.5",
-    "webpack": "4.38.0"
+    "webpack": "4.39.0"
   },
   "lint-staged": {
     "lib/**/*.{ts,tsx}": [
