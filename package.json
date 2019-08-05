@@ -62,7 +62,7 @@
     "rimraf": "2.6.3",
     "rollup": "1.17.0",
     "rollup-plugin-analyzer": "3.1.2",
-    "rollup-plugin-commonjs": "10.0.1",
+    "rollup-plugin-commonjs": "10.0.2",
     "rollup-plugin-node-resolve": "5.2.0",
     "rollup-plugin-terser": "5.1.1",
     "standard-version": "7.0.0",
