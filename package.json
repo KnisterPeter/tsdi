@@ -60,7 +60,7 @@
     "jest": "24.8.0",
     "lint-staged": "9.2.1",
     "rimraf": "2.6.3",
-    "rollup": "1.19.3",
+    "rollup": "1.19.4",
     "rollup-plugin-analyzer": "3.1.2",
     "rollup-plugin-commonjs": "10.0.2",
     "rollup-plugin-node-resolve": "5.2.0",
