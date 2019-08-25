@@ -17,17 +17,11 @@ jobs:
       - run: npm install -g yarn
       - run: yarn install
       - run: yarn test --maxWorkers=2
-
-  coverage:
-    needs: [test]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: codecov/codecov-action@v1
+      - uses: codecov/codecov-action@v1.0.2
         with:
           token: ${{secrets.CODECOV_TOKEN}}
 
   linter:
-    needs: [test]
     runs-on: ubuntu-latest
     name: Linter
     steps:
@@ -36,4 +30,6 @@ jobs:
         uses: actions/setup-node@v1
         with:
           version: 12
+      - run: npm install -g yarn
+      - run: yarn install
       - run: yarn linter
