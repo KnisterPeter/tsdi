@@ -19,14 +19,15 @@ jobs:
       - run: yarn test
 
   coverage:
-    runs-on: ubuntu-latest
     needs: [test]
+    runs-on: ubuntu-latest
     steps:
       - uses: codecov/codecov-action@v1
         with:
           token: ${{secrets.CODECOV_TOKEN}}
 
   linter:
+    needs: [test]
     runs-on: ubuntu-latest
     name: Linter
     steps:
