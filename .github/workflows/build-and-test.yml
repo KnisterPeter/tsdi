@@ -16,7 +16,7 @@ jobs:
           version: ${{ matrix.node }}
       - run: npm install -g yarn
       - run: yarn install
-      - run: yarn test
+      - run: yarn test --maxWorkers=2
 
   coverage:
     needs: [test]
