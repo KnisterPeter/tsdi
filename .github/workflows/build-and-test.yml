@@ -1,0 +1,35 @@
+name: Build and Test (node 12)
+on: [push]
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        node: ['12', '10']
+    name: Test using node ${{ matrix.node }}
+    steps:
+      - uses: actions/checkout@v1
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          version: ${{ matrix.node }}
+      - run: npm install -g yarn
+      - run: yarn install
+      - run: yarn test
+
+  coverage:
+    needs: [test]
+    steps:
+      - uses: codecov/codecov-action@v1
+        with:
+          token: ${{secrets.CODECOV_TOKEN}}
+
+  linter:
+    name: Linter
+    steps:
+      - uses: actions/checkout@v1
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          version: 12
+      - run: yarn linter
