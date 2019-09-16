@@ -41,9 +41,9 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@commitlint/cli": "8.1.0",
-    "@commitlint/config-conventional": "8.1.0",
-    "@commitlint/travis-cli": "8.1.0",
+    "@commitlint/cli": "8.2.0",
+    "@commitlint/config-conventional": "8.2.0",
+    "@commitlint/travis-cli": "8.2.0",
     "@knisterpeter/standard-tslint": "1.7.2",
     "@types/execa": "0.9.0",
     "@types/figlet": "1.2.0",
