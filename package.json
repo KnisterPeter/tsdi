@@ -67,7 +67,7 @@
     "rollup-plugin-terser": "5.1.2",
     "standard-version": "7.0.0",
     "ts-jest": "24.1.0",
-    "ts-loader": "6.1.2",
+    "ts-loader": "6.2.0",
     "tslint": "5.20.0"
   },
   "dependencies": {
