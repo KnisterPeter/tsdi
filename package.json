@@ -79,7 +79,7 @@
     "prettier": "1.18.2",
     "reflect-metadata": "0.1.13",
     "resolve-from": "^5.0.0",
-    "ts-morph": "^1.2.0",
+    "ts-morph": "^4.0.0",
     "typescript": "3.6.4",
     "webpack": "4.41.0"
   },
