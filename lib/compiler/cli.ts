@@ -56,9 +56,7 @@ class CompilerCommand extends Command {
           const fullFilePath = join(flags['out-dir'], fileName + '.ts');
           writeFileSync(fullFilePath, code);
           console.error(
-            `Written container ${container.name} (${
-              container.implName
-            }) to ${fullFilePath}`
+            `Written container ${container.name} (${container.implName}) to ${fullFilePath}`
           );
         }
       });
