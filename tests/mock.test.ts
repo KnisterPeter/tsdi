@@ -12,7 +12,7 @@ describe('TSDI', () => {
       if (
         args.length > 0 &&
         typeof args[0] === 'string' &&
-        (args[0] as string).indexOf('deprecated') > -1
+        args[0].indexOf('deprecated') > -1
       ) {
         return;
       }
