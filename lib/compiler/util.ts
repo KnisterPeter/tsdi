@@ -77,7 +77,11 @@ export function getDecoratorPropertyInitializer<TKind extends SyntaxKind>(
   if (!property || !TypeGuards.isPropertyAssignment(property)) {
     return undefined;
   }
-  return kind ? property.getInitializerIfKind(kind) : property.getInitializer();
+  if (kind) {
+    return property.getInitializerIfKind(kind);
+  }
+  // no kind typing possible
+  return property.getInitializer() as any;
 }
 
 export function getBooleanDecoratorProperty(
