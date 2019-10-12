@@ -2,31 +2,30 @@
   "name": "tsdi",
   "version": "0.20.3",
   "description": "Dependency Injection container (IoC) for TypeScript",
-  "main": "dist/lib/index.js",
-  "module": "dist/esm/lib/index.js",
-  "types": "dist/esm/lib/index.d.ts",
+  "source": "lib/index.ts",
+  "main": "dist/index.js",
+  "umd:main": "dist/index.umd.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
   "files": [
-    "dist",
-    "lib"
+    "dist"
   ],
   "engines": {
     "node": ">=10.0.0"
   },
   "scripts": {
     "linter": "tslint --project ./tsconfig.json",
-    "clean": "rimraf dist",
+    "linter:tests": "tslint --project ./tests/tsconfig.json",
+    "clean": "rimraf .nyc_output coverage dist dist-tests",
     "prebuild": "yarn clean",
-    "build": "yarn build:cjs && yarn build:esm",
-    "build:cjs": "tsc --sourceMap --module commonjs --outDir dist",
-    "build:esm": "tsc --sourceMap --module es2015 --outDir dist/esm",
-    "pretest": "yarn build",
-    "test": "nyc mocha -r source-map-support/register dist/tests/",
+    "build": "microbundle",
+    "pretest": "yarn build && tsc --project ./tests/tsconfig.json",
+    "test": "nyc --reporter=text-summary --reporter=lcov mocha dist-tests",
     "prerelease": "git checkout master && git pull origin master && yarn test && yarn build",
     "release": "standard-version",
     "postrelease": "git push --follow-tags origin master && npm publish",
-    "precoverage": "yarn clean && tsc --inlineSourceMap",
-    "coverage": "codecov",
-    "build:watch": "yarn build:cjs -- --watch"
+    "#precoverage": "yarn clean && tsc --inlineSourceMap",
+    "coverage": "nyc report --reporter=lcov && codecov"
   },
   "author": {
     "name": "Markus Wolf",
@@ -51,11 +50,11 @@
     "cz-conventional-changelog": "3.0.2",
     "husky": "3.0.8",
     "lint-staged": "9.4.2",
+    "microbundle": "^0.11.0",
     "mocha": "6.2.1",
     "nyc": "12.0.1",
     "prettier": "1.18.2",
     "rimraf": "3.0.0",
-    "source-map-support": "0.5.13",
     "standard-version": "7.0.0",
     "tslint": "5.20.0",
     "typescript": "3.6.4"
@@ -72,20 +71,25 @@
     ]
   },
   "lint-staged": {
-    "lib/**/*.{ts,tsx}": [
-      "npm run linter --",
+    "**/*": [
       "prettier --list-different"
     ],
+    "lib/**/*.{ts,tsx}": [
+      "yarn linter"
+    ],
     "tests/**/*.{ts,tsx}": [
-      "npm run linter --",
-      "prettier --list-different"
+      "yarn linter:tests"
     ]
   },
   "nyc": {
+    "extends": "@istanbuljs/nyc-config-typescript",
+    "all": true,
+    "check-coverage": true,
+    "include": [
+      "dist/**"
+    ],
     "exclude": [
-      "node_modules",
-      "coverage",
-      "dist/tests"
+      "dist/index.umd.js"
     ]
   },
   "husky": {

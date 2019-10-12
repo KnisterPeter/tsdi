@@ -1,7 +1,6 @@
 // tslint:disable: no-implicit-dependencies
 import { assert } from 'chai';
-import 'source-map-support/register';
-import { component, initialize, inject, TSDI } from '../lib/tsdi';
+import { component, initialize, inject, TSDI } from '../dist';
 
 let origWarn: (...args: any[]) => void;
 

@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
     "declaration": true,
-    "target": "es5",
+    "target": "esnext",
     "module": "esnext",
-    "outDir": "dist/esm",
+    "outDir": "dist",
     "lib": ["dom", "esnext"],
+    "rootDir": "lib",
     "strict": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     "stripInternal": true,
     "moduleResolution": "node",
     "noImplicitAny": true,
@@ -20,5 +20,5 @@
     "declarationMap": true,
     "esModuleInterop": true
   },
-  "exclude": ["node_modules", "dist"]
+  "include": ["lib/"]
 }

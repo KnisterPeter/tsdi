@@ -1,5 +1,7 @@
 /node_modules/
 /dist/
+/dist-tests/
 /.nyc_output/
 /coverage/
+/.rts2_cache_*/
 npm-debug.log
