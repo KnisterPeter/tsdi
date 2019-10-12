@@ -56,8 +56,8 @@
     "typescript": "2.9.2"
   },
   "dependencies": {
-    "debug": "3.1.0",
-    "reflect-metadata": "0.1.12"
+    "debug": "4.1.1",
+    "reflect-metadata": "0.1.13"
   },
   "config": {
     "commitizen": {
