@@ -2,9 +2,7 @@ sudo: false
 language: node_js
 node_js:
 - stable
-- '8'
-- '6'
-- '4'
+- '10'
 matrix:
   fast_finish: true
 branches:
