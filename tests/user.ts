@@ -3,7 +3,6 @@ import { Dependency } from './dependency';
 
 @Component()
 export class User {
-
   @Inject()
   protected dependency!: Dependency;
 
@@ -25,5 +24,4 @@ export class User {
   public method(): string {
     return this.dependency.echo('hello');
   }
-
 }

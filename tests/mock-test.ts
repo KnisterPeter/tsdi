@@ -15,7 +15,7 @@ describe('TSDI', () => {
       if (
         args.length > 0 &&
         typeof args[0] === 'string' &&
-        (args[0]).indexOf('deprecated') > -1
+        args[0].indexOf('deprecated') > -1
       ) {
         return;
       }
@@ -30,7 +30,6 @@ describe('TSDI', () => {
   });
 
   describe('when in mock mode', () => {
-
     beforeEach(() => {
       tsdi.enableComponentScanner();
     });
@@ -111,7 +110,7 @@ describe('TSDI', () => {
       }
 
       tsdi.enableAutomock();
-      tsdi.mock(Foo).foo = () => created = true;
+      tsdi.mock(Foo).foo = () => (created = true);
       tsdi.get(Bar);
 
       assert.isTrue(created);
