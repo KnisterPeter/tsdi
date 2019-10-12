@@ -1,6 +1,5 @@
 // tslint:disable: no-implicit-dependencies
 import { assert } from 'chai';
-import 'source-map-support/register';
 import {
   Component,
   component,
@@ -14,7 +13,7 @@ import {
   Inject,
   inject,
   TSDI
-} from '../lib/tsdi';
+} from '../dist/';
 import { Cyclic1 } from './cyclic1';
 import { Dependency } from './dependency';
 import { EagerComponent1 } from './eager1';

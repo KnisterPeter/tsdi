@@ -1,4 +1,4 @@
-import { component } from '../lib/';
+import { component } from '../dist/';
 
 @component({ eager: true })
 export class EagerComponent2 {}
