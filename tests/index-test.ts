@@ -13,7 +13,8 @@ import {
   initialize,
   Inject,
   inject,
-  TSDI } from '../lib/tsdi';
+  TSDI
+} from '../lib/tsdi';
 import { Cyclic1 } from './cyclic1';
 import { Dependency } from './dependency';
 import { EagerComponent1 } from './eager1';
@@ -21,9 +22,7 @@ import { EagerComponent2 } from './eager2';
 import { User } from './user';
 
 describe('TSDI', () => {
-
   describe('when creating a container instance', () => {
-
     let tsdi: TSDI;
 
     beforeEach(() => {
@@ -73,8 +72,7 @@ describe('TSDI', () => {
       tsdi.enableComponentScanner();
 
       @component()
-      class Late {
-      }
+      class Late {}
 
       const late: Late = tsdi.get(Late);
       assert.isTrue(late instanceof Late);
@@ -92,7 +90,7 @@ describe('TSDI', () => {
 
     it('components could registered with metadata', () => {
       class A {}
-      @Component({name: 'RegisteredWithMetadata'})
+      @Component({ name: 'RegisteredWithMetadata' })
       class B extends A {}
 
       tsdi.register(A);
@@ -105,26 +103,31 @@ describe('TSDI', () => {
 
       @Component()
       class A {
-        public m(): string { return 'a'; }
+        public m(): string {
+          return 'a';
+        }
       }
 
       @Component()
       // @ts-ignore
       class BExtendsA extends A {
-        public m(): string { return 'b'; }
+        public m(): string {
+          return 'b';
+        }
       }
 
       @Component({ name: 'Foo' })
       // @ts-ignore
       class CExtendsA extends A {
-        public m(): string { return 'c'; }
+        public m(): string {
+          return 'c';
+        }
       }
 
       @Component({ name: 'Bar' })
       // @ts-ignore
       class DExtendsA extends A {
-
-        @inject({name: 'Foo'})
+        @inject({ name: 'Foo' })
         private readonly a!: A;
 
         public m(): string {
@@ -135,14 +138,17 @@ describe('TSDI', () => {
       assert.equal(tsdi.get(A, 'Bar').m(), 'c');
     });
 
-    it('should warn if register component with duplicate name', (done) => {
+    it('should warn if register component with duplicate name', done => {
       class A {}
       class B {}
 
       const consoleWarn = console.warn;
       try {
         console.warn = function(msg: string): void {
-          assert.equal(msg, "Component with name 'DuplicateComponentName' already registered.");
+          assert.equal(
+            msg,
+            "Component with name 'DuplicateComponentName' already registered."
+          );
           done();
         };
         tsdi.register(A, 'DuplicateComponentName');
@@ -155,10 +161,12 @@ describe('TSDI', () => {
     it('should inject defined properties', () => {
       @Component()
       class ComponentWithProperties {
-        @Inject({name: 'prop'})
+        @Inject({ name: 'prop' })
         private readonly _prop!: boolean;
 
-        public get prop(): boolean { return this._prop; }
+        public get prop(): boolean {
+          return this._prop;
+        }
       }
       tsdi.addProperty('prop', false);
       tsdi.register(ComponentWithProperties);
@@ -184,7 +192,9 @@ describe('TSDI', () => {
         @Inject
         private readonly _tsdi!: TSDI;
 
-        public get prop(): TSDI { return this._tsdi; }
+        public get prop(): TSDI {
+          return this._tsdi;
+        }
       }
       assert.strictEqual(tsdi.get(ComponentWithContainerDependency).prop, tsdi);
     });
@@ -217,25 +227,36 @@ describe('TSDI', () => {
         private readonly _tsdi: TSDI;
         public b: ConstructorParameterComponent;
 
-        constructor(@Inject() container: TSDI, @Inject b: ConstructorParameterComponent) {
+        constructor(
+          @Inject() container: TSDI,
+          @Inject b: ConstructorParameterComponent
+        ) {
           this._tsdi = container;
           this.b = b;
         }
 
-        public get prop(): TSDI { return this._tsdi; }
+        public get prop(): TSDI {
+          return this._tsdi;
+        }
       }
 
       assert.strictEqual(tsdi.get(ComponentWithConstructor).prop, tsdi);
-      assert.instanceOf(tsdi.get(ComponentWithConstructor).b, ConstructorParameterComponent);
+      assert.instanceOf(
+        tsdi.get(ComponentWithConstructor).b,
+        ConstructorParameterComponent
+      );
     });
 
     it('should create a new instance for non-singletons', () => {
       tsdi.enableComponentScanner();
 
-      @Component({singleton: false})
+      @Component({ singleton: false })
       class NonSingletonComponent {}
 
-      assert.notEqual(tsdi.get(NonSingletonComponent), tsdi.get(NonSingletonComponent));
+      assert.notEqual(
+        tsdi.get(NonSingletonComponent),
+        tsdi.get(NonSingletonComponent)
+      );
     });
 
     it('should register factories on components', () => {
@@ -257,7 +278,10 @@ describe('TSDI', () => {
       // class C {}
 
       assert.instanceOf(tsdi.get(NonSingletonObject), NonSingletonObject);
-      assert.strictEqual(tsdi.get(NonSingletonObject), tsdi.get(NonSingletonObject));
+      assert.strictEqual(
+        tsdi.get(NonSingletonObject),
+        tsdi.get(NonSingletonObject)
+      );
     });
 
     it('should return a new component on each call for non singleton factories', () => {
@@ -269,22 +293,24 @@ describe('TSDI', () => {
       @Component()
       // @ts-ignore
       class FactoryComponentWithNonSingletonFactory {
-        @Factory({singleton: false})
+        @Factory({ singleton: false })
         public someFactory(): NonSingletonObject {
           return new NonSingletonObject();
         }
       }
 
       assert.instanceOf(tsdi.get(NonSingletonObject), NonSingletonObject);
-      assert.notEqual(tsdi.get(NonSingletonObject), tsdi.get(NonSingletonObject));
+      assert.notEqual(
+        tsdi.get(NonSingletonObject),
+        tsdi.get(NonSingletonObject)
+      );
     });
 
     it('inject should fallback to typename if no explicit name given', () => {
       tsdi.enableComponentScanner();
 
       @Component()
-      class InjectedComponent {
-      }
+      class InjectedComponent {}
 
       @Component()
       class ComponentWithNonNamedInject {
@@ -295,15 +321,17 @@ describe('TSDI', () => {
         }
       }
 
-      assert.strictEqual(tsdi.get(ComponentWithNonNamedInject).comp, tsdi.get(InjectedComponent));
+      assert.strictEqual(
+        tsdi.get(ComponentWithNonNamedInject).comp,
+        tsdi.get(InjectedComponent)
+      );
     });
 
     it('should report an error if named injection could not resolve to a component', () => {
       tsdi.enableComponentScanner();
 
       @Component()
-      class UnknownComponent {
-      }
+      class UnknownComponent {}
 
       @Component()
       class ComponentWithNamedInject {
@@ -314,7 +342,10 @@ describe('TSDI', () => {
         }
       }
 
-      assert.throws(() => tsdi.get(ComponentWithNamedInject).comp, "Component named 'unknown' not found");
+      assert.throws(
+        () => tsdi.get(ComponentWithNamedInject).comp,
+        "Component named 'unknown' not found"
+      );
     });
 
     it('should report an error for a probable cyclic dependency', () => {
@@ -345,7 +376,10 @@ describe('TSDI', () => {
 
         assert.fail('Should throw error');
       } catch (e) {
-        assert.match(e.message, /Duplicate name 'Component' for known Components/);
+        assert.match(
+          e.message,
+          /Duplicate name 'Component' for known Components/
+        );
       }
     });
 
@@ -353,26 +387,24 @@ describe('TSDI', () => {
       tsdi.enableComponentScanner();
 
       @Component()
-      class Injected {
-      }
+      class Injected {}
 
       @Component()
       class ComponentWithLazyInjection {
-        @Inject({lazy: true})
+        @Inject({ lazy: true })
         public dependency!: Injected;
       }
 
       const component = tsdi.get(ComponentWithLazyInjection);
       const instances = (tsdi as any).instances;
-      const injected = Object
-        .keys(instances)
+      const injected = Object.keys(instances)
         .map((key: string) => instances[key])
         .filter(instance => instance instanceof Injected);
       assert.lengthOf(injected, 0);
       assert.isDefined(component.dependency);
     });
 
-    it('should create eager components as soon as possible', (done) => {
+    it('should create eager components as soon as possible', done => {
       tsdi.enableComponentScanner();
       let count = 0;
 
@@ -391,7 +423,7 @@ describe('TSDI', () => {
       }, 1);
     });
 
-    it('should respect dependency tree for eager creation', (done) => {
+    it('should respect dependency tree for eager creation', done => {
       tsdi.enableComponentScanner();
 
       const eager1 = tsdi.get(EagerComponent1);
@@ -408,8 +440,7 @@ describe('TSDI', () => {
       let count = 0;
 
       @component
-      class Component {
-      }
+      class Component {}
       tsdi.addLifecycleListener({
         onCreate(component: any): void {
           if (component instanceof Component) {
@@ -427,8 +458,7 @@ describe('TSDI', () => {
       let count = 0;
 
       @component
-      class Component {
-      }
+      class Component {}
       tsdi.addLifecycleListener({
         onDestroy(component: any): void {
           if (component instanceof Component) {
@@ -500,18 +530,18 @@ describe('TSDI', () => {
     });
 
     it('should re-resolve dependency if injected as dynamic  one', () => {
-      @component({scope: 're-resolve'})
+      @component({ scope: 're-resolve' })
       class Dependency {
         public value = 1;
       }
 
       @component
       class Dependent {
-        @inject({dynamic: true})
+        @inject({ dynamic: true })
         public dependency!: Dependency;
 
         // lazy=false is ignored here, proxy is always lazy
-        @inject({lazy: false, dynamic: true})
+        @inject({ lazy: false, dynamic: true })
         public eagerDependency!: Dependency;
       }
 
@@ -531,22 +561,24 @@ describe('TSDI', () => {
     });
 
     it('should throw if use unavailable dependency injected as dynamic one', () => {
-      @component({scope: 'scope'})
+      @component({ scope: 'scope' })
       class Dependency {
         public value = 1;
       }
 
       @component
       class Dependent {
-        @inject({dynamic: true})
+        @inject({ dynamic: true })
         public dependency!: Dependency;
       }
 
       tsdi.enableComponentScanner();
       const dependent = tsdi.get(Dependent);
 
-      assert.throws(() => dependent.dependency.value,
-        "Component 'Dependency' not found: required scope 'scope' is not enabled");
+      assert.throws(
+        () => dependent.dependency.value,
+        "Component 'Dependency' not found: required scope 'scope' is not enabled"
+      );
     });
 
     describe('with external classes', () => {
@@ -554,8 +586,7 @@ describe('TSDI', () => {
         tsdi.enableComponentScanner();
 
         @Component('user2')
-        class User2 extends User {
-        }
+        class User2 extends User {}
 
         @external
         class ExternalClass {
@@ -574,7 +605,7 @@ describe('TSDI', () => {
         tsdi.enableComponentScanner();
 
         let called = false;
-        const fn = () => called = true;
+        const fn = () => (called = true);
 
         @External()
         class ExternalClass {
@@ -597,7 +628,9 @@ describe('TSDI', () => {
           @Inject('prop')
           private readonly _prop!: boolean;
 
-          public get prop(): boolean { return this._prop; }
+          public get prop(): boolean {
+            return this._prop;
+          }
         }
         tsdi.addProperty('prop', false);
 
@@ -639,21 +672,18 @@ describe('TSDI', () => {
         class Base {}
 
         @External()
-        class ExternalClass extends Base {
-        }
+        class ExternalClass extends Base {}
 
         assert.instanceOf(new ExternalClass(), Base);
       });
     });
 
     describe('and scope', () => {
-
       it('should create components for that scopes', () => {
         tsdi.enableComponentScanner();
 
-        @component({scope: 'scope'})
-        class ComponentWithScope {
-        }
+        @component({ scope: 'scope' })
+        class ComponentWithScope {}
 
         tsdi.getScope('scope').enter();
         const instance = tsdi.get(ComponentWithScope);
@@ -664,12 +694,13 @@ describe('TSDI', () => {
       it('should throw if scope is not enabled', () => {
         tsdi.enableComponentScanner();
 
-        @component({scope: 'scope'})
-        class ComponentWithScope {
-        }
+        @component({ scope: 'scope' })
+        class ComponentWithScope {}
 
-        assert.throws(() => tsdi.get(ComponentWithScope),
-          "Component 'ComponentWithScope' not found: required scope 'scope' is not enabled");
+        assert.throws(
+          () => tsdi.get(ComponentWithScope),
+          "Component 'ComponentWithScope' not found: required scope 'scope' is not enabled"
+        );
       });
 
       it('should destroy instances when their scope was left', () => {
@@ -677,7 +708,7 @@ describe('TSDI', () => {
 
         let destructorCalled = false;
 
-        @component({scope: 'scope'})
+        @component({ scope: 'scope' })
         class ComponentWithScope {
           @destroy
           protected destroy(): void {
@@ -705,7 +736,7 @@ describe('TSDI', () => {
           }
         }
 
-        @component({scope: 'other'})
+        @component({ scope: 'other' })
         class ComponentWithOtherScope {
           @destroy
           protected destroy(): void {
@@ -726,7 +757,7 @@ describe('TSDI', () => {
         tsdi.enableComponentScanner();
 
         // @ts-ignore
-        @component({scope: 'scope'})
+        @component({ scope: 'scope' })
         class ComponentToBeInjected {}
 
         // @ts-ignore
@@ -740,10 +771,13 @@ describe('TSDI', () => {
         try {
           console.warn = function(msg: string): void {
             // tslint:disable-next-line:prefer-template
-            assert.equal(msg, "Component 'ComponentToBeInjected' is scoped to 'scope' "
-              + "and injected into 'ComponentToInjectTo' without scope. This could easily "
-              + "lead to stale references. Consider to add the scope 'scope' to "
-              + "'ComponentToInjectTo' as well or make the inject dynamic.");
+            assert.equal(
+              msg,
+              "Component 'ComponentToBeInjected' is scoped to 'scope' " +
+                "and injected into 'ComponentToInjectTo' without scope. This could easily " +
+                "lead to stale references. Consider to add the scope 'scope' to " +
+                "'ComponentToInjectTo' as well or make the inject dynamic."
+            );
             done();
           };
           tsdi.getScope('scope').enter();
@@ -759,7 +793,7 @@ describe('TSDI', () => {
         tsdi.enableComponentScanner();
 
         // @ts-ignore
-        @component({scope: 'scope'})
+        @component({ scope: 'scope' })
         class ComponentToBeInjected {}
 
         // @ts-ignore

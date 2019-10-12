@@ -10,7 +10,7 @@
     "lib"
   ],
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=10.0.0"
   },
   "scripts": {
     "linter": "tslint --project ./tsconfig.json",
@@ -25,7 +25,7 @@
     "release": "standard-version",
     "postrelease": "git push --follow-tags origin master && npm publish",
     "precoverage": "npm run clean && tsc --inlineSourceMap",
-    "coverage": "nyc report --reporter=lcov && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
+    "coverage": "codecov",
     "build:watch": "npm run build:cjs -- --watch"
   },
   "author": {
@@ -38,16 +38,22 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@commitlint/cli": "8.2.0",
+    "@commitlint/config-conventional": "8.2.0",
+    "@commitlint/travis-cli": "8.2.0",
     "@knisterpeter/standard-tslint": "1.7.2",
     "@types/chai": "4.2.3",
     "@types/debug": "4.1.5",
     "@types/mocha": "5.2.7",
     "@types/node": "12.7.12",
     "chai": "4.2.0",
-    "coveralls": "3.0.7",
+    "codecov": "3.6.1",
     "cz-conventional-changelog": "3.0.2",
+    "husky": "3.0.8",
+    "lint-staged": "9.4.2",
     "mocha": "6.2.1",
     "nyc": "12.0.1",
+    "prettier": "1.18.2",
     "rimraf": "3.0.0",
     "source-map-support": "0.5.13",
     "standard-version": "7.0.0",
@@ -58,10 +64,23 @@
     "debug": "4.1.1",
     "reflect-metadata": "0.1.13"
   },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
+  "prettier": {
+    "singleQuote": true
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "lint-staged": {
+    "lib/**/*.{ts,tsx}": [
+      "npm run linter --",
+      "prettier --list-different"
+    ],
+    "tests/**/*.{ts,tsx}": [
+      "npm run linter --",
+      "prettier --list-different"
+    ]
   },
   "nyc": {
     "exclude": [
@@ -69,5 +88,11 @@
       "coverage",
       "dist/tests"
     ]
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -e $GIT_PARAMS",
+      "pre-commit": "lint-staged"
+    }
   }
 }

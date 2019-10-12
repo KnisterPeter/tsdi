@@ -5,10 +5,19 @@ import { IComponentOptions } from './tsdi';
 
 const log = debug('tsdi');
 
-export function Component<TFunction extends Function>(target: TFunction): TFunction;
-export function Component(optionsOrString?: IComponentOptions | string): ClassDecorator;
-export function Component<TFunction extends Function>(...args: any[]): ClassDecorator| TFunction {
-  const decorate = (target: TFunction, optionsOrString: IComponentOptions | string = {}) => {
+export function Component<TFunction extends Function>(
+  target: TFunction
+): TFunction;
+export function Component(
+  optionsOrString?: IComponentOptions | string
+): ClassDecorator;
+export function Component<TFunction extends Function>(
+  ...args: any[]
+): ClassDecorator | TFunction {
+  const decorate = (
+    target: TFunction,
+    optionsOrString: IComponentOptions | string = {}
+  ) => {
     log(`@Component ${(target as any).name}`);
     const options = getNamedOptions<IComponentOptions>(optionsOrString);
     addKnownComponent({
