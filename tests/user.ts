@@ -1,11 +1,11 @@
-import { Component, Inject, Initialize } from '../lib/';
+import { Component, Initialize, Inject } from '../lib/';
 import { Dependency } from './dependency';
 
 @Component()
 export class User {
 
   @Inject()
-  private dependency!: Dependency;
+  protected dependency!: Dependency;
 
   private initMessage!: string;
 

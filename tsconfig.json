@@ -20,7 +20,6 @@
     "noUnusedParameters": true,
     "pretty": true,
     "declarationMap": true,
-    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
   },
   "exclude": [
