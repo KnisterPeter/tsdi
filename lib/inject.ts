@@ -1,12 +1,7 @@
+import debug from 'debug';
 import { getNamedOptions } from './helper';
-import {
-  IInjectOptions,
-  Constructable,
-  InjectMetadata,
-  ParameterMetadata
-} from './tsdi';
+import { Constructable, IInjectOptions, InjectMetadata, ParameterMetadata } from './tsdi';
 
-import * as debug from 'debug';
 const log = debug('tsdi');
 
 export function Inject(target: Object, propertyKey: string | symbol, parameterIndex?: number): void;
