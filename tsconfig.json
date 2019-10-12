@@ -4,9 +4,7 @@
     "target": "es5",
     "module": "esnext",
     "outDir": "dist/esm",
-    "lib": [
-      "esnext"
-    ],
+    "lib": ["dom", "esnext"],
     "strict": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -20,10 +18,7 @@
     "noUnusedParameters": true,
     "pretty": true,
     "declarationMap": true,
-    "esModuleInterop": true,
+    "esModuleInterop": true
   },
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "exclude": ["node_modules", "dist"]
 }
