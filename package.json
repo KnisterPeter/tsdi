@@ -20,7 +20,7 @@
     "prebuild": "yarn clean",
     "build": "microbundle",
     "pretest": "yarn build && tsc --project ./tests/tsconfig.json",
-    "test": "nyc --reporter=text-summary --reporter=lcov mocha dist-tests",
+    "test": "nyc --reporter=text --reporter=lcov mocha dist-tests",
     "prerelease": "git checkout master && git pull origin master && yarn test && yarn build",
     "release": "standard-version",
     "postrelease": "git push --follow-tags origin master && npm publish",
