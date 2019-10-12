@@ -72,17 +72,17 @@ export class TSDI {
 
   private autoMock: any[] | undefined = undefined;
 
-  private components: ComponentOrFactoryMetadata[] = [];
+  private readonly components: ComponentOrFactoryMetadata[] = [];
 
   private instances: {[idx: number]: Object} = {};
 
   private listener: ComponentListener | undefined;
 
-  private properties: {[key: string]: any} = {};
+  private readonly properties: {[key: string]: any} = {};
 
-  private lifecycleListeners: LifecycleListener[] = [];
+  private readonly lifecycleListeners: LifecycleListener[] = [];
 
-  private scopes: {[name: string]: boolean} = {};
+  private readonly scopes: {[name: string]: boolean} = {};
 
   constructor() {
     this.registerComponent(
@@ -153,7 +153,7 @@ export class TSDI {
 
   public enableComponentScanner(): void {
     if (!this.listener) {
-      this.listener = (metadataOrExternal: ComponentOrFactoryMetadata | Function) => {
+      this.listener = (metadataOrExternal: Parameters<ComponentListener>[0]) => {
         if (typeof metadataOrExternal === 'function')  {
           (metadataOrExternal as any).__tsdi__ = this;
         } else {

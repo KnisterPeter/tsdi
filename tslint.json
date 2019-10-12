@@ -1,3 +1,6 @@
 {
-  "extends": "@knisterpeter/standard-tslint"
+  "extends": "@knisterpeter/standard-tslint",
+  "rules": {
+    "ban-types": false
+  }
 }

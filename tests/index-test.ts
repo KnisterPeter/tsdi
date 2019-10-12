@@ -1,20 +1,19 @@
+// tslint:disable: no-implicit-dependencies
 import { assert } from 'chai';
 import 'source-map-support/register';
-
 import {
-  TSDI,
   Component,
   component,
-  Inject,
-  inject,
-  Factory,
-  factory,
+  destroy,
   External,
   external,
+  Factory,
+  factory,
   Initialize,
   initialize,
-  destroy
-} from '../lib/tsdi';
+  Inject,
+  inject,
+  TSDI } from '../lib/tsdi';
 import { Cyclic1 } from './cyclic1';
 import { Dependency } from './dependency';
 import { EagerComponent1 } from './eager1';
@@ -126,7 +125,7 @@ describe('TSDI', () => {
       class DExtendsA extends A {
 
         @inject({name: 'Foo'})
-        private a!: A;
+        private readonly a!: A;
 
         public m(): string {
           return this.a.m();
@@ -136,7 +135,7 @@ describe('TSDI', () => {
       assert.equal(tsdi.get(A, 'Bar').m(), 'c');
     });
 
-    it('should warn if register component with duplicate name', (done: MochaDone) => {
+    it('should warn if register component with duplicate name', (done) => {
       class A {}
       class B {}
 
@@ -157,7 +156,7 @@ describe('TSDI', () => {
       @Component()
       class ComponentWithProperties {
         @Inject({name: 'prop'})
-        private _prop!: boolean;
+        private readonly _prop!: boolean;
 
         public get prop(): boolean { return this._prop; }
       }
@@ -183,7 +182,7 @@ describe('TSDI', () => {
       @Component()
       class ComponentWithContainerDependency {
         @Inject
-        private _tsdi!: TSDI;
+        private readonly _tsdi!: TSDI;
 
         public get prop(): TSDI { return this._tsdi; }
       }
@@ -215,7 +214,7 @@ describe('TSDI', () => {
 
       @Component
       class ComponentWithConstructor {
-        private _tsdi: TSDI;
+        private readonly _tsdi: TSDI;
         public b: ConstructorParameterComponent;
 
         constructor(@Inject() container: TSDI, @Inject b: ConstructorParameterComponent) {
@@ -290,7 +289,7 @@ describe('TSDI', () => {
       @Component()
       class ComponentWithNonNamedInject {
         @Inject()
-        private _comp!: InjectedComponent;
+        private readonly _comp!: InjectedComponent;
         get comp(): InjectedComponent {
           return this._comp;
         }
@@ -309,7 +308,7 @@ describe('TSDI', () => {
       @Component()
       class ComponentWithNamedInject {
         @Inject('unknown')
-        private _comp!: UnknownComponent;
+        private readonly _comp!: UnknownComponent;
         get comp(): UnknownComponent {
           return this._comp;
         }
@@ -373,7 +372,7 @@ describe('TSDI', () => {
       assert.isDefined(component.dependency);
     });
 
-    it('should create eager components as soon as possible', (done: MochaDone) => {
+    it('should create eager components as soon as possible', (done) => {
       tsdi.enableComponentScanner();
       let count = 0;
 
@@ -392,7 +391,7 @@ describe('TSDI', () => {
       }, 1);
     });
 
-    it('should respect dependency tree for eager creation', (done: MochaDone) => {
+    it('should respect dependency tree for eager creation', (done) => {
       tsdi.enableComponentScanner();
 
       const eager1 = tsdi.get(EagerComponent1);
@@ -596,7 +595,7 @@ describe('TSDI', () => {
         @External()
         class ExternalClass {
           @Inject('prop')
-          private _prop!: boolean;
+          private readonly _prop!: boolean;
 
           public get prop(): boolean { return this._prop; }
         }

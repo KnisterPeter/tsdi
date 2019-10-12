@@ -1,3 +1,4 @@
+// tslint:disable: no-implicit-dependencies
 import { assert } from 'chai';
 import 'source-map-support/register';
 import { component, initialize, inject, TSDI } from '../lib/tsdi';
@@ -14,7 +15,7 @@ describe('TSDI', () => {
       if (
         args.length > 0 &&
         typeof args[0] === 'string' &&
-        (args[0] as string).indexOf('deprecated') > -1
+        (args[0]).indexOf('deprecated') > -1
       ) {
         return;
       }
