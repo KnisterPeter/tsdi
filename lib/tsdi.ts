@@ -1,15 +1,8 @@
+import debug from 'debug';
 import 'reflect-metadata';
-import {
-  ComponentListener,
-  addListener,
-  removeListener
-} from './global-state';
-import {
-  isFactoryMetadata,
-  findIndexOf
-} from './helper';
+import { addListener, ComponentListener, removeListener } from './global-state';
+import { findIndexOf, isFactoryMetadata } from './helper';
 
-import * as debug from 'debug';
 const log = debug('tsdi');
 
 export type Constructable<T> = { new(...args: any[]): T; };
@@ -383,9 +376,9 @@ export class TSDI {
       __tsdi__mock__: 'This is a TSDI automock'
     };
     const proto = constructor.prototype;
-    Object.keys(proto).forEach(property => {
+    Object.getOwnPropertyNames(proto).forEach(property => {
       if (typeof proto[property] === 'function') {
-          (automock as any)[property] = function(...args: any[]): any {
+        (automock as any)[property] = function(...args: any[]): any {
             return args;
           };
         }
@@ -499,8 +492,9 @@ export class TSDI {
 }
 
 export { component, Component } from './component';
-export { external, External } from './external';
-export { inject, Inject } from './inject';
-export { initialize, Initialize } from './initialize';
 export { destroy, Destroy } from './destroy';
+export { external, External } from './external';
 export { factory, Factory } from './factory';
+export { initialize, Initialize } from './initialize';
+export { inject, Inject } from './inject';
+

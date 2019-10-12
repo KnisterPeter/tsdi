@@ -1,6 +1,6 @@
+import debug from 'debug';
 import { addKnownExternal } from './global-state';
 
-import * as debug from 'debug';
 const log = debug('tsdi');
 
 export function External<TFunction extends Function>(target: TFunction): TFunction;
