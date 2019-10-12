@@ -2,7 +2,6 @@ import { assert } from 'chai';
 import 'source-map-support/register';
 import { component, initialize, inject, TSDI } from '../lib/tsdi';
 
-
 let origWarn: (...args: any[]) => void;
 
 describe('TSDI', () => {
