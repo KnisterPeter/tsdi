@@ -61,7 +61,6 @@
     "typescript": "3.6.4"
   },
   "dependencies": {
-    "debug": "4.1.1",
     "reflect-metadata": "0.1.13"
   },
   "prettier": {

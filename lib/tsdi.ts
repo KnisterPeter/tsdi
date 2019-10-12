@@ -1,5 +1,5 @@
-import debug from 'debug';
 import 'reflect-metadata';
+import { debug } from './debug';
 import { addListener, ComponentListener, removeListener } from './global-state';
 import { findIndexOf, isFactoryMetadata } from './helper';
 

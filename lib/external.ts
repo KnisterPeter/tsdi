@@ -1,4 +1,4 @@
-import debug from 'debug';
+import { debug } from './debug';
 import { addKnownExternal } from './global-state';
 
 const log = debug('tsdi');

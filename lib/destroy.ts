@@ -1,4 +1,4 @@
-import debug from 'debug';
+import { debug } from './debug';
 const log = debug('tsdi');
 
 export function Destroy(target: Object, propertyKey: string): void;
