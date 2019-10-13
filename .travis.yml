@@ -17,7 +17,5 @@ cache:
     - 'node_modules'
 
 before_script: 'yarn linter'
-script:
-  - 'yarn build'
-  - 'yarn test'
+script: 'yarn test'
 after_script: 'yarn coverage'
