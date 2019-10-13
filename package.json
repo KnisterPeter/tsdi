@@ -19,7 +19,7 @@
     "clean": "rimraf .nyc_output coverage dist dist-tests",
     "prebuild": "yarn clean",
     "build": "microbundle",
-    "pretest": "yarn build && tsc --project ./tests/tsconfig.json",
+    "pretest": "tsc --project ./tests/tsconfig.json",
     "test": "nyc --reporter=text --reporter=lcov mocha dist-tests",
     "prerelease": "git checkout master && git pull origin master && yarn test && yarn build",
     "release": "standard-version",
@@ -55,6 +55,7 @@
     "nyc": "12.0.1",
     "prettier": "1.18.2",
     "rimraf": "3.0.0",
+    "shipjs": "^0.6.0",
     "standard-version": "7.0.0",
     "tslint": "5.20.0",
     "typescript": "3.6.4"
