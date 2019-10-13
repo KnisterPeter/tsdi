@@ -21,11 +21,9 @@
     "build": "microbundle",
     "pretest": "tsc --project ./tests/tsconfig.json",
     "test": "nyc --reporter=text --reporter=lcov mocha dist-tests",
-    "prerelease": "git checkout master && git pull origin master && yarn test && yarn build",
-    "release": "standard-version",
-    "postrelease": "git push --follow-tags origin master && npm publish",
-    "#precoverage": "yarn clean && tsc --inlineSourceMap",
-    "coverage": "nyc report --reporter=lcov && codecov"
+    "coverage": "nyc report --reporter=lcov && codecov",
+    "release:prepare": "shipjs prepare",
+    "release:trigger": "shipjs trigger"
   },
   "author": {
     "name": "Markus Wolf",
@@ -56,7 +54,6 @@
     "prettier": "1.18.2",
     "rimraf": "3.0.0",
     "shipjs": "^0.6.0",
-    "standard-version": "7.0.0",
     "tslint": "5.20.0",
     "typescript": "3.6.4"
   },
