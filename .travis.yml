@@ -1,8 +1,8 @@
 sudo: false
 language: node_js
 node_js:
-- stable
-- '10'
+  - 'stable'
+  - '10'
 matrix:
   fast_finish: true
 branches:
@@ -14,8 +14,10 @@ notifications:
     on_success: never
 cache:
   directories:
-  - node_modules
+    - 'node_modules'
 
 before_script: 'yarn linter'
-script: 'yarn test'
+script:
+  - 'yarn build'
+  - 'yarn test'
 after_script: 'yarn coverage'
