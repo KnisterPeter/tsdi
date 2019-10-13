@@ -1,0 +1,15 @@
+{
+  "version-0.20.0-docs": {
+    "TSDI": [
+      "version-0.20.0-getting-started",
+      "version-0.20.0-features",
+      "version-0.20.0-alternative-syntax"
+    ]
+  },
+  "version-0.20.0-api": {
+    "API": [
+      "version-0.20.0-api-tsdi",
+      "version-0.20.0-api-lifecyclelistener"
+    ]
+  }
+}
