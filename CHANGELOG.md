@@ -8,10 +8,6 @@
 
 
 
-# Change Log
-
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
-
 <a name="0.20.3"></a>
 ## [0.20.3](https://github.com/KnisterPeter/tsdi/compare/v0.20.2...v0.20.3) (2018-06-04)
 
