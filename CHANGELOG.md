@@ -1,3 +1,13 @@
+<a name="0.21.0"></a>
+# [0.21.0](https://github.com/KnisterPeter/tsdi/compare/v0.20.3...v0.21.0) (2019-10-13)
+
+
+### Features
+
+* bundle with microbundle ([1a9bd4e](https://github.com/KnisterPeter/tsdi/commit/1a9bd4e))
+
+
+
 # Change Log
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
