@@ -21,6 +21,22 @@ jobs:
         with:
           token: ${{secrets.CODECOV_TOKEN}}
 
+  integration:
+    runs-on: ubuntu-latest
+    name: Integration tests
+    steps:
+      - uses: actions/checkout@v1
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - run: npm install -g yarn
+      - run: yarn install
+      - run: yarn cypress:run --record --key ${{secrets.CYPRESS_KEY}}
+        env:
+          CI: true
+          COMMIT_INFO_BRANCH: ${GITHUB_REF}
+
   linter:
     runs-on: ubuntu-latest
     name: Linter

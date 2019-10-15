@@ -26,7 +26,7 @@
     "coverage": "nyc report --reporter=lcov && codecov",
     "integration": "tsc --project ./tests/integration/tsconfig.json",
     "precypress:run": "yarn build && yarn integration",
-    "cypress:run": "node ./dist-tests/integration/cypress run",
+    "cypress:run": "node ./dist-tests/integration/cypress run $@",
     "precypress:open": "yarn integration",
     "cypress:open": "node ./dist-tests/integration/cypress open",
     "release:prepare": "shipjs prepare",
