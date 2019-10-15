@@ -16,12 +16,19 @@
   "scripts": {
     "linter": "tslint --project ./tsconfig.json",
     "linter:tests": "tslint --project ./tests/tsconfig.json",
+    "linter:integration": "tslint --project ./tests/integration/tsconfig.json",
     "clean": "rimraf .nyc_output coverage dist dist-tests",
     "prebuild": "yarn clean",
-    "build": "microbundle",
+    "build": "microbundle build",
+    "build:watch": "microbundle watch & tsc --project ./tests/tsconfig.json --watch & tsc --project ./tests/integration/tsconfig.json --watch",
     "pretest": "yarn build && tsc --project ./tests/tsconfig.json",
     "test": "nyc --reporter=text --reporter=lcov mocha dist-tests",
     "coverage": "nyc report --reporter=lcov && codecov",
+    "integration": "tsc --project ./tests/integration/tsconfig.json",
+    "precypress:run": "yarn build && yarn integration",
+    "cypress:run": "node ./dist-tests/integration/cypress run",
+    "precypress:open": "yarn integration",
+    "cypress:open": "node ./dist-tests/integration/cypress open",
     "release:prepare": "shipjs prepare",
     "release:trigger": "shipjs trigger"
   },
@@ -43,6 +50,7 @@
     "@types/debug": "4.1.5",
     "@types/mocha": "5.2.7",
     "@types/node": "12.7.12",
+    "@types/shelljs": "^0.8.5",
     "chai": "4.2.0",
     "codecov": "3.6.1",
     "cz-conventional-changelog": "3.0.2",
@@ -53,11 +61,14 @@
     "nyc": "14.1.1",
     "prettier": "1.18.2",
     "rimraf": "3.0.0",
+    "shelljs": "^0.8.3",
     "shipjs": "0.6.0",
     "tslint": "5.20.0",
-    "typescript": "3.6.4"
+    "typescript": "3.6.4",
+    "wait-on": "^3.3.0"
   },
   "dependencies": {
+    "cypress": "^3.4.1",
     "reflect-metadata": "0.1.13"
   },
   "prettier": {
@@ -75,8 +86,11 @@
     "lib/**/*.{ts,tsx}": [
       "yarn linter"
     ],
-    "tests/**/*.{ts,tsx}": [
+    "tests/!(integration)/**/*.{ts,tsx}": [
       "yarn linter:tests"
+    ],
+    "tests/integration/**/*.{ts,tsx}": [
+      "yarn linter:integration"
     ]
   },
   "nyc": {
