@@ -100,7 +100,8 @@
       "lcovonly"
     ],
     "extends": "@istanbuljs/nyc-config-typescript",
-    "all": true,
+    "#fixme": "https://github.com/istanbuljs/istanbuljs/issues/413",
+    "#all": true,
     "exclude": [
       "dist-tests",
       "wallaby.js",
