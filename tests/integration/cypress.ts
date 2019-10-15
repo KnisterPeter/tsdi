@@ -1,11 +1,13 @@
 // tslint:disable-next-line: no-implicit-dependencies
 import { exec } from 'shelljs';
 
+const [, , command, ...args] = process.argv;
+
 try {
   run('npx http-server -p 9876 .', true);
   run('yarn wait-on http://localhost:9876/dist/index.js');
 
-  run(`yarn cypress ${process.argv[2]}`);
+  run(`yarn cypress ${command} ${args.join(' ')}`);
 } finally {
   run('pkill --full "npx http-server -p 9876"');
 }

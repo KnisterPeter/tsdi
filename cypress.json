@@ -1,4 +1,5 @@
 {
+  "projectId": "osbnyw",
   "baseUrl": "http://localhost:9876",
   "testFiles": "**/*.spec.js",
   "integrationFolder": "dist-tests/integration",
