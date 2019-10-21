@@ -15,7 +15,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - run: npm install -g pnpm
-      - run: pnpm run install
+      - run: pnpm install
       - run: pnpm run test
       - uses: codecov/codecov-action@v1.0.2
         with:
@@ -31,7 +31,7 @@ jobs:
         with:
           node-version: 12
       - run: npm install -g pnpm
-      - run: pnpm run install
+      - run: pnpm install
       - run: pnpm run cypress:run --record --key ${{secrets.CYPRESS_KEY}}
         env:
           CI: true
@@ -47,5 +47,5 @@ jobs:
         with:
           node-version: 12
       - run: npm install -g pnpm
-      - run: pnpm run install
+      - run: pnpm install
       - run: pnpm run linter
