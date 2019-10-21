@@ -25,7 +25,7 @@
     "test": "nyc mocha dist-tests",
     "coverage": "codecov",
     "integration": "tsc --project ./tests/integration/tsconfig.json",
-    "precypress:run": "pnpm run build && pnpm run integration --",
+    "precypress:run": "pnpm run build && pnpm run integration",
     "cypress:run": "node ./dist-tests/integration/cypress run $@",
     "precypress:open": "pnpm run integration",
     "cypress:open": "node ./dist-tests/integration/cypress open",
