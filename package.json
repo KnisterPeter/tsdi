@@ -18,16 +18,16 @@
     "linter:tests": "tslint --project ./tests/tsconfig.json",
     "linter:integration": "tslint --project ./tests/integration/tsconfig.json",
     "clean": "rimraf .nyc_output coverage dist dist-tests",
-    "prebuild": "yarn clean",
+    "prebuild": "pnpm run clean",
     "build": "microbundle build",
     "build:watch": "microbundle watch & tsc --project ./tests/tsconfig.json --watch & tsc --project ./tests/integration/tsconfig.json --watch",
-    "pretest": "yarn build && tsc --project ./tests/tsconfig.json",
+    "pretest": "pnpm run build && tsc --project ./tests/tsconfig.json",
     "test": "nyc mocha dist-tests",
     "coverage": "codecov",
     "integration": "tsc --project ./tests/integration/tsconfig.json",
-    "precypress:run": "yarn build && yarn integration",
+    "precypress:run": "pnpm run build && pnpm run integration",
     "cypress:run": "node ./dist-tests/integration/cypress run $@",
-    "precypress:open": "yarn integration",
+    "precypress:open": "pnpm run integration",
     "cypress:open": "node ./dist-tests/integration/cypress open",
     "release:prepare": "shipjs prepare",
     "release:trigger": "shipjs trigger"
@@ -84,13 +84,13 @@
       "prettier --list-different"
     ],
     "lib/**/*.{ts,tsx}": [
-      "yarn linter"
+      "pnpm run linter"
     ],
     "tests/!(integration)/**/*.{ts,tsx}": [
-      "yarn linter:tests"
+      "pnpm run linter:tests"
     ],
     "tests/integration/**/*.{ts,tsx}": [
-      "yarn linter:integration"
+      "pnpm run linter:integration"
     ]
   },
   "nyc": {

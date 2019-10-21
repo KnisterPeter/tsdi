@@ -22,7 +22,7 @@ Easy dependency injection for TypeScript.
 Install as npm package:
 
 ```sh
-$ yarn add tsdi
+$ yarn add tsdi -S
 ```
 
 or

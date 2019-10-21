@@ -6,29 +6,29 @@ contributing, please read the
 
 ## Developing
 
-TSDI is built for Node 6 and up but we develop using Node 10 and yarn. You can check this with `node -v`.
+TSDI is built for Node 10 and up but we develop using Node 12 and pnpm. You can check this with `node -v`.
 
-Make sure that Yarn is installed with version >= `1.6.0`.
-Installation instructions can be found here: https://yarnpkg.com/en/docs/install.
+Make sure that pnpm is installed with version >= `4.0.0`.
+Installation instructions can be found here: https://github.com/pnpm/pnpm#install.
 
 ### Setup
 
 ```sh
 $ git clone https://github.com/KnisterPeter/tsdi
 $ cd tsdi
-$ yarn
+$ pnpm install
 ```
 
 Then you can either run:
 
 ```sh
-$ yarn build
+$ pnpm run build
 ```
 
 to build TSDI **once** or:
 
 ```sh
-$ yarn build:watch
+$ pnpm run build:watch
 ```
 
 to have TSDI build itself and incrementally build files on change.
@@ -38,17 +38,17 @@ to have TSDI build itself and incrementally build files on change.
 You can run lint via:
 
 ```sh
-$ yarn linter
+$ pnpm run linter
 ```
 
 You can run tests via:
 
 ```sh
-$ yarn test
+$ pnpm run test
 ```
 
 or enable debug output via:
 
 ```sh
-$ DEBUG='tsdi' yarn test
+$ DEBUG='tsdi' pnpm run test
 ```

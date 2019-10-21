@@ -10,7 +10,7 @@ Getting started with TSDI as dependency injection container in your project.
 Install as npm package:
 
 ```sh
-$ yarn add tsdi
+$ yarn add tsdi -S
 ```
 
 or

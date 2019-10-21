@@ -14,9 +14,9 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node }}
-      - run: npm install -g yarn
-      - run: yarn install
-      - run: yarn test
+      - run: npm install -g pnpm
+      - run: pnpm run install
+      - run: pnpm run test
       - uses: codecov/codecov-action@v1.0.2
         with:
           token: ${{secrets.CODECOV_TOKEN}}
@@ -30,9 +30,9 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 12
-      - run: npm install -g yarn
-      - run: yarn install
-      - run: yarn cypress:run --record --key ${{secrets.CYPRESS_KEY}}
+      - run: npm install -g pnpm
+      - run: pnpm run install
+      - run: pnpm run cypress:run --record --key ${{secrets.CYPRESS_KEY}}
         env:
           CI: true
           COMMIT_INFO_BRANCH: ${GITHUB_REF}
@@ -46,6 +46,6 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 12
-      - run: npm install -g yarn
-      - run: yarn install
-      - run: yarn linter
+      - run: npm install -g pnpm
+      - run: pnpm run install
+      - run: pnpm run linter

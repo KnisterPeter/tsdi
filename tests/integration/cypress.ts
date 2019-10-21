@@ -5,9 +5,9 @@ const [, , command, ...args] = process.argv;
 
 try {
   run('npx http-server -p 9876 .', true);
-  run('yarn wait-on http://localhost:9876/dist/index.js');
+  run('./node_modules/.bin/wait-on http://localhost:9876/dist/index.js');
 
-  run(`yarn cypress ${command} ${args.join(' ')}`);
+  run(`./node_modules/.bin/cypress ${command} ${args.join(' ')}`);
 } finally {
   run('pkill --full "npx http-server -p 9876"');
 }
