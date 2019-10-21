@@ -32,7 +32,7 @@ jobs:
           node-version: 12
       - run: npm install -g pnpm
       - run: pnpm install
-      - run: pnpm run cypress:run --record --key ${{secrets.CYPRESS_KEY}}
+      - run: pnpm run cypress:run -- --record --key ${{secrets.CYPRESS_KEY}}
         env:
           CI: true
           COMMIT_INFO_BRANCH: ${GITHUB_REF}
