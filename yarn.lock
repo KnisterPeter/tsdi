@@ -156,6 +156,13 @@
     core-js "^2.6.5"
     regenerator-runtime "^0.13.2"
 
+"@babel/runtime@^7.6.3":
+  version "7.6.3"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.6.3.tgz#935122c74c73d2240cafd32ddb5fc2a6cd35cf1f"
+  integrity sha512-kq6anf9JGjW8Nt5rYfEuGRaEAaH1mkv3Bbu6rYvLOpPh/RusSJXuKPEAoZ7L7gybZkchE8+NV5g9vKF4AGAtsA==
+  dependencies:
+    regenerator-runtime "^0.13.2"
+
 "@babel/template@^7.1.0", "@babel/template@^7.4.0", "@babel/template@^7.6.0":
   version "7.6.0"
   resolved "https://registry.yarnpkg.com/@babel/template/-/template-7.6.0.tgz#7f0159c7f5012230dad64cca42ec9bdb5c9536e6"
@@ -1396,16 +1403,16 @@ conventional-changelog-atom@^2.0.3:
   dependencies:
     q "^1.5.1"
 
-conventional-changelog-cli@2.0.23:
-  version "2.0.23"
-  resolved "https://registry.yarnpkg.com/conventional-changelog-cli/-/conventional-changelog-cli-2.0.23.tgz#3f6b2bb3e1e6a6f520f7fa514fe8fba2d92faab0"
-  integrity sha512-a/jDZHEUpSHQMAqeDrmrFhz9CKHBKhBGpJyc38BCfNjFA1RKchpq/Qqbo1BZwRLWrW/PX7IGsUicTyhniqUH9g==
+conventional-changelog-cli@2.0.25:
+  version "2.0.25"
+  resolved "https://registry.yarnpkg.com/conventional-changelog-cli/-/conventional-changelog-cli-2.0.25.tgz#911e4dc67a6455f387a0657a49186aea5d3a86ad"
+  integrity sha512-b0zNygHrFI4HjNmgPzDLSqoltIwo3pIfilWZFNH/1w6QIZoZHeA4SxojRgih9aCc0Eeg1RH7lXIPaRgHa9cv7A==
   dependencies:
     add-stream "^1.0.0"
-    conventional-changelog "^3.1.10"
+    conventional-changelog "^3.1.12"
     lodash "^4.14.14"
     meow "^4.0.0"
-    tempfile "^1.1.1"
+    tempfile "^3.0.0"
 
 conventional-changelog-codemirror@^2.0.3:
   version "2.0.3"
@@ -1499,7 +1506,7 @@ conventional-changelog-writer@^4.0.9:
     split "^1.0.0"
     through2 "^3.0.0"
 
-conventional-changelog@^3.1.10:
+conventional-changelog@^3.1.12:
   version "3.1.12"
   resolved "https://registry.yarnpkg.com/conventional-changelog/-/conventional-changelog-3.1.12.tgz#ede5b6803cfa8af6c7ea97e54ce5519508903afb"
   integrity sha512-zyGKwii8Z5zOq1nGFm5jn9Ou1jQ6UBoRT0+nqBIU8fEzh64+AcVxrY97tVuK77Ati0xwpBiFHpDXAW7pkq1jEw==
@@ -4488,7 +4495,7 @@ os-homedir@^2.0.0:
   resolved "https://registry.yarnpkg.com/os-homedir/-/os-homedir-2.0.0.tgz#a0c76bb001a8392a503cbd46e7e650b3423a923c"
   integrity sha512-saRNz0DSC5C/I++gFIaJTXoFJMRwiP5zHar5vV3xQ2TkgEw6hDCcU5F272JjUylpiVgBrZNQHnfjkLabTfb92Q==
 
-os-tmpdir@^1.0.0, os-tmpdir@~1.0.2:
+os-tmpdir@~1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/os-tmpdir/-/os-tmpdir-1.0.2.tgz#bbe67406c79aa85c5cfec766fe5734555dfa1274"
   integrity sha1-u+Z0BseaqFxc/sdm/lc0VV36EnQ=
@@ -6175,6 +6182,11 @@ shebang-regex@^3.0.0:
   resolved "https://registry.yarnpkg.com/shebang-regex/-/shebang-regex-3.0.0.tgz#ae16f1644d873ecad843b0307b143362d4c42172"
   integrity sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==
 
+shell-quote@^1.7.2:
+  version "1.7.2"
+  resolved "https://registry.yarnpkg.com/shell-quote/-/shell-quote-1.7.2.tgz#67a7d02c76c9da24f99d20808fcaded0e0e04be2"
+  integrity sha512-mRz/m/JVscCrkMyPqHc/bczi3OQHkLTqXHEFu0zDhK/qfv3UcOA4SVmRCLmos4bhjr9ekVQubj/R7waKapmiQg==
+
 shelljs@0.8.3:
   version "0.8.3"
   resolved "https://registry.yarnpkg.com/shelljs/-/shelljs-0.8.3.tgz#a7f3319520ebf09ee81275b2368adb286659b097"
@@ -6184,29 +6196,32 @@ shelljs@0.8.3:
     interpret "^1.0.0"
     rechoir "^0.6.2"
 
-shipjs-lib@0.6.0:
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/shipjs-lib/-/shipjs-lib-0.6.0.tgz#12a727d62e5d47c497a74fe0a608a9143892c4d3"
-  integrity sha512-QqRpWuI1PdRGSTdEzx+GRZzEDRcnCfXnkVpMac8PsucrWKt481aTpkaTk6HHzTX0fqbd5H7pqg8OUuoGyUZjYg==
+shipjs-lib@0.7.1:
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/shipjs-lib/-/shipjs-lib-0.7.1.tgz#fb239e596ec13289e39669f2dd0dc3c57f292873"
+  integrity sha512-T6NC0gz5jkcJB6obVRPukereDwJTypQE11k7ZNMymKc2u4KXdW6MgBAOZw9Xj6ibF3Yv54lb16qq2lfiZhnbxQ==
   dependencies:
     dotenv "^8.1.0"
     parse-github-url "1.0.2"
     semver "6.3.0"
     shelljs "0.8.3"
 
-shipjs@0.6.0:
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/shipjs/-/shipjs-0.6.0.tgz#e104ac66643fb3888572be870c42acdaae23e470"
-  integrity sha512-juQ+K1OzqlO5JFt70Vd+X1UsuYuDdxEVioDKzxUiH7+Iq/4xfzeErbTdWsUNDlXIhwdZEcXmZ8ZcbICynpIydA==
+shipjs@0.7.1:
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/shipjs/-/shipjs-0.7.1.tgz#db1ae8871152d841435a6781df33977c7742cf6b"
+  integrity sha512-mhvPZZqKcVAeCM+FFGiPfovNOUM6GTVf23Z9eA1qfDXVsCk3YzOvv8PXRnyRYkuJo1xEEJYiViAwV9dtBDxSRw==
   dependencies:
+    "@babel/runtime" "^7.6.3"
     "@slack/webhook" "^5.0.1"
     arg "4.1.1"
     chalk "2.4.2"
     change-case "3.1.0"
-    conventional-changelog-cli "2.0.23"
+    conventional-changelog-cli "2.0.25"
     esm "3.2.25"
+    globby "^10.0.1"
     inquirer "7.0.0"
-    shipjs-lib "0.6.0"
+    shell-quote "^1.7.2"
+    shipjs-lib "0.7.1"
     temp-write "4.0.0"
 
 signal-exit@^3.0.0, signal-exit@^3.0.2:
@@ -6634,6 +6649,11 @@ temp-dir@^1.0.0:
   resolved "https://registry.yarnpkg.com/temp-dir/-/temp-dir-1.0.0.tgz#0a7c0ea26d3a39afa7e0ebea9c1fc0bc4daa011d"
   integrity sha1-CnwOom06Oa+n4OvqnB/AvE2qAR0=
 
+temp-dir@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/temp-dir/-/temp-dir-2.0.0.tgz#bde92b05bdfeb1516e804c9c00ad45177f31321e"
+  integrity sha512-aoBAniQmmwtcKp/7BzsH8Cxzv8OL736p7v1ihGb5e9DJ9kTwGWHrQrVB5+lfVDzfGrdRzXch+ig7LHaY1JTOrg==
+
 temp-write@4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/temp-write/-/temp-write-4.0.0.tgz#cd2e0825fc826ae72d201dc26eef3bf7e6fc9320"
@@ -6645,13 +6665,13 @@ temp-write@4.0.0:
     temp-dir "^1.0.0"
     uuid "^3.3.2"
 
-tempfile@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/tempfile/-/tempfile-1.1.1.tgz#5bcc4eaecc4ab2c707d8bc11d99ccc9a2cb287f2"
-  integrity sha1-W8xOrsxKsscH2LwR2ZzMmiyyh/I=
+tempfile@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/tempfile/-/tempfile-3.0.0.tgz#5376a3492de7c54150d0cc0612c3f00e2cdaf76c"
+  integrity sha512-uNFCg478XovRi85iD42egu+eSFUmmka750Jy7L5tfHI5hQKKtbPnxaSaXAbBqCDYrw3wx4tXjKwci4/QmsZJxw==
   dependencies:
-    os-tmpdir "^1.0.0"
-    uuid "^2.0.1"
+    temp-dir "^2.0.0"
+    uuid "^3.3.2"
 
 terser@^3.8.2:
   version "3.17.0"
@@ -6944,11 +6964,6 @@ util.promisify@~1.0.0:
   dependencies:
     define-properties "^1.1.2"
     object.getownpropertydescriptors "^2.0.3"
-
-uuid@^2.0.1:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-2.0.3.tgz#67e2e863797215530dff318e5bf9dcebfd47b21a"
-  integrity sha1-Z+LoY3lyFVMN/zGOW/nc6/1Hsho=
 
 uuid@^3.3.2:
   version "3.3.3"
