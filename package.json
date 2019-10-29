@@ -116,5 +116,21 @@
       "commit-msg": "commitlint -e $GIT_PARAMS",
       "pre-commit": "lint-staged"
     }
+  },
+  "renovate": {
+    "extends": [
+      "config:base"
+    ],
+    "lockFileMaintenance": {
+      "enabled": true
+    },
+    "packageRules": [
+      {
+        "packagePatterns": [
+          "^@types/"
+        ],
+        "automerge": true
+      }
+    ]
   }
 }
