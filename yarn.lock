@@ -6244,20 +6244,20 @@ shelljs@0.8.3:
     interpret "^1.0.0"
     rechoir "^0.6.2"
 
-shipjs-lib@0.8.0:
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/shipjs-lib/-/shipjs-lib-0.8.0.tgz#611f5db1ff8879a905b0eaee2c6fe79ede5fdc6f"
-  integrity sha512-yqfGP44ozfQm6tDfaGAlm8IdxwOyV66hQ9fxj+5ur25iSehwxDBYRGRitzRy8HKV0hzYxJnEw/ZYUor16ri/3A==
+shipjs-lib@0.8.1:
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/shipjs-lib/-/shipjs-lib-0.8.1.tgz#8790c4665a4b744bcc2ebdcb354b32e869ac8695"
+  integrity sha512-hZnMf8/SW0ggIwKbkveXz7fD1s2jrT89x5KgNo14trFL13OyKey2WyAl4uxBtnMMDMWrnEkeD85SXlnrvWaQew==
   dependencies:
     dotenv "^8.1.0"
     parse-github-url "1.0.2"
     semver "6.3.0"
     shelljs "0.8.3"
 
-shipjs@0.8.0:
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/shipjs/-/shipjs-0.8.0.tgz#63ffed07caea888a1dd0bd70286f6a936736c006"
-  integrity sha512-mhkksBGqUvXURULPHCF5SFmSypFj9ytDWDWfU3+b6U8kdiAd2HLhk1oC5KfCEZ9gCmr4A6ayDu8HSmK7LHd1QQ==
+shipjs@0.8.1:
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/shipjs/-/shipjs-0.8.1.tgz#4be9569f97d9a2d499eb7ff79631d64728894536"
+  integrity sha512-BtnaGk7zNlKcsn6Ji7XVE/atmm1d35Z9NAyk8LOIYn41F5zoGnOVb5g4BRHN3P+iJ3Na40KrpACYKUanLwC3XQ==
   dependencies:
     "@babel/runtime" "^7.6.3"
     "@slack/webhook" "^5.0.1"
@@ -6272,7 +6272,7 @@ shipjs@0.8.0:
     mkdirp "^0.5.1"
     prettier "^1.18.2"
     shell-quote "^1.7.2"
-    shipjs-lib "0.8.0"
+    shipjs-lib "0.8.1"
     temp-write "4.0.0"
 
 signal-exit@^3.0.0, signal-exit@^3.0.2:
