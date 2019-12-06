@@ -58,6 +58,8 @@
     "chai": "4.2.0",
     "codecov": "3.6.1",
     "cypress": "3.6.1",
+    "fkill": "^6.2.0",
+    "get-port": "^5.0.0",
     "husky": "3.1.0",
     "lint-staged": "9.4.3",
     "microbundle": "0.11.0",
@@ -113,7 +115,7 @@
   },
   "husky": {
     "hooks": {
-      "commit-msg": "commitlint -e $GIT_PARAMS",
+      "commit-msg": "commitlint --env HUSKY_GIT_PARAMS",
       "pre-commit": "lint-staged"
     }
   },
