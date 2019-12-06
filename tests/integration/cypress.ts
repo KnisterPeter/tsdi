@@ -1,16 +1,34 @@
-// tslint:disable-next-line: no-implicit-dependencies
+// tslint:disable: no-implicit-dependencies
+import fkill from 'fkill';
+import getPort from 'get-port';
 import { exec } from 'shelljs';
 
 const [, , command, ...args] = process.argv;
 
-try {
-  run('npx http-server -p 9876 .', true);
-  run('yarn wait-on http://localhost:9876/dist/index.js');
+// tslint:disable-next-line: space-before-function-paren
+(async () => {
+  const port = await getPort({ port: 9876 });
+  try {
+    run(`npx http-server -p ${port} .`, true);
+    run(`yarn wait-on http://localhost:${port}/dist/index.js`);
 
-  run(`yarn cypress ${command} ${args.join(' ')}`);
-} finally {
-  run('pkill --full "npx http-server -p 9876"');
-}
+    run(
+      `npx cross-env CYPRESS_baseUrl=http://localhost:${port} yarn cypress ${command} ${args.join(
+        ' '
+      )}`
+    );
+  } finally {
+    try {
+      await fkill(`:${port}`);
+    } catch (e) {
+      console.warn(e);
+    }
+  }
+})().catch(e => {
+  setImmediate(() => {
+    throw e;
+  });
+});
 
 function run(command: string, async = false): void {
   const result = exec(command, { async });
