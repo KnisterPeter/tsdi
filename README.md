@@ -1,5 +1,6 @@
 > tsdi
 
+[![Github Workflow](https://github.com/knisterpeter/tsdi/workflows/Build%20and%20Test/badge.svg)](https://github.com/KnisterPeter/tsdi/actions)
 [![npm](https://img.shields.io/npm/v/tsdi.svg)](https://www.npmjs.com/package/tsdi)
 [![GitHub license](https://img.shields.io/github/license/KnisterPeter/tsdi.svg)]()
 [![codecov](https://codecov.io/gh/KnisterPeter/tsdi/branch/master/graph/badge.svg)](https://codecov.io/gh/KnisterPeter/tsdi)
