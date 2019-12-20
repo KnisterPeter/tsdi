@@ -1,3 +1,19 @@
+# [0.22.0](https://github.com/KnisterPeter/tsdi/compare/v0.21.0...v0.22.0) (2019-12-20)
+
+
+### Bug Fixes
+
+* move cypress to dev dependencies ([a298fba](https://github.com/KnisterPeter/tsdi/commit/a298fba61e33e9daf72f468aee0a097a513056b2))
+* remove cz-conventional-changelog ([0e75308](https://github.com/KnisterPeter/tsdi/commit/0e753084077b4bb1c96c8e313374fa653d85bb6e))
+
+
+### Features
+
+* add cypress github integration ([553998d](https://github.com/KnisterPeter/tsdi/commit/553998d8c5d42f2ac6b1c97c3b9d0aba5613580d))
+* add umd test and browser tests ([ef6495e](https://github.com/KnisterPeter/tsdi/commit/ef6495e08a1a710f5817b300845156453b0a1317))
+
+
+
 <a name="0.21.0"></a>
 # [0.21.0](https://github.com/KnisterPeter/tsdi/compare/v0.20.3...v0.21.0) (2019-10-13)
 
