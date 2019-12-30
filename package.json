@@ -48,7 +48,7 @@
     "@commitlint/cli": "8.2.0",
     "@commitlint/config-conventional": "8.2.0",
     "@commitlint/travis-cli": "8.2.0",
-    "@istanbuljs/nyc-config-typescript": "1.0.0",
+    "@istanbuljs/nyc-config-typescript": "1.0.1",
     "@knisterpeter/standard-tslint": "1.7.2",
     "@types/chai": "4.2.7",
     "@types/debug": "4.1.5",
