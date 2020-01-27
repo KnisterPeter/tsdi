@@ -68,7 +68,7 @@
     "prettier": "1.19.1",
     "rimraf": "3.0.0",
     "shelljs": "0.8.3",
-    "shipjs": "0.14.0",
+    "shipjs": "0.14.1",
     "tslint": "5.20.1",
     "typescript": "3.7.5",
     "wait-on": "4.0.0"
