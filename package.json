@@ -56,7 +56,7 @@
     "@types/node": "12.12.21",
     "@types/shelljs": "0.8.6",
     "chai": "4.2.0",
-    "codecov": "3.6.2",
+    "codecov": "3.6.4",
     "cypress": "3.8.3",
     "fkill": "6.2.0",
     "get-port": "5.1.1",
