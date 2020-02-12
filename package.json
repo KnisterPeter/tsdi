@@ -58,7 +58,7 @@
     "chai": "4.2.0",
     "codecov": "3.6.5",
     "cypress": "4.0.1",
-    "fkill": "6.2.0",
+    "fkill": "7.0.0",
     "get-port": "5.1.1",
     "husky": "4.2.3",
     "lint-staged": "10.0.7",
