@@ -60,7 +60,7 @@
     "cypress": "4.3.0",
     "fkill": "7.0.0",
     "get-port": "5.1.1",
-    "husky": "4.2.4",
+    "husky": "4.2.5",
     "lint-staged": "10.1.3",
     "microbundle": "0.11.0",
     "mocha": "7.1.1",
