@@ -57,7 +57,7 @@
     "@types/shelljs": "0.8.7",
     "chai": "4.2.0",
     "codecov": "3.6.5",
-    "cypress": "4.4.0",
+    "cypress": "4.4.1",
     "fkill": "7.0.0",
     "get-port": "5.1.1",
     "husky": "4.2.5",
