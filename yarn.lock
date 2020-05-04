@@ -2919,10 +2919,10 @@ find-versions@^3.2.0:
   dependencies:
     semver-regex "^2.0.0"
 
-fkill@7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/fkill/-/fkill-7.0.0.tgz#33f0e1a314df097735b5985df12b29577563b29e"
-  integrity sha512-i61SqvPdfCxl1/VQulh9SXrC+4dudCtINzTHbKaEx3Jr0kD9SvxKDeXzej7Saurnj3al/jMJwQnsUc62VrBMHQ==
+fkill@7.0.1:
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/fkill/-/fkill-7.0.1.tgz#5f764986c260ead323ea9083acbc3138ed506387"
+  integrity sha512-rziuWzpWErC2aGQUuvGo9dcVBDeHowK9g75u4fnkTCAqPgvUVRMtlDW6KWsWonxY1tjF+p1mIys33yNvLRlAtw==
   dependencies:
     aggregate-error "^3.0.0"
     arrify "^2.0.1"
