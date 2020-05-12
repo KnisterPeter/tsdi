@@ -70,7 +70,7 @@
     "shelljs": "0.8.4",
     "shipjs": "0.19.0",
     "tslint": "6.1.2",
-    "typescript": "3.8.3",
+    "typescript": "3.9.2",
     "wait-on": "5.0.0"
   },
   "dependencies": {
