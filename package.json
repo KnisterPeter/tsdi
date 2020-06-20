@@ -62,7 +62,7 @@
     "get-port": "5.1.1",
     "husky": "4.2.5",
     "lint-staged": "10.2.11",
-    "microbundle": "0.12.1",
+    "microbundle": "0.12.2",
     "mocha": "8.0.1",
     "nyc": "15.1.0",
     "prettier": "2.0.5",
