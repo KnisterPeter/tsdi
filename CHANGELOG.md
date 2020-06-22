@@ -1,3 +1,12 @@
+## [0.22.1](https://github.com/KnisterPeter/tsdi/compare/v0.22.0...v0.22.1) (2020-06-22)
+
+
+### Bug Fixes
+
+* remove mergeStrategy ([#996](https://github.com/KnisterPeter/tsdi/issues/996)) ([7309226](https://github.com/KnisterPeter/tsdi/commit/730922695435607cba165f4a8063e2aeff0099db))
+
+
+
 # [0.22.0](https://github.com/KnisterPeter/tsdi/compare/v0.21.0...v0.22.0) (2019-12-20)
 
 
