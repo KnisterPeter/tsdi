@@ -71,7 +71,7 @@
     "shipjs": "0.20.1",
     "tslint": "6.1.2",
     "typescript": "3.9.6",
-    "wait-on": "5.0.1"
+    "wait-on": "5.0.2"
   },
   "dependencies": {
     "reflect-metadata": "0.1.13"
