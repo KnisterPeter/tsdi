@@ -4585,6 +4585,11 @@ lodash@4.17.15, lodash@^4.17.13, lodash@^4.17.15:
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
   integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
 
+lodash@^4.17.18:
+  version "4.17.18"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.18.tgz#5c5f072c5c02f386378dd3f6325b529376210427"
+  integrity sha512-au4L1q0HKcaaa37qOdpWWhwzDnB/taYJfRiKULnaT+Ml9UaBIjJ2SOJMeLtSeeLT+zUdyFMm0+ts+j4eeuUpIA==
+
 log-symbols@3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/log-symbols/-/log-symbols-3.0.0.tgz#f3a08516a5dea893336a7dee14d18a1cfdab77c4"
@@ -7331,14 +7336,14 @@ vlq@^0.2.2:
   resolved "https://registry.yarnpkg.com/vlq/-/vlq-0.2.3.tgz#8f3e4328cf63b1540c0d67e1b2778386f8975b26"
   integrity sha512-DRibZL6DsNhIgYQ+wNdWDL2SL3bKPlVrRiBqV5yuMm++op8W4kGFtaQfCs4KEJn0wBZcHVHJ3eoywX8983k1ow==
 
-wait-on@5.0.1:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/wait-on/-/wait-on-5.0.1.tgz#7dadfe83c36fdf034de996a41aa094af5cf23077"
-  integrity sha512-TxzkYIfRWK1hLc9IlUh9bE1mrvIIM3ptPRKQ86Z8Qo0tBQLCHEvWzkRD1Ge4FWprKflHOnAtqIBH2nKmib/lrg==
+wait-on@5.0.2:
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/wait-on/-/wait-on-5.0.2.tgz#1b78f7111aa72949eddcf9b443661a8d4144e721"
+  integrity sha512-c4NqepdinnIfnZ7Vz70xUu9QgAr6Lj3fVCgUR947jdNW1VRtI34H80DQkTPR0NWCev2gh0+0OqQYr+FaswIFvg==
   dependencies:
     "@hapi/joi" "^17.1.1"
     axios "^0.19.2"
-    lodash "^4.17.15"
+    lodash "^4.17.18"
     minimist "^1.2.5"
     rxjs "^6.5.5"
 
