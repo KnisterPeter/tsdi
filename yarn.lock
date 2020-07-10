@@ -7336,10 +7336,10 @@ vlq@^0.2.2:
   resolved "https://registry.yarnpkg.com/vlq/-/vlq-0.2.3.tgz#8f3e4328cf63b1540c0d67e1b2778386f8975b26"
   integrity sha512-DRibZL6DsNhIgYQ+wNdWDL2SL3bKPlVrRiBqV5yuMm++op8W4kGFtaQfCs4KEJn0wBZcHVHJ3eoywX8983k1ow==
 
-wait-on@5.0.3:
-  version "5.0.3"
-  resolved "https://registry.yarnpkg.com/wait-on/-/wait-on-5.0.3.tgz#763789f77a548bba318a256211f49fae04dc8065"
-  integrity sha512-0v3rQfJfLNVxZS0UP9lSYYMRUh8M+RgtkiSoPQOi7+QOlbG8XeY2uD0OE+rDeG/cJ35n1xMihuweSbjt1uB17w==
+wait-on@5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/wait-on/-/wait-on-5.1.0.tgz#b697f21c6fea0908b9c7ad6ed56ace4736768b66"
+  integrity sha512-JM0kgaE+V0nCDvSl72iM05W8NDt2E2M56WC5mzR7M+T+k6xjt2yYpyom+xA8RasSunFGzbxIpAXbVzXqtweAnA==
   dependencies:
     "@hapi/joi" "^17.1.1"
     axios "^0.19.2"
