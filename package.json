@@ -47,7 +47,7 @@
   "devDependencies": {
     "@commitlint/cli": "9.0.1",
     "@commitlint/config-conventional": "9.1.1",
-    "@commitlint/travis-cli": "9.0.1",
+    "@commitlint/travis-cli": "9.1.1",
     "@istanbuljs/nyc-config-typescript": "1.0.1",
     "@knisterpeter/standard-tslint": "1.7.2",
     "@types/chai": "4.2.11",
