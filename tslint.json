@@ -2,7 +2,8 @@
   "extends": "@knisterpeter/standard-tslint",
   "rules": {
     "ban-types": false,
-    "trailing-comma": false,
-    "space-before-function-paren": false
+    "max-line-length": false,
+    "space-before-function-paren": false,
+    "trailing-comma": false
   }
 }
