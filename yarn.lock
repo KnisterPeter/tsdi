@@ -1334,9 +1334,9 @@
     any-observable "^0.3.0"
 
 "@slack/types@^1.2.1":
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/@slack/types/-/types-1.8.0.tgz#a5a0b31bace03f524174991dfc41c60311e6f32f"
-  integrity sha512-YvLCtxqbIdCCI+xMQBFH3GJVhRp8jJNl8BUE0RgJlZcDF+wXSB1wkcgLz7zHtD3oOF39GedYiE1e/rQrZ4Dr1A==
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/@slack/types/-/types-1.9.0.tgz#aa8f90b2f66ac54a77e42606644366f93cff4871"
+  integrity sha512-RmwgMWqOtzd2JPXdiaD/tyrDD0vtjjRDFdxN1I3tAxwBbg4aryzDUVqFc8na16A+3Xik/UN8X1hvVTw8J4EB9w==
 
 "@slack/webhook@^5.0.1":
   version "5.0.3"
