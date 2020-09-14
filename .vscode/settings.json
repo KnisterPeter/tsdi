@@ -1,4 +1,7 @@
 {
   "github.autoPublish": true,
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "todo-tree.filtering.excludeGlobs": [
+    "dist-tests/**"
+  ]
 }

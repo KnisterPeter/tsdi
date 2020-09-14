@@ -428,11 +428,11 @@ export class TSDI {
       );
       if (hasAsyncInitializers) {
         return Promise.all(
-          injects.map((inject) => {
-            const [metadata, idx] = this.getInjectComponentMetadata(inject);
-            const injectedComponent = this.getOrCreate(metadata, idx);
-            return this.getInitializerPromise(injectedComponent);
-          })
+          injects.map((inject) =>
+            this.getInitializerPromise(
+              this.getOrCreate(...this.getInjectComponentMetadata(inject))
+            )
+          )
         );
       }
     }
