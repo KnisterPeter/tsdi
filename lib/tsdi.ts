@@ -239,6 +239,19 @@ export class TSDI {
           componentMetadata.fn.prototype
         );
       }
+    } else {
+      // is the factory async?...
+      const isAsync = Reflect.getMetadata(
+        'component:init:async',
+        componentMetadata.target.constructor.prototype
+      ) as boolean;
+
+      // ...then the resulting component is as well!
+      Reflect.defineMetadata(
+        'component:init:async',
+        isAsync,
+        componentMetadata.rtti.prototype
+      );
     }
   }
 
@@ -334,6 +347,16 @@ export class TSDI {
     );
   }
 
+  private getOrCreateFactory(metadata: FactoryMetadata): any {
+    return this.get(metadata.target.constructor as Constructable<any>);
+  }
+
+  private hasAsyncFactoryInitializer(metadata: FactoryMetadata): boolean {
+    const factory = this.getOrCreateFactory(metadata);
+    const awaiter = this.getInitializerPromise(factory);
+    return Boolean(awaiter);
+  }
+
   private getOrCreate<T>(metadata: ComponentOrFactoryMetadata, idx: number): T {
     log('> getOrCreate %o', metadata);
     let instance = this.instances[idx] as T;
@@ -344,9 +367,8 @@ export class TSDI {
           metadata.rtti.name,
           metadata.options
         );
-        instance = this.get(metadata.target.constructor as Constructable<any>)[
-          metadata.property
-        ]();
+        const factory = this.getOrCreateFactory(metadata);
+        instance = factory[metadata.property]();
         this.instances[idx] = instance;
       } else {
         instance = this.createComponent(metadata, idx);
@@ -428,11 +450,13 @@ export class TSDI {
       );
       if (hasAsyncInitializers) {
         return Promise.all(
-          injects.map((inject) =>
-            this.getInitializerPromise(
-              this.getOrCreate(...this.getInjectComponentMetadata(inject))
-            )
-          )
+          injects.map((inject) => {
+            const [metadata, idx] = this.getInjectComponentMetadata(inject);
+            const instance = isFactoryMetadata(metadata)
+              ? this.getOrCreateFactory(metadata)
+              : this.getOrCreate(metadata, idx);
+            return this.getInitializerPromise(instance);
+          })
         );
       }
     }
@@ -504,7 +528,10 @@ export class TSDI {
 
     const isAsyncInjection = this.isAsyncInitializerDependency(inject);
 
-    if (!isAsyncInjection && (inject.options.lazy || inject.options.dynamic)) {
+    const notAsyncButLazyOrDynamic = () =>
+      !isAsyncInjection && (inject.options.lazy || inject.options.dynamic);
+
+    if (notAsyncButLazyOrDynamic()) {
       const tsdi = this;
       Object.defineProperty(instance, inject.property, {
         configurable: true,
@@ -536,6 +563,8 @@ export class TSDI {
           return instance[inject.property];
         },
       });
+    } else if (this.isAsyncFactoryInjection(inject)) {
+      this.createAsyncFactoryInjection(instance, inject);
     } else {
       instance[inject.property] = this.getComponentDependency(
         inject,
@@ -545,10 +574,56 @@ export class TSDI {
     }
   }
 
+  private createAsyncFactoryInjection(
+    instance: any,
+    inject: InjectMetadata
+  ): void {
+    const [metadata] = this.getInjectComponentMetadata(inject);
+    if (!isFactoryMetadata(metadata)) {
+      throw new Error(
+        'Illegal state: async factory injection without factory metadata'
+      );
+    }
+
+    const factory = this.getOrCreateFactory(metadata);
+    const awaiter = this.getInitializerPromise(factory);
+    let ready = false;
+    if (awaiter) {
+      // tslint:disable-next-line: no-floating-promises
+      awaiter.then(() => {
+        ready = true;
+      });
+    }
+
+    Object.defineProperty(instance, inject.property, {
+      configurable: true,
+      enumerable: true,
+      get(): any {
+        if (ready) {
+          const value = factory[metadata.property]();
+          Object.defineProperty(instance, inject.property, {
+            enumerable: true,
+            value,
+          });
+          return value;
+        }
+        throw new Error('Illegal state: need to wait for factory to resolve');
+      },
+    });
+  }
+
+  private isAsyncFactoryInjection(inject: InjectMetadata): boolean {
+    const [metadata] = this.getInjectComponentMetadata(inject);
+    return isFactoryMetadata(metadata)
+      ? this.hasAsyncFactoryInitializer(metadata)
+      : false;
+  }
+
   private isAsyncInitializerDependency(inject: InjectMetadata): boolean {
     const [metadata] = this.getInjectComponentMetadata(inject);
+
     const async = isFactoryMetadata(metadata)
-      ? false
+      ? this.hasAsyncFactoryInitializer(metadata)
       : (Reflect.getMetadata(
           'component:init:async',
           metadata.fn.prototype
