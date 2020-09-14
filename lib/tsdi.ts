@@ -341,7 +341,7 @@ export class TSDI {
       if (isFactoryMetadata(metadata)) {
         log(
           'create %o from factory with %o',
-          (metadata.rtti as any).name,
+          metadata.rtti.name,
           metadata.options
         );
         instance = this.get(metadata.target.constructor as Constructable<any>)[
@@ -378,8 +378,8 @@ export class TSDI {
         `required scope '${metadata.options.scope}' is not enabled`
       );
     }
-    log('create %o with %o', (metadata.fn as any).name, metadata.options);
-    const constructor: Constructable<T> = metadata.fn as any;
+    log('create %o with %o', metadata.fn.name, metadata.options);
+    const constructor: Constructable<T> = metadata.fn;
     const parameters = this.getConstructorParameters(metadata);
     const instance = new constructor(...parameters);
     // note: This stores an incomplete instance (injects/properties/...)
@@ -446,7 +446,7 @@ export class TSDI {
     );
   }
 
-  public configureExternal<T>(args: any[], target: any): T {
+  public configureExternal<T>(args: unknown[], target: any): T {
     const parameters = this.getConstructorParameters({
       fn: target,
       options: {},
@@ -611,9 +611,7 @@ export class TSDI {
     if (!this.instances[idx]) {
       const mock = this.createAutoMock(component);
       if (!mock) {
-        throw new Error(
-          `Failed to create mock from ${(component as any).name}`
-        );
+        throw new Error(`Failed to create mock from ${component.name}`);
       }
       this.instances[idx] = mock;
     }
@@ -629,16 +627,13 @@ export class TSDI {
     );
     if (injectIdx === -1) {
       this.checkAndThrowDependencyError(inject);
-      injectIdx = this.getComponentMetadataIndex(
-        inject.type,
-        (inject.type as any).name
-      );
+      injectIdx = this.getComponentMetadataIndex(inject.type, inject.type.name);
     }
     const injectMetadata = this.components[injectIdx];
     if (!injectMetadata) {
       throw new Error(
         `Failed to get inject '${inject.options.name}' for ` +
-          `'${(inject.target.constructor as any).name}#${inject.property}'`
+          `'${inject.target.constructor.name}#${inject.property}'`
       );
     }
     return [injectMetadata, injectIdx];
@@ -671,27 +666,21 @@ export class TSDI {
   private checkAndThrowDependencyError(inject: InjectMetadata): void {
     if (inject.type && inject.options.name) {
       const e = new Error(
-        `Injecting undefined type on ${
-          (inject.target.constructor as any).name
-        }` +
+        `Injecting undefined type on ${inject.target.constructor.name}` +
           `#${inject.property}: Component named '${inject.options.name}' not found`
       );
       log(e);
       log(
         'Known Components: %o',
         this.components.map((component) =>
-          isFactoryMetadata(component)
-            ? (component.rtti as any).name
-            : (component.fn as any).name
+          isFactoryMetadata(component) ? component.rtti.name : component.fn.name
         )
       );
       throw e;
     }
     if (!inject.type || inject.options.name) {
       const e = new Error(
-        `Injecting undefined type on ${
-          (inject.target.constructor as any).name
-        }` +
+        `Injecting undefined type on ${inject.target.constructor.name}` +
           `#${inject.property}: Probably a cyclic dependency, switch to name based injection`
       );
       log(e);
@@ -704,7 +693,7 @@ export class TSDI {
   public get<T>(componentOrHint: Constructable<T> | string, hint?: string): T {
     let component: Constructable<T> | undefined;
     if (typeof componentOrHint === 'string') {
-      hint = componentOrHint as any;
+      hint = componentOrHint;
       component = undefined;
     } else {
       component = componentOrHint;
