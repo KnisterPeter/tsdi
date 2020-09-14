@@ -12,7 +12,7 @@ import {
   initialize,
   Inject,
   inject,
-  TSDI
+  TSDI,
 } from '../dist/';
 import { Cyclic1 } from './cyclic1';
 import { Dependency } from './dependency';
@@ -137,13 +137,13 @@ describe('TSDI', () => {
       assert.equal(tsdi.get(A, 'Bar').m(), 'c');
     });
 
-    it('should warn if register component with duplicate name', done => {
+    it('should warn if register component with duplicate name', (done) => {
       class A {}
       class B {}
 
       const consoleWarn = console.warn;
       try {
-        console.warn = function(msg: string): void {
+        console.warn = function (msg: string): void {
           assert.equal(
             msg,
             "Component with name 'DuplicateComponentName' already registered."
@@ -172,7 +172,7 @@ describe('TSDI', () => {
       assert.equal(tsdi.get(ComponentWithProperties).prop, false);
     });
 
-    it('should throw if requried component was not found', () => {
+    it('should throw if required component was not found', () => {
       @Component()
       class NonRegisteredComponent {}
       try {
@@ -198,7 +198,7 @@ describe('TSDI', () => {
       assert.strictEqual(tsdi.get(ComponentWithContainerDependency).prop, tsdi);
     });
 
-    it('should call the initalizer', () => {
+    it('should call the initializer', () => {
       tsdi.enableComponentScanner();
 
       let called = false;
@@ -215,7 +215,7 @@ describe('TSDI', () => {
       assert.isTrue(called);
     });
 
-    it('should call the initializer after multiple async dependencies are initialized', done => {
+    it('should call the initializer after multiple async dependencies are initialized', (done) => {
       tsdi.enableComponentScanner();
 
       @component
@@ -224,7 +224,7 @@ describe('TSDI', () => {
 
         @initialize
         protected async init(): Promise<void> {
-          return new Promise<void>(resolve => {
+          return new Promise<void>((resolve) => {
             setTimeout(() => {
               this.value = 10;
               resolve();
@@ -260,7 +260,7 @@ describe('TSDI', () => {
       tsdi.get(Dependent);
     });
 
-    it('should call the initializer after  async dependencies w/o initializers are initialized', done => {
+    it('should call the initializer after async dependencies w/o initializers are initialized', (done) => {
       tsdi.enableComponentScanner();
 
       @component
@@ -269,7 +269,7 @@ describe('TSDI', () => {
 
         @initialize
         protected async init(): Promise<void> {
-          return new Promise<void>(resolve => {
+          return new Promise<void>((resolve) => {
             setTimeout(() => {
               this.value = 10;
               resolve();
@@ -298,17 +298,17 @@ describe('TSDI', () => {
       tsdi.get(Dependent);
     });
 
-    it('should call the initalizer if all injections are itself initialized', done => {
+    it('should call the initializer if all injections are itself initialized', (done) => {
       // this case test the case with async initializers
 
-      let testValue: number | undefined;
+      let testValue: number | undefined = undefined;
 
       @component
       class Dependency {
         public value?: number;
         @initialize
         protected async init(): Promise<void> {
-          return new Promise<void>(resolve => {
+          return new Promise<void>((resolve) => {
             setTimeout(() => {
               this.value = 10;
               resolve();
@@ -318,9 +318,9 @@ describe('TSDI', () => {
       }
       tsdi.register(Dependency);
 
-      @component({eager: true})
+      @component({ eager: true })
       class Dependent {
-        @inject private dependency!: Dependency;
+        @inject private readonly dependency!: Dependency;
 
         @initialize
         protected init(): void {
@@ -329,10 +329,14 @@ describe('TSDI', () => {
       }
       tsdi.register(Dependent);
 
+      // note: we need to test the value here, since the init method
+      // is called multiple times (by different tests), since the
+      // component is declared as eager and therefore created from
+      // other tests after it has been registered here
       setTimeout(() => {
         assert.equal(testValue, 10);
         done();
-      }, 15);
+      }, 30);
     });
 
     it('should throw if async initializer dependency is injected dynamically', () => {
@@ -344,7 +348,7 @@ describe('TSDI', () => {
         public value?: number;
         @initialize
         protected async init(): Promise<void> {
-          return new Promise<void>(resolve => {
+          return new Promise<void>((resolve) => {
             setTimeout(() => {
               this.value = 10;
               resolve();
@@ -355,7 +359,7 @@ describe('TSDI', () => {
 
       @component
       class Dependent {
-        @inject({dynamic: true}) private dependency!: Dependency;
+        @inject({ dynamic: true }) private readonly dependency!: Dependency;
 
         @initialize
         protected init(): void {
@@ -365,8 +369,10 @@ describe('TSDI', () => {
         }
       }
 
-      assert.throws(() => tsdi.get(Dependent),
-        'Injecting Dependency into Dependent#dependency must not be dynamic since Dependency has an async initializer');
+      assert.throws(
+        () => tsdi.get(Dependent),
+        'Injecting Dependency into Dependent#dependency must not be dynamic since Dependency has an async initializer'
+      );
     });
 
     it('should inject annotated constructor parameters', () => {
@@ -552,12 +558,12 @@ describe('TSDI', () => {
       const instances = (tsdi as any).instances;
       const injected = Object.keys(instances)
         .map((key: string) => instances[key])
-        .filter(instance => instance instanceof Injected);
+        .filter((instance) => instance instanceof Injected);
       assert.lengthOf(injected, 0);
       assert.isDefined(component.dependency);
     });
 
-    it('should create eager components as soon as possible', done => {
+    it('should create eager components as soon as possible', (done) => {
       tsdi.enableComponentScanner();
       let count = 0;
 
@@ -576,7 +582,7 @@ describe('TSDI', () => {
       }, 1);
     });
 
-    it('should respect dependency tree for eager creation', done => {
+    it('should respect dependency tree for eager creation', (done) => {
       tsdi.enableComponentScanner();
 
       const eager1 = tsdi.get(EagerComponent1);
@@ -599,7 +605,7 @@ describe('TSDI', () => {
           if (component instanceof Component) {
             count++;
           }
-        }
+        },
       });
       tsdi.get(Component);
 
@@ -617,7 +623,7 @@ describe('TSDI', () => {
           if (component instanceof Component) {
             count++;
           }
-        }
+        },
       });
       tsdi.get(Component);
       tsdi.close();
@@ -906,7 +912,7 @@ describe('TSDI', () => {
         assert.isFalse(destructorCalled);
       });
 
-      it('should warn user if statically injecting scoped component into unscoped component', done => {
+      it('should warn user if statically injecting scoped component into un-scoped component', (done) => {
         tsdi.enableComponentScanner();
 
         // @ts-ignore
@@ -922,7 +928,7 @@ describe('TSDI', () => {
 
         const consoleWarn = console.warn;
         try {
-          console.warn = function(msg: string): void {
+          console.warn = function (msg: string): void {
             // tslint:disable-next-line:prefer-template
             assert.equal(
               msg,
@@ -958,7 +964,7 @@ describe('TSDI', () => {
 
         const consoleWarn = console.warn;
         try {
-          console.warn = function(): void {
+          console.warn = function (): void {
             assert.fail();
           };
           tsdi.getScope('scope').enter();
@@ -973,7 +979,7 @@ describe('TSDI', () => {
   });
 
   describe('without container instance', () => {
-    it('a created instance should not have dependencies satisified', () => {
+    it('a created instance should not have dependencies satisfied', () => {
       const comp: User = new User();
       assert.throw(comp.method);
     });
@@ -983,7 +989,7 @@ describe('TSDI', () => {
       comp['dependency'] = {
         echo(): string {
           return 'world';
-        }
+        },
       };
       assert.equal(comp.method(), 'world');
     });
