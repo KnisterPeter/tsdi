@@ -86,20 +86,20 @@ export class TSDI {
   constructor() {
     this.registerComponent({
       fn: TSDI,
-      options: {}
+      options: {},
     });
     this.instances[0] = this;
   }
 
   public addLifecycleListener(lifecycleListener: LifecycleListener): void {
     this.lifecycleListeners.push(lifecycleListener);
-    Object.keys(this.instances).forEach(idx => {
+    Object.keys(this.instances).forEach((idx) => {
       this.notifyOnCreate(this.instances[parseInt(idx, 10)]);
     });
   }
 
   private notifyOnCreate(component: any): void {
-    this.lifecycleListeners.forEach(l => {
+    this.lifecycleListeners.forEach((l) => {
       if (l.onCreate) {
         l.onCreate(component);
       }
@@ -107,7 +107,7 @@ export class TSDI {
   }
 
   private notifyOnDestroy(component: any): void {
-    this.lifecycleListeners.forEach(l => {
+    this.lifecycleListeners.forEach((l) => {
       if (l.onDestroy) {
         l.onDestroy(component);
       }
@@ -119,7 +119,7 @@ export class TSDI {
   }
 
   public close(): void {
-    Object.keys(this.instances).forEach(key => {
+    Object.keys(this.instances).forEach((key) => {
       const idx = parseInt(key, 10);
       const metadata = this.components[idx];
       if (!isFactoryMetadata(metadata)) {
@@ -185,7 +185,7 @@ export class TSDI {
         componentMetadata.options.name &&
         findIndexOf(
           this.components,
-          meta => meta.options.name === componentMetadata.options.name
+          (meta) => meta.options.name === componentMetadata.options.name
         ) > -1
       ) {
         console.warn(
@@ -216,8 +216,8 @@ export class TSDI {
       fn: component,
       options: {
         ...options,
-        name: name || options.name
-      }
+        name: name || options.name,
+      },
     });
   }
 
@@ -283,11 +283,11 @@ export class TSDI {
     if (parameterMetadata) {
       return parameterMetadata
         .sort((a, b) => a.index - b.index)
-        .map(parameter => ({
+        .map((parameter) => ({
           index: this.getComponentMetadataIndex(
             parameter.rtti,
             parameter.options.name
-          )
+          ),
         }))
         .map(({ index }) => this.getOrCreate(this.components[index], index));
     }
@@ -324,7 +324,10 @@ export class TSDI {
     return instance;
   }
 
-  private addInitializerPromise(instance: any, value: Promise<void> | undefined): void {
+  private addInitializerPromise(
+    instance: any,
+    value: Promise<void> | undefined
+  ): void {
     if (value) {
       Reflect.defineMetadata('tsdi:initialize:promise', value, instance);
     }
@@ -357,27 +360,47 @@ export class TSDI {
     if (init) {
       const awaiter = this.waitForInjectInitializers(metadata);
       if (awaiter) {
+        // todo: handle promise errors
+        // tslint:disable-next-line: no-floating-promises
         awaiter.then(() => {
-          this.addInitializerPromise(instance, (instance as any)[init].call(instance) || Promise.resolve());
+          this.addInitializerPromise(
+            instance,
+            (instance as any)[init].call(instance) || Promise.resolve()
+          );
         });
       } else {
-        this.addInitializerPromise(instance, (instance as any)[init].call(instance));
+        this.addInitializerPromise(
+          instance,
+          (instance as any)[init].call(instance)
+        );
       }
     }
     return instance;
   }
 
-  private waitForInjectInitializers(metadata: ComponentMetadata): Promise<void[]> | undefined {
-    const injects: InjectMetadata[] = Reflect.getMetadata('component:injects', metadata.fn.prototype);
+  private waitForInjectInitializers(
+    metadata: ComponentMetadata
+  ): Promise<void[]> | undefined {
+    const injects: InjectMetadata[] = Reflect.getMetadata(
+      'component:injects',
+      metadata.fn.prototype
+    );
     if (injects) {
-      const initializers = injects.map(inject => {
-        const [metadata, idx] = this.getInjectComponentMetadata(inject);
-        // todo: check if injected component has async initializer
-        const injectedComponent = this.getOrCreate(metadata, idx);
-        return this.getInitializerPromise(injectedComponent);
-      });
-      if (initializers.some(initializer => Boolean(initializer))) {
-        return Promise.all(initializers);
+      const hasAsyncInitializers = injects.some(
+        (inject) =>
+          Reflect.getMetadata(
+            'component:init:async',
+            inject.type.prototype
+          ) as boolean
+      );
+      if (hasAsyncInitializers) {
+        return Promise.all(
+          injects.map((inject) => {
+            const [metadata, idx] = this.getInjectComponentMetadata(inject);
+            const injectedComponent = this.getOrCreate(metadata, idx);
+            return this.getInitializerPromise(injectedComponent);
+          })
+        );
       }
     }
     return undefined;
@@ -393,7 +416,7 @@ export class TSDI {
   public configureExternal<T>(args: any[], target: any): T {
     const parameters = this.getConstructorParameters({
       fn: target,
-      options: {}
+      options: {},
     });
     const instance = new target(...args, ...parameters);
     this.injectIntoInstance(instance, true, { fn: target, options: {} });
@@ -469,7 +492,7 @@ export class TSDI {
           }
           Object.defineProperty(instance, inject.property, {
             enumerable: true,
-            value
+            value,
           });
           log(
             'lazy-resolved injected property %s.%s <- %o',
@@ -478,9 +501,16 @@ export class TSDI {
             instance[inject.property]
           );
           return instance[inject.property];
-        }
+        },
       });
     } else {
+      if (isAsyncInjection) {
+        Reflect.defineMetadata(
+          'component:init:async',
+          true,
+          instance.constructor.prototype
+        );
+      }
       instance[inject.property] = this.getComponentDependency(
         inject,
         componentMetadata,
@@ -493,10 +523,14 @@ export class TSDI {
     const [metadata] = this.getInjectComponentMetadata(inject);
     const async = isFactoryMetadata(metadata)
       ? false
-      : Reflect.getMetadata('component:init:async', metadata.fn.prototype) as boolean;
+      : (Reflect.getMetadata(
+          'component:init:async',
+          metadata.fn.prototype
+        ) as boolean);
     if (async && inject.options.dynamic) {
-      throw new Error(`Injecting ${inject.type.name} into ${inject.target.constructor.name}#${inject.property
-        } must not be dynamic since ${inject.type.name} has an async initializer`);
+      throw new Error(
+        `Injecting ${inject.type.name} into ${inject.target.constructor.name}#${inject.property} must not be dynamic since ${inject.type.name} has an async initializer`
+      );
     }
     return async;
   }
@@ -527,12 +561,12 @@ export class TSDI {
       return undefined;
     }
     const automock = {
-      __tsdi__mock__: 'This is a TSDI automock'
+      __tsdi__mock__: 'This is a TSDI automock',
     };
     const proto = constructor.prototype;
-    Object.getOwnPropertyNames(proto).forEach(property => {
+    Object.getOwnPropertyNames(proto).forEach((property) => {
       if (typeof proto[property] === 'function') {
-        (automock as any)[property] = function(...args: any[]): any {
+        (automock as any)[property] = function (...args: any[]): any {
           return args;
         };
       }
@@ -619,7 +653,7 @@ export class TSDI {
       log(e);
       log(
         'Known Components: %o',
-        this.components.map(component =>
+        this.components.map((component) =>
           isFactoryMetadata(component)
             ? (component.rtti as any).name
             : (component.fn as any).name
@@ -673,16 +707,16 @@ export class TSDI {
         delete self.scopes[name];
         self.components
           .filter(
-            metadata =>
+            (metadata) =>
               !isFactoryMetadata(metadata) && metadata.options.scope === name
           )
-          .forEach(metadata => {
+          .forEach((metadata) => {
             const idx = self.getComponentMetadataIndex(
               isFactoryMetadata(metadata) ? metadata.rtti : metadata.fn
             );
             self.destroyInstance(idx, metadata);
           });
-      }
+      },
     };
   }
 }
