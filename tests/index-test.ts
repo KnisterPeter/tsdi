@@ -256,7 +256,6 @@ describe('TSDI', () => {
         }
       }
 
-      // todo: this must throw because Dependent is async
       tsdi.get(Dependent);
     });
 
@@ -294,7 +293,6 @@ describe('TSDI', () => {
         }
       }
 
-      // todo: this must throw because Dependent is async
       tsdi.get(Dependent);
     });
 
