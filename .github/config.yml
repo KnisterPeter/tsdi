@@ -1,0 +1,4 @@
+todo:
+  label: ['todo']
+  reopenClosed: true
+  exclude: '\.vscode/.*'
