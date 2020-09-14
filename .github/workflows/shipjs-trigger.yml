@@ -1,4 +1,3 @@
-
 name: Ship js trigger
 on:
   push:
@@ -7,12 +6,12 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: Ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
       - uses: actions/setup-node@master
         with:
-          registry-url: "https://registry.npmjs.org"
+          registry-url: 'https://registry.npmjs.org'
       - run: git switch master
       - run: |
           if [ -f "yarn.lock" ]; then
@@ -24,4 +23,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-    
