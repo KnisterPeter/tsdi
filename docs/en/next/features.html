@@ -1,18 +1,51 @@
-<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Features · TSDI</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="## Component Scanner"/><meta name="docsearch:version" content="next"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Features · TSDI"/><meta property="og:type" content="website"/><meta property="og:url" content="https://tsdi.js.org/index.html"/><meta property="og:description" content="## Component Scanner"/><meta property="og:image" content="https://tsdi.js.org/img/puzzle.png"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://tsdi.js.org/img/puzzle.png"/><link rel="shortcut icon" href="/img/puzzle.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><link rel="stylesheet" href="/css/main.css"/></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/en"><img class="logo" src="/img/puzzle.png" alt="TSDI"/><h2 class="headerTitleWithLogo">TSDI</h2></a><a href="/en/versions.html"><h3>next</h3></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/docs/en/next/getting-started.html" target="_self">Docs</a></li><li class=""><a href="/docs/en/next/api-tsdi.html" target="_self">API</a></li><li class=""><a href="https://github.com/KnisterPeter/tsdi" target="_self">GitHub</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="container docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><i></i></div><h2><i>›</i><span>TSDI</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">TSDI</h3><ul><li class="navListItem"><a class="navItem" href="/docs/en/next/getting-started.html">Getting Started</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/docs/en/next/features.html">Features</a></li><li class="navListItem"><a class="navItem" href="/docs/en/next/externals.html">Externals</a></li><li class="navListItem"><a class="navItem" href="/docs/en/next/alternative-syntax.html">Alternative Syntax</a></li></ul></div></div></section></div><script>
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Features · TSDI</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="## Component Scanner"/><meta name="docsearch:version" content="next"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Features · TSDI"/><meta property="og:type" content="website"/><meta property="og:url" content="https://tsdi.js.org/index.html"/><meta property="og:description" content="## Component Scanner"/><meta property="og:image" content="https://tsdi.js.org/img/puzzle.png"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://tsdi.js.org/img/puzzle.png"/><link rel="shortcut icon" href="/img/puzzle.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/en"><img class="logo" src="/img/puzzle.png" alt="TSDI"/><h2 class="headerTitleWithLogo">TSDI</h2></a><a href="/en/versions.html"><h3>next</h3></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/docs/en/next/getting-started.html" target="_self">Docs</a></li><li class=""><a href="/docs/en/next/api-tsdi.html" target="_self">API</a></li><li class=""><a href="https://github.com/KnisterPeter/tsdi" target="_self">GitHub</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>TSDI</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">TSDI</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/en/next/getting-started.html">Getting Started</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/docs/en/next/features.html">Features</a></li><li class="navListItem"><a class="navItem" href="/docs/en/next/externals.html">Externals</a></li><li class="navListItem"><a class="navItem" href="/docs/en/next/alternative-syntax.html">Alternative Syntax</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
             document.addEventListener('DOMContentLoaded', function() {
               createToggler('#navToggler', '#docsNav', 'docsSliderActive');
               createToggler('#tocToggler', 'body', 'tocActive');
 
-              const headings = document.querySelector('.toc-headings');
+              var headings = document.querySelector('.toc-headings');
               headings && headings.addEventListener('click', function(event) {
-                if (event.target.tagName === 'A') {
-                  document.body.classList.remove('tocActive');
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
                 }
               }, false);
 
               function createToggler(togglerSelector, targetSelector, className) {
                 var toggler = document.querySelector(togglerSelector);
                 var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
 
                 toggler.onclick = function(event) {
                   event.preventDefault();
@@ -21,7 +54,7 @@
                 };
               }
             });
-        </script></nav></div><div class="container mainContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 class="postHeaderTitle">Features</h1></header><article><div><span><h2><a class="anchor" aria-hidden="true" id="component-scanner"></a><a href="#component-scanner" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Component Scanner</h2>
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Features</h1></header><article><div><span><h2><a class="anchor" aria-hidden="true" id="component-scanner"></a><a href="#component-scanner" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Component Scanner</h2>
 <p>To automatically register all decorated components in a
 container instance the method <a href="/docs/en/next/api-tsdi.html#enablecomponentscanner"><code>enableComponentScanner()</code></a> need
 to be called on the instance.</p>
@@ -32,7 +65,7 @@ to be called on the instance.</p>
 <p>To hook into component creation and destruction there are two
 decorators available. <code>@initialize</code> and <code>@destroy</code>.
 They are call on the respective lifecycle event.</p>
-<pre><code class="hljs css languages- js"><span class="hljs-keyword">import</span> { component, initialize, destroy } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
+<pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> { component, initialize, destroy } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
 
 @component
 <span class="hljs-keyword">export</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">User</span> </span>{
@@ -56,7 +89,7 @@ They are call on the respective lifecycle event.</p>
 <h2><a class="anchor" aria-hidden="true" id="name-based-injection-hints"></a><a href="#name-based-injection-hints" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Name based injection (hints)</h2>
 <p>Instead of using the type of the component (the type of the class) as identifier for injection it is also possible to
 specify the name as a custom string as depicted in the following example:</p>
-<pre><code class="hljs css languages- js"><span class="hljs-keyword">import</span> { TSDI, Component, Inject } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
+<pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> { TSDI, Component, Inject } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
 
 @Component()
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">A</span> </span>{}
@@ -81,7 +114,7 @@ name based injection.</p>
 <h2><a class="anchor" aria-hidden="true" id="property-value-injection-configuration"></a><a href="#property-value-injection-configuration" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Property value injection (configuration)</h2>
 <p>In cases in which it is necessary to simply inject a single atomic value, as for example a config value, it is possible
 to define a property using <code>tsdi.addProperty(...)</code>. it can then be injected normally using name based injection.</p>
-<pre><code class="hljs css languages- js"><span class="hljs-keyword">import</span> { TSDI, Component, Inject } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
+<pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> { TSDI, Component, Inject } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
 
 @Component()
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">A</span> </span>{
@@ -97,7 +130,7 @@ tsdi.register(A);
 <p>You should not use property value injection to inject complex structures, objects or instances of classes. Consider
 using a <code>@Factory()</code> instead.</p>
 <h2><a class="anchor" aria-hidden="true" id="constructor-parameter-injection"></a><a href="#constructor-parameter-injection" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Constructor parameter injection</h2>
-<pre><code class="hljs css languages- js"><span class="hljs-keyword">import</span> { TSDI, Component, Inject } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
+<pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> { TSDI, Component, Inject } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
 
 @Component()
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">A</span> </span>{}
@@ -118,7 +151,7 @@ tsdi.get(C);
 <p>Sometimes it can be useful to inject a new instance of a Component everytime it is injected. In order to achieve this
 you can configure the component to not be singleton <code>{ singleton: false }</code> and a new instance will be created everytime
 it is retrieved or injected.</p>
-<pre><code class="hljs css languages- js"><span class="hljs-keyword">import</span> { TSDI, Component } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
+<pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> { TSDI, Component } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
 
 @Component({ <span class="hljs-attr">singleton</span>: <span class="hljs-literal">false</span> })
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">A</span> </span>{}
@@ -141,7 +174,7 @@ tsdi.enableComponentScanner();
 <p>In cases in which you need to be able to inject dependencies which are not just classes but objects (interfaces) or
 simply not maintained by you it is possible to define a <code>@Factory()</code> which creates these dependencies and makes them
 injectable:</p>
-<pre><code class="hljs css languages- js"><span class="hljs-keyword">import</span> { TSDI, Component, Factory } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
+<pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> { TSDI, Component, Factory } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">A</span> </span>{}
 
@@ -164,7 +197,7 @@ tsdi.get(A);
 <h2><a class="anchor" aria-hidden="true" id="lazy-injection"></a><a href="#lazy-injection" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Lazy injection</h2>
 <p>You can mark individual injections as <code>{ lazy: true }</code>, which will lead to the injected <code>@Component()</code>s being
 created only when they are first touched.</p>
-<pre><code class="hljs css languages- js"><span class="hljs-keyword">import</span> { TSDI, Component, Inject } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
+<pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> { TSDI, Component, Inject } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
 
 @Component()
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">A</span> </span>{
@@ -178,7 +211,7 @@ tsdi.register(A);
 <span class="hljs-built_in">console</span>.log(a.some); <span class="hljs-comment">// &lt;-- at this point some is created and return (on first property access)</span>
 </code></pre>
 <h2><a class="anchor" aria-hidden="true" id="lifecycle-listeners"></a><a href="#lifecycle-listeners" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Lifecycle listeners</h2>
-<pre><code class="hljs css languages- js"><span class="hljs-keyword">import</span> { TSDI, Component, Inject } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
+<pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> { TSDI, Component, Inject } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
 
 @component
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">A</span> </span>{
@@ -200,7 +233,7 @@ tsdi.close();
 <h2><a class="anchor" aria-hidden="true" id="eager-components"></a><a href="#eager-components" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Eager components</h2>
 <p>You can mark an individual <code>@Component()</code> as <code>{ eager: true }</code> which will make sure that this component
 is instanced as soon as it is discovered by TSDI.</p>
-<pre><code class="hljs css languages- js"><span class="hljs-keyword">import</span> { TSDI, Component, Inject } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
+<pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> { TSDI, Component, Inject } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
 
 @component({ <span class="hljs-attr">eager</span>: <span class="hljs-literal">true</span> })
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">A</span> </span>{}
@@ -212,7 +245,7 @@ tsdi.register(A); <span class="hljs-comment">// &lt;-- here the class A is insta
 <p>To inspect which component is created when and injected where one can enable debug logging by either
 set the environment variable <code>DEBUG</code> (node) or a localStorage key (browser) <code>debug</code> to <code>tsdi</code>.</p>
 <h2><a class="anchor" aria-hidden="true" id="automocks"></a><a href="#automocks" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Automocks</h2>
-<pre><code class="hljs css languages- js"><span class="hljs-keyword">import</span> { TSDI, component, inject, initialize } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
+<pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> { TSDI, component, inject, initialize } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
 
 @component
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Foo</span> </span>{
@@ -249,7 +282,7 @@ tsdi.get(Baz);
 <p>Scopes could be seen as lifecycle bounds for a managed dependency.
 By that it is meant that components with a defined scope are only as long as
 the scope is entered/valid.</p>
-<pre><code class="hljs css languages- js"><span class="hljs-keyword">import</span> { TSDI, component, destroy } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
+<pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> { TSDI, component, destroy } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
 
 @component({<span class="hljs-attr">scope</span>: <span class="hljs-string">'some-scope'</span>})
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Foo</span> </span>{
@@ -279,7 +312,7 @@ This means it is a dependency which could be come and go every moment and prior
 to access an application should check the availability.<br>
 This also means it could be dynamic dependencies which could could be injected
 in more static ones.</p>
-<pre><code class="hljs css languages- js"><span class="hljs-keyword">import</span> { TSDI, component, inject } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
+<pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> { TSDI, component, inject } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
 
 @component({<span class="hljs-attr">scope</span>: <span class="hljs-string">'some-scope'</span>})
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Foo</span> </span>{
@@ -310,7 +343,7 @@ bar.bar() <span class="hljs-comment">// &lt;-- this will be okay, since a new fo
 <h2><a class="anchor" aria-hidden="true" id="strictpropertyinitialization"></a><a href="#strictpropertyinitialization" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>StrictPropertyInitialization</h2>
 <p>The new <code>--strictPropertyInitialization</code> in TypeScript 2.7 could be used with TSDI by
 using the <em>definite assignment assertion modifiers</em>.</p>
-<pre><code class="hljs css languages- js"><span class="hljs-keyword">import</span> { component, inject } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
+<pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> { component, inject } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
 
 @component
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Foo</span> </span>{
@@ -323,17 +356,17 @@ using the <em>definite assignment assertion modifiers</em>.</p>
 }
 </code></pre>
 <h2><a class="anchor" aria-hidden="true" id="async-dependencies"></a><a href="#async-dependencies" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Async Dependencies</h2>
-<p>Components can have <code>@initialize</code> methods which are typed <code>async</code> or delcare <code>Promise</code> as return type.<br>
+<p>Components can have <code>@initialize</code> methods which are typed <code>async</code> or declare <code>Promise</code> as return type.<br>
 <strong>note</strong>: It is not sufficient to just return a <code>Promise</code> since then the typescript compiler <em>may</em>
 not detect the async nature of the method.</p>
 <p>When injected into another component the depending component's <code>@initialize</code> method will be called
-after the dependencies initializer has resolved. This is for example usefull when injecting a
-something like a database connecti#on which needs asynchroneous setup code:</p>
-<pre><code class="hljs css languages- js"><span class="hljs-keyword">import</span> { component, inject } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
+after the dependencies initializer has resolved. This is for example useful when injecting a
+something like a database connection which needs asynchronous setup code:</p>
+<pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> { component, inject } <span class="hljs-keyword">from</span> <span class="hljs-string">'tsdi'</span>;
 
 @component
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DatabaseConnection</span> </span>{
-  public connection?:
+  public connection?;
 
   @initialize
   private <span class="hljs-keyword">async</span> initialize() {
@@ -355,4 +388,22 @@ something like a database connecti#on which needs asynchroneous setup code:</p>
 <blockquote>
 <p>This does not work with dynamic injections and will throw an error. Please note that async injections can not be lazy and will not be lazy by default.</p>
 </blockquote>
-</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/en/next/getting-started.html">← Getting Started</a><a class="docs-next button" href="/docs/en/next/externals.html">Externals →</a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#component-scanner">Component Scanner</a></li><li><a href="#lifecycle-methods">Lifecycle methods</a></li><li><a href="#name-based-injection-hints">Name based injection (hints)</a></li><li><a href="#property-value-injection-configuration">Property value injection (configuration)</a></li><li><a href="#constructor-parameter-injection">Constructor parameter injection</a></li><li><a href="#singletons-vs-instances">Singletons vs. Instances</a></li><li><a href="#factories">Factories</a></li><li><a href="#lazy-injection">Lazy injection</a></li><li><a href="#lifecycle-listeners">Lifecycle listeners</a></li><li><a href="#eager-components">Eager components</a></li><li><a href="#debug-logging">Debug logging</a></li><li><a href="#automocks">Automocks</a></li><li><a href="#scopes">Scopes</a></li><li><a href="#dynamic-injections">Dynamic Injections</a></li><li><a href="#strictpropertyinitialization">StrictPropertyInitialization</a></li><li><a href="#async-dependencies">Async Dependencies</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/puzzle.png" alt="TSDI" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/getting-started.html">Getting Started</a><a href="/docs/en/api-tsdi.html">API Reference</a></div><div><h5>Community</h5><a href="/en/users.html">User Showcase</a></div><div><h5>More</h5><a href="https://github.com/KnisterPeter/tsdi">GitHub</a><a class="github-button" href="https://github.com/KnisterPeter/tsdi" data-icon="octicon-star" data-show-count="true" aria-label="Star knisterpeter/tsdi on GitHub">Star</a></div></section><section class="copyright">Copyright © 2018 Markus Wolf</section></footer></div></body></html>
+<h2><a class="anchor" aria-hidden="true" id="declarative-configuration-of-dependencies"></a><a href="#declarative-configuration-of-dependencies" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Declarative configuration of dependencies</h2>
+<pre><code class="hljs css language-js"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SomeClass</span> </span>{
+  private property!: SomeDependency;
+
+  <span class="hljs-keyword">constructor</span>(private parameter: SomeDependency) {}
+}
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SomeDependency</span> </span>{
+}
+
+<span class="hljs-keyword">const</span> tsdi = <span class="hljs-keyword">new</span> TSDI();
+tsdi.configure(
+  SomeClass,
+  {
+    <span class="hljs-attr">constructorDependencies</span>: [SomeDependency],
+    <span class="hljs-attr">propertyDependencies</span>: [{ <span class="hljs-attr">property</span>: <span class="hljs-string">'property'</span>, <span class="hljs-attr">type</span>: SomeDependency }]
+  });
+</code></pre>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/en/next/getting-started.html"><span class="arrow-prev">← </span><span>Getting Started</span></a><a class="docs-next button" href="/docs/en/next/externals.html"><span>Externals</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#component-scanner">Component Scanner</a></li><li><a href="#lifecycle-methods">Lifecycle methods</a></li><li><a href="#name-based-injection-hints">Name based injection (hints)</a></li><li><a href="#property-value-injection-configuration">Property value injection (configuration)</a></li><li><a href="#constructor-parameter-injection">Constructor parameter injection</a></li><li><a href="#singletons-vs-instances">Singletons vs. Instances</a></li><li><a href="#factories">Factories</a></li><li><a href="#lazy-injection">Lazy injection</a></li><li><a href="#lifecycle-listeners">Lifecycle listeners</a></li><li><a href="#eager-components">Eager components</a></li><li><a href="#debug-logging">Debug logging</a></li><li><a href="#automocks">Automocks</a></li><li><a href="#scopes">Scopes</a></li><li><a href="#dynamic-injections">Dynamic Injections</a></li><li><a href="#strictpropertyinitialization">StrictPropertyInitialization</a></li><li><a href="#async-dependencies">Async Dependencies</a></li><li><a href="#declarative-configuration-of-dependencies">Declarative configuration of dependencies</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/puzzle.png" alt="TSDI" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/getting-started.html">Getting Started</a><a href="/docs/en/api-tsdi.html">API Reference</a></div><div><h5>Community</h5><a href="/en/users.html">User Showcase</a></div><div><h5>More</h5><a href="https://github.com/KnisterPeter/tsdi">GitHub</a><a class="github-button" href="https://github.com/KnisterPeter/tsdi" data-icon="octicon-star" data-show-count="true" aria-label="Star knisterpeter/tsdi on GitHub">Star</a></div></section><section class="copyright">Copyright © 2020 Markus Wolf</section></footer></div></body></html>
