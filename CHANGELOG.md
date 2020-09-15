@@ -1,3 +1,25 @@
+# [0.23.0](https://github.com/KnisterPeter/tsdi/compare/v0.22.0...v0.23.0) (2020-09-15)
+
+
+### Bug Fixes
+
+* add missing return ([aa63bfe](https://github.com/KnisterPeter/tsdi/commit/aa63bfe45d8e0c4beeb4b1c2bcc23803d291f66c))
+* handle deeper async structures ([8be0d49](https://github.com/KnisterPeter/tsdi/commit/8be0d498a6724fe8dc3823eff8c4807d3cc97f3a))
+* mark components as async during registration phase ([ebf95f6](https://github.com/KnisterPeter/tsdi/commit/ebf95f62253604d792cdec3e28e65e486aa75972))
+* remove mergeStrategy ([#996](https://github.com/KnisterPeter/tsdi/issues/996)) ([7309226](https://github.com/KnisterPeter/tsdi/commit/730922695435607cba165f4a8063e2aeff0099db))
+
+
+### Features
+
+* add lazy factory injections ([dbe18c5](https://github.com/KnisterPeter/tsdi/commit/dbe18c565834d5d5b2d7e62aef09a692bb3d5b4c))
+* externals could be lazy initialized ([b5e581b](https://github.com/KnisterPeter/tsdi/commit/b5e581b85e3af13dac1248224ac691aa1afe7883))
+* implement async component initializers ([aaaed6e](https://github.com/KnisterPeter/tsdi/commit/aaaed6e456d56a54f7868e98ca2e3ff2deb57867)), closes [#208](https://github.com/KnisterPeter/tsdi/issues/208)
+* Test for async initializers w/o intializers ([fe21685](https://github.com/KnisterPeter/tsdi/commit/fe21685ae5b0270d38e6cbab8ae5645e59e54674))
+* throw if dynamic inject async component ([9d7cd6e](https://github.com/KnisterPeter/tsdi/commit/9d7cd6e7739aaf118f87a3f80f854ddc527c310a))
+* wait for indirect async dependencies to settle ([c28a07f](https://github.com/KnisterPeter/tsdi/commit/c28a07f57e7dc1181b82102016e8afe1c93faf72))
+
+
+
 # [0.22.0](https://github.com/KnisterPeter/tsdi/compare/v0.21.0...v0.22.0) (2019-12-20)
 
 
