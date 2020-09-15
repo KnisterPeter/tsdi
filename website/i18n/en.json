@@ -4,16 +4,59 @@
     "next": "Next",
     "previous": "Previous",
     "tagline": "Easy dependency injection for TypeScript.",
-    "alternative-syntax": "Alternative Syntax",
-    "api-lifecyclelistener": "LifecycleListener",
-    "api-tsdi": "TSDI",
-    "externals": "Externals",
-    "features": "Features",
-    "getting-started": "Getting Started",
-    "Docs": "Docs",
-    "API": "API",
-    "GitHub": "GitHub",
-    "TSDI": "TSDI"
+    "docs": {
+      "alternative-syntax": {
+        "title": "Alternative Syntax"
+      },
+      "api-lifecyclelistener": {
+        "title": "LifecycleListener"
+      },
+      "api-tsdi": {
+        "title": "TSDI"
+      },
+      "externals": {
+        "title": "Externals"
+      },
+      "features": {
+        "title": "Features"
+      },
+      "getting-started": {
+        "title": "Getting Started"
+      },
+      "version-0.20.0/version-0.20.0-alternative-syntax": {
+        "title": "Alternative Syntax"
+      },
+      "version-0.20.0/version-0.20.0-api-lifecyclelistener": {
+        "title": "LifecycleListener"
+      },
+      "version-0.20.0/version-0.20.0-api-tsdi": {
+        "title": "TSDI"
+      },
+      "version-0.20.0/version-0.20.0-features": {
+        "title": "Features"
+      },
+      "version-0.20.0/version-0.20.0-getting-started": {
+        "title": "Getting Started"
+      },
+      "version-0.23.0/version-0.23.0-api-tsdi": {
+        "title": "TSDI"
+      },
+      "version-0.23.0/version-0.23.0-externals": {
+        "title": "Externals"
+      },
+      "version-0.23.0/version-0.23.0-features": {
+        "title": "Features"
+      }
+    },
+    "links": {
+      "Docs": "Docs",
+      "API": "API",
+      "GitHub": "GitHub"
+    },
+    "categories": {
+      "TSDI": "TSDI",
+      "API": "API"
+    }
   },
   "pages-strings": {
     "Help Translate|recruit community translators for your project": "Help Translate",
