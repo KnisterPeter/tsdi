@@ -11,7 +11,7 @@ export function External<TFunction extends Function>(
   ...args: any[]
 ): ClassDecorator | TFunction {
   const decorate = (target: TFunction) => {
-    log(`@External ${(target as any).name}`);
+    log(`@External ${target.name}`);
     addKnownExternal(target);
     const constructor = function InjectedConstructor(
       this: any,
@@ -19,10 +19,10 @@ export function External<TFunction extends Function>(
     ): any {
       return (target as any).__tsdi__.configureExternal(args, target);
     };
-    (constructor as any).displayName = (target as any).name;
+    (constructor as any).displayName = target.name;
     Object.getOwnPropertyNames(target)
       .filter(
-        prop =>
+        (prop) =>
           prop !== 'name' &&
           prop !== 'length' &&
           prop !== 'caller' &&
@@ -30,7 +30,7 @@ export function External<TFunction extends Function>(
           prop !== 'arguments' &&
           !(constructor as any)[prop]
       )
-      .forEach(prop => ((constructor as any)[prop] = (target as any)[prop]));
+      .forEach((prop) => ((constructor as any)[prop] = (target as any)[prop]));
     constructor.prototype = target.prototype;
     return constructor as any;
   };
@@ -38,7 +38,7 @@ export function External<TFunction extends Function>(
   if (args.length > 0) {
     return decorate(args[0]);
   }
-  return function(target: TFunction): TFunction {
+  return function (target: TFunction): TFunction {
     return decorate(target);
   } as ClassDecorator;
 }
