@@ -412,24 +412,7 @@ export class TSDI {
       'component:init',
       metadata.fn.prototype
     );
-    const awaiter = this.waitForInjectInitializers(metadata);
-    if (init) {
-      if (awaiter) {
-        this.addInitializerPromise(
-          instance,
-          awaiter.then(
-            () => (instance as any)[init].call(instance) || Promise.resolve()
-          )
-        );
-      } else {
-        this.addInitializerPromise(
-          instance,
-          (instance as any)[init].call(instance)
-        );
-      }
-    } else if (awaiter) {
-      this.addInitializerPromise(instance, awaiter);
-    }
+    this.maybeLazyInitialize(instance, init, metadata);
     return instance;
   }
 
@@ -471,20 +454,40 @@ export class TSDI {
   }
 
   public configureExternal<T>(args: unknown[], target: any): T {
+    const metadata: ComponentMetadata = { fn: target, options: {} };
     const parameters = this.getConstructorParameters({
       fn: target,
       options: {},
     });
     const instance = new target(...args, ...parameters);
-    this.injectIntoInstance(instance, true, { fn: target, options: {} });
+    this.injectIntoInstance(instance, true, metadata);
+
     const init: string = Reflect.getMetadata(
       'component:init',
       target.prototype
     );
-    if (init) {
-      instance[init].call(instance);
-    }
+    this.maybeLazyInitialize(instance, init, metadata);
     return instance;
+  }
+
+  private maybeLazyInitialize(
+    instance: any,
+    init: string,
+    metadata: ComponentMetadata
+  ): void {
+    const awaiter = this.waitForInjectInitializers(metadata);
+    if (init) {
+      if (awaiter) {
+        this.addInitializerPromise(
+          instance,
+          awaiter.then(() => instance[init].call(instance) || Promise.resolve())
+        );
+      } else {
+        this.addInitializerPromise(instance, instance[init].call(instance));
+      }
+    } else if (awaiter) {
+      this.addInitializerPromise(instance, awaiter);
+    }
   }
 
   private injectIntoInstance(
