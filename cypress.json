@@ -2,9 +2,9 @@
   "projectId": "osbnyw",
   "baseUrl": "http://localhost:9876",
   "testFiles": "**/*.spec.js",
-  "integrationFolder": "dist-tests/integration",
-  "screenshotsFolder": "dist-tests/screenshots",
-  "videosFolder": "dist-tests/videos",
+  "integrationFolder": "dist/__integration__",
+  "screenshotsFolder": "dist/screenshots",
+  "videosFolder": "dist/videos",
   "pluginsFile": false,
   "supportFile": false,
   "fixturesFolder": false

@@ -1,4 +1,4 @@
-import { component, inject } from '../dist/';
+import { component, inject } from '../..';
 import { EagerComponent2 } from './eager2';
 
 @component({ eager: true })

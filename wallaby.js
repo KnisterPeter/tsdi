@@ -1,23 +1,16 @@
 module.exports = function (wallaby) {
   return {
-    files: [
-      'lib/**/*.ts',
-      'tests/**/*.ts',
-      '!tests/**/*-test.ts'
-    ],
-    tests: [
-      'tests/**/*-test.ts'
-    ],
+    trace: true,
+    files: ['lib/**', '!lib/__tests__/*-test.ts'],
+    tests: ['lib/__tests__/*-test.ts'],
     testFramework: 'mocha',
     env: {
-      type: 'node'
+      type: 'node',
     },
     compilers: {
-      '**/*.ts': wallaby.compilers.typeScript({
-        typescript: require('typescript'),
-        module: 1, // commonjs
-        emitDecoratorMetadata: true
-      })
-    }
+      '**/*.ts?(x)': wallaby.compilers.typeScript({
+        module: 'commonjs',
+      }),
+    },
   };
 };

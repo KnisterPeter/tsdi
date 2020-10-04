@@ -1,4 +1,4 @@
-import { Component } from '../dist/';
+import { Component } from '../..';
 
 @Component()
 export class Dependency {
