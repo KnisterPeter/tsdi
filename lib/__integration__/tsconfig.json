@@ -1,14 +1,12 @@
 {
-  "extends": "../tsconfig.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "module": "CommonJS",
     "declaration": false,
     "declarationMap": false,
     "lib": ["dom", "esnext"],
     "baseUrl": "../../node_modules",
     "types": ["cypress"],
-    // fixme: disable when https://github.com/cypress-io/cypress/issues/5065 is released
     "skipLibCheck": true
-  },
-  "include": ["**/*.ts"],
-  "exclude": []
+  }
 }

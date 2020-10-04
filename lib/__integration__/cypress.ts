@@ -24,7 +24,7 @@ const [, , command, ...args] = process.argv;
       console.warn(e);
     }
   }
-})().catch(e => {
+})().catch((e) => {
   setImmediate(() => {
     throw e;
   });

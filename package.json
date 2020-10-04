@@ -18,20 +18,18 @@
   },
   "scripts": {
     "linter": "tslint --project ./tsconfig.json",
-    "linter:tests": "tslint --project ./tests/tsconfig.json",
-    "linter:integration": "tslint --project ./tests/integration/tsconfig.json",
-    "clean": "rimraf .nyc_output coverage dist dist-tests",
+    "clean": "rimraf .nyc_output coverage dist",
     "prebuild": "yarn clean",
     "build": "microbundle build",
-    "build:watch": "microbundle watch & tsc --project ./tests/tsconfig.json --watch & tsc --project ./tests/integration/tsconfig.json --watch",
-    "pretest": "yarn build && tsc --project ./tests/tsconfig.json",
-    "test": "nyc mocha dist-tests",
+    "build:watch": "microbundle watch & tsc --project ./lib/__tests__/tsconfig.json --watch & tsc --project ./lib/__integration__/tsconfig.json --watch",
+    "pretest": "yarn build && tsc -p ./lib/__tests__",
+    "test": "nyc mocha dist/__tests__",
     "coverage": "codecov",
-    "integration": "tsc --project ./tests/integration/tsconfig.json",
+    "integration": "tsc --project ./lib/__integration__/tsconfig.json",
     "precypress:run": "yarn build && yarn integration",
-    "cypress:run": "node ./dist-tests/integration/cypress run $@",
+    "cypress:run": "node ./dist/__integration__/cypress run $@",
     "precypress:open": "yarn integration",
-    "cypress:open": "node ./dist-tests/integration/cypress open",
+    "cypress:open": "node ./dist/__integration__/cypress open",
     "release:prepare": "shipjs prepare",
     "release:trigger": "shipjs trigger"
   },
@@ -90,12 +88,6 @@
     ],
     "lib/**/*.{ts,tsx}": [
       "yarn linter"
-    ],
-    "tests/!(integration)/**/*.{ts,tsx}": [
-      "yarn linter:tests"
-    ],
-    "tests/integration/**/*.{ts,tsx}": [
-      "yarn linter:integration"
     ]
   },
   "nyc": {
@@ -107,7 +99,6 @@
     "#fixme": "https://github.com/istanbuljs/istanbuljs/issues/413",
     "#all": true,
     "exclude": [
-      "dist-tests",
       "wallaby.js",
       "website/",
       "tests/integration/"

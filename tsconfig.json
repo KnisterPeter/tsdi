@@ -8,6 +8,7 @@
     "rootDir": "lib",
     "strict": true,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "stripInternal": true,
     "moduleResolution": "node",
     "noImplicitAny": true,

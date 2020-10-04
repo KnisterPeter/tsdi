@@ -1,6 +1,6 @@
 // tslint:disable: no-implicit-dependencies
 import { assert } from 'chai';
-import { component, initialize, inject, TSDI } from '../dist';
+import { component, initialize, inject, TSDI } from '..';
 
 let origWarn: (...args: any[]) => void;
 
@@ -10,7 +10,7 @@ describe('TSDI', () => {
   beforeEach(() => {
     // disable deprecation warning in tests
     origWarn = console.warn;
-    console.warn = function(...args: any[]): void {
+    console.warn = function (...args: any[]): void {
       if (
         args.length > 0 &&
         typeof args[0] === 'string' &&

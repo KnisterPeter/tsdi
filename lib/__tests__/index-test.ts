@@ -13,12 +13,12 @@ import {
   Inject,
   inject,
   TSDI,
-} from '../dist/';
-import { Cyclic1 } from './cyclic1';
-import { Dependency } from './dependency';
-import { EagerComponent1 } from './eager1';
-import { EagerComponent2 } from './eager2';
-import { User } from './user';
+} from '..';
+import { Cyclic1 } from './__fixtures__/cyclic1';
+import { Dependency } from './__fixtures__/dependency';
+import { EagerComponent1 } from './__fixtures__/eager1';
+import { EagerComponent2 } from './__fixtures__/eager2';
+import { User } from './__fixtures__/user';
 
 describe('TSDI', () => {
   describe('when creating a container instance', () => {
