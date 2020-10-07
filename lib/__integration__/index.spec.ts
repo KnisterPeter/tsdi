@@ -1,6 +1,7 @@
 // these imports run the test directly
 // in the default window of cypress
 import '../__tests__/configure-test';
+import '../__tests__/hierarchy-test';
 import '../__tests__/index-test';
 import '../__tests__/mock-test';
 

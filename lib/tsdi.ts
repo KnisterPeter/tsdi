@@ -83,7 +83,9 @@ export class TSDI {
 
   private readonly scopes: { [name: string]: boolean } = {};
 
-  constructor(configuration?: Object) {
+  private readonly parent: TSDI | undefined;
+
+  constructor(configuration?: Object, parent?: TSDI) {
     this.registerComponent({
       fn: TSDI,
       options: {},
@@ -144,6 +146,7 @@ export class TSDI {
           }
         });
     }
+    this.parent = parent;
   }
 
   public addLifecycleListener(lifecycleListener: LifecycleListener): void {
@@ -763,9 +766,14 @@ export class TSDI {
     }
     const injectMetadata = this.components[injectIdx];
     if (!injectMetadata) {
+      if (this.parent) {
+        return this.parent.getInjectComponentMetadata(inject);
+      }
+
       throw new Error(
-        `Failed to get inject '${inject.options.name}' for ` +
-          `'${inject.target.constructor.name}#${inject.property}'`
+        `Failed to get inject '${
+          inject.type.name || inject.options.name
+        }' for ` + `'${inject.target.constructor.name}#${inject.property}'`
       );
     }
     return [injectMetadata, injectIdx];
@@ -833,6 +841,9 @@ export class TSDI {
     const idx = this.getComponentMetadataIndex(component, hint);
     const metadata = this.components[idx];
     if (!metadata) {
+      if (this.parent) {
+        return this.parent.get(componentOrHint);
+      }
       this.throwComponentNotFoundError(component, hint);
     }
     return this.getOrCreate<T>(metadata, idx);
