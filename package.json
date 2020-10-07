@@ -48,7 +48,7 @@
     "@commitlint/travis-cli": "11.0.0",
     "@istanbuljs/nyc-config-typescript": "1.0.1",
     "@knisterpeter/standard-tslint": "1.7.2",
-    "@types/chai": "4.2.12",
+    "@types/chai": "4.2.13",
     "@types/debug": "4.1.5",
     "@types/mocha": "8.0.3",
     "@types/node": "14.11.2",
