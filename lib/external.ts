@@ -19,6 +19,9 @@ export function External<TFunction extends Function>(
     ): any {
       return (target as any).__tsdi__.configureExternal(args, target);
     };
+    Object.defineProperty(constructor, '__tsdi__external__', {
+      value: target,
+    });
     (constructor as any).displayName = target.name;
     Object.getOwnPropertyNames(target)
       .filter(

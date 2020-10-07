@@ -394,23 +394,70 @@ class RestApi {
 
 > This does not work with dynamic injections and will throw an error. Please note that async injections can not be lazy and will not be lazy by default.
 
-## Declarative configuration of dependencies
+## Configured sets
+
+A container instance could be configured from a configuration class. This configuration could be used to limit the container visible components.
+
+When using [`enableComponentScanner()`](api-tsdi.md#enablecomponentscanner) all components of the whole project are added to the container instance. This is often not whats required or useful.  
+There are multiple ways around this and configured sets are one of them.
+
+Another reason to give your container a bit more structure is, if you need to have multiple container with different sets of components to create a hierarchy. This isn't possible with [`externals`](externals.md#external-dependencies) otherwise. These are only working with `enableComponentScanner()` otherwise.
+
+> Just like with `enableComponentScanner()`, externals with configured sets could only occur in one container at once. It does not even give a good error message when misconfigured.
 
 ```js
-class SomeClass {
-  private property!: SomeDependency;
-
-  constructor(private parameter: SomeDependency) {}
+@component
+class Dice {
+  public roll(): number {
+    return 1;
+  }
 }
 
-class SomeDependency {
+class Player {
+  constructor(public dice: Dice) {
+  }
 }
 
-const tsdi = new TSDI();
-tsdi.configure(
-  SomeClass,
-  {
-    constructorDependencies: [SomeDependency],
-    propertyDependencies: [{ property: 'property', type: SomeDependency }]
-  });
+class Game {
+  constructor(private player: Player) {}
+
+  public start(): void {
+    this.player.dice.roll();
+  }
+}
+
+@external
+class UI {
+  @inject
+  private readonly game!: Game;
+
+  public render(): void {
+    // ...
+  }
+}
+
+class Config {
+  @configure
+  public dice!: Dice;
+
+  @configure
+  public ui!: UI;
+
+  @configure
+  public player(): Player {
+    return new Player(this.dice());
+  }
+
+  @configure
+  public game(): Game {
+    return new Game(this.player());
+  }
+}
+
+const tsdi = new TSDI(new Config());
+const game = tsdi.get(Game);
+game.start();
+
+const ui = tsdi.get(UI);
+ui.render();
 ```
