@@ -1,7 +1,7 @@
 module.exports = function (wallaby) {
   return {
     trace: true,
-    files: ['lib/**', '!lib/__tests__/*-test.ts'],
+    files: ['lib/**', '!lib/__integration__/**', '!lib/__tests__/*-test.ts'],
     tests: ['lib/__tests__/*-test.ts'],
     testFramework: 'mocha',
     env: {

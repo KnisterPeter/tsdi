@@ -8,5 +8,6 @@
     "baseUrl": "../../node_modules",
     "types": ["cypress"],
     "skipLibCheck": true
-  }
+  },
+  "exclude": []
 }
