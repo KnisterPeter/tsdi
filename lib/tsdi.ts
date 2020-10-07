@@ -83,12 +83,67 @@ export class TSDI {
 
   private readonly scopes: { [name: string]: boolean } = {};
 
-  constructor() {
+  constructor(configuration?: Object) {
     this.registerComponent({
       fn: TSDI,
       options: {},
     });
     this.instances[0] = this;
+
+    if (configuration) {
+      this.registerComponent({
+        fn: configuration.constructor as Constructable<unknown>,
+        options: {},
+      });
+      this.instances[1] = configuration;
+      Object.defineProperty(configuration, '__tsdi__', {
+        configurable: false,
+        enumerable: false,
+        writable: false,
+        value: this,
+      });
+
+      Object.getOwnPropertyNames(configuration.constructor.prototype)
+        .filter((name) =>
+          Reflect.getMetadata(
+            'component:configured',
+            configuration.constructor.prototype,
+            name
+          )
+        )
+        .forEach((property) => {
+          const rtti = Reflect.getMetadata(
+            'design:returntype',
+            configuration,
+            property
+          );
+          if (rtti) {
+            // method
+            this.registerComponent({
+              target: configuration,
+              property,
+              options: {},
+              rtti,
+            });
+          } else {
+            const fn = Reflect.getMetadata(
+              'design:type',
+              configuration,
+              property
+            );
+            if (fn.__tsdi__external__) {
+              // external component
+              fn.__tsdi__external__.__tsdi__ = this;
+            } else {
+              // property component
+              this.registerComponent({
+                fn,
+                options: {},
+              });
+            }
+          }
+        });
+    }
   }
 
   public addLifecycleListener(lifecycleListener: LifecycleListener): void {
@@ -296,8 +351,7 @@ export class TSDI {
   ): boolean {
     return (
       typeof component !== 'undefined' &&
-      ((metadata as ComponentMetadata).fn === component ||
-        (isFactoryMetadata(metadata) && metadata.rtti === component))
+      (isFactoryMetadata(metadata) ? metadata.rtti : metadata.fn) === component
     );
   }
 
@@ -820,3 +874,4 @@ export { external, External } from './external';
 export { factory, Factory } from './factory';
 export { initialize, Initialize } from './initialize';
 export { inject, Inject } from './inject';
+export { configure, Configure } from './configure';

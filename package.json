@@ -18,6 +18,7 @@
   },
   "scripts": {
     "linter": "tslint --project ./tsconfig.json",
+    "linter:integration": "tslint --project ./lib/__integration__/tsconfig.json",
     "clean": "rimraf .nyc_output coverage dist website/build",
     "prebuild": "yarn clean",
     "build": "microbundle build",
@@ -86,8 +87,11 @@
     "**/*.{ts,tsx}": [
       "prettier --list-different"
     ],
-    "lib/**/*.{ts,tsx}": [
+    "lib/!(__integration__)/*.{ts,tsx}": [
       "yarn linter"
+    ],
+    "lib/__integration__/**/*.{ts,tsx}": [
+      "yarn linter:integration"
     ]
   },
   "nyc": {

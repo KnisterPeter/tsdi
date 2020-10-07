@@ -14,7 +14,7 @@ export function addKnownComponent(metadata: ComponentOrFactoryMetadata): void {
     metadata.options.name &&
     findIndexOf(
       knownComponents,
-      meta => meta.options.name === metadata.options.name
+      (meta) => meta.options.name === metadata.options.name
     ) > -1
   ) {
     throw new Error(
@@ -22,22 +22,26 @@ export function addKnownComponent(metadata: ComponentOrFactoryMetadata): void {
     );
   }
   knownComponents.push(metadata);
-  listeners.forEach(listener => listener(metadata));
+  listeners.forEach((listener) => listener(metadata));
 }
 
 export function addKnownExternal(external: Function): void {
-  if (findIndexOf(knownExternals, fn => fn === external) === -1) {
+  if (!isKnownExternal(external)) {
     knownExternals.push(external);
-    listeners.forEach(listener => listener(external));
+    listeners.forEach((listener) => listener(external));
   }
+}
+
+export function isKnownExternal(external: Function): boolean {
+  return findIndexOf(knownExternals, (fn) => fn === external) !== -1;
 }
 
 export function addListener(listener: ComponentListener): void {
   listeners.push(listener);
-  knownComponents.forEach(metadata => listener(metadata));
-  knownExternals.forEach(external => listener(external));
+  knownComponents.forEach((metadata) => listener(metadata));
+  knownExternals.forEach((external) => listener(external));
 }
 
 export function removeListener(listener: ComponentListener): void {
-  listeners = removeElement(listeners, l => l === listener);
+  listeners = removeElement(listeners, (l) => l === listener);
 }
