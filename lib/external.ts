@@ -13,12 +13,13 @@ export function External<TFunction extends Function>(
   const decorate = (target: TFunction) => {
     log(`@External ${target.name}`);
     addKnownExternal(target);
-    const constructor = function InjectedConstructor(
-      this: any,
-      ...args: any[]
-    ): any {
+
+    const constructor = function (this: any, ...args: any[]): any {
       return (target as any).__tsdi__.configureExternal(args, target);
     };
+    Object.defineProperty(constructor, 'name', {
+      value: target.name,
+    });
     Object.defineProperty(constructor, '__tsdi__external__', {
       value: target,
     });
