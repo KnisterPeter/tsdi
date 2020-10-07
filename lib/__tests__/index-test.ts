@@ -380,45 +380,57 @@ describe('TSDI', () => {
       tsdi.get(Dependent);
     });
 
-    it('should call the initializer if all injections are itself initialized', (done) => {
-      // this case test the case with async initializers
+    describe('with an async global component', () => {
+      // note: this hack is required, since the component
+      // here is registered globally with `enableComponentScanner`
+      // and its initializer is called from different test. Therefore
+      // we toggle the test case to disable the check
+      // when not active.
+      let runCheck = false;
 
-      let testValue: number | undefined = undefined;
+      beforeEach(() => {
+        runCheck = true;
+      });
 
-      @component
-      class Dependency {
-        public value?: number;
-        @initialize
-        protected async init(): Promise<void> {
-          return new Promise<void>((resolve) => {
-            setTimeout(() => {
-              this.value = 10;
-              resolve();
-            }, 10);
-          });
+      afterEach(() => {
+        runCheck = false;
+      });
+
+      it('should call the initializer if all injections are itself initialized', (done) => {
+        // this case test the case with async initializers
+
+        let testValue: number | undefined = undefined;
+
+        @component
+        class Dependency {
+          public value?: number;
+          @initialize
+          protected async init(): Promise<void> {
+            return new Promise<void>((resolve) => {
+              setTimeout(() => {
+                this.value = 10;
+                resolve();
+              }, 10);
+            });
+          }
         }
-      }
-      tsdi.register(Dependency);
+        tsdi.register(Dependency);
 
-      @component({ eager: true })
-      class Dependent {
-        @inject private readonly dependency!: Dependency;
+        @component({ eager: true })
+        class Dependent {
+          @inject private readonly dependency!: Dependency;
 
-        @initialize
-        protected init(): void {
-          testValue = this.dependency.value;
+          @initialize
+          protected init(): void {
+            if (runCheck) {
+              testValue = this.dependency.value;
+              assert.equal(testValue, 10);
+              done();
+            }
+          }
         }
-      }
-      tsdi.register(Dependent);
-
-      // note: we need to test the value here, since the init method
-      // is called multiple times (by different tests), since the
-      // component is declared as eager and therefore created from
-      // other tests after it has been registered here
-      setTimeout(() => {
-        assert.equal(testValue, 10);
-        done();
-      }, 30);
+        tsdi.register(Dependent);
+      });
     });
 
     it('should throw if async initializer dependency is injected dynamically', () => {
