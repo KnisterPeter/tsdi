@@ -101,7 +101,7 @@
     "exclude": [
       "wallaby.js",
       "website/",
-      "tests/integration/"
+      "lib/__integration__/"
     ]
   },
   "husky": {
