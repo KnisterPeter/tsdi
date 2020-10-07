@@ -461,3 +461,40 @@ game.start();
 const ui = tsdi.get(UI);
 ui.render();
 ```
+
+## Container hierarchies
+
+Sometimes it is nice to create a container for a certain scope or moment in time. While it is possible to create a container just for this case, a hierarchy to access components which have a longer lifecycle would be nice.
+
+For example in a http server, there could be a container created during application startup, which then creates long-lived resources like database connections. And then there could be a separate container for short-lived resources like a user object per request.
+
+This is possible in combination with [`configured sets`](#configured-sets) and a hierarchy of containers like this.
+
+```js
+class OuterConfig {
+  @configure
+  public both(): Both {
+    return new Both('outer');
+  }
+
+  @configure
+  public onlyOuter(): OnlyOuter {
+    return new OnlyOuter();
+  }
+}
+
+
+class InnerConfig {
+  @configure
+  public both(): Both {
+    return new Both('inner');
+  }
+}
+
+const outer = new TSDI(new OuterConfig());
+const inner = new TSDI(new InnerConfig(), outer); // <--- note the second parameter here
+
+inner.get(Both).target; // === 'inner'
+inner.get(OuterOnly); // will be resolved from the parent container
+
+```
