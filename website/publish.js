@@ -11,7 +11,7 @@ if (!shell.which('git')) {
   shell.exit(1);
 }
 
-if (shell.exec(`git worktree add build/gh-pages origin/gh-pages`).code !== 0) {
+if (shell.exec(`git worktree add build/gh-pages gh-pages`).code !== 0) {
   shell.echo('Error: git worktree failed');
   shell.exit(1);
 }
@@ -24,11 +24,11 @@ if (
   shell.exit(1);
 }
 
-shell.exec('cd build/gh-pages');
+shell.cd('build/gh-pages');
 shell.exec('git add --all');
 if (
   shell.exec(
-    `git commit -m "Update Page" -m "Deploy website version based on ${currentCommit}"`
+    `git commit --no-verify -m "Deploy website" -m "Deploy website version based on ${currentCommit}"`
   ).code !== 0
 ) {
   shell.echo('Error: git commit failed');
