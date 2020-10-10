@@ -1,14 +1,12 @@
 #!/usr/bin/env node
 
-const fs = require('fs-extra');
-const path = require('path');
 const shell = require('shelljs');
 
 const currentCommit = shell.exec('git rev-parse HEAD').stdout.trim();
 
 const siteConfig = require(`${process.cwd()}/siteConfig.js`);
 
-if (shell.exec(`git worktree add build/gh-pages gh-pages`).code !== 0) {
+if (shell.exec(`git worktree add build/gh-pages origin/gh-pages`).code !== 0) {
   shell.echo('Error: git worktree failed');
   shell.exit(1);
 }
