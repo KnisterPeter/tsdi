@@ -6,6 +6,13 @@ const currentCommit = shell.exec('git rev-parse HEAD').stdout.trim();
 
 const siteConfig = require(`${process.cwd()}/siteConfig.js`);
 
+if (!shell.which('git')) {
+  shell.echo('Sorry, this script requires git');
+  shell.exit(1);
+}
+
+console.log(shell.exec('git --version').stdout.trim());
+
 if (shell.exec(`git worktree add build/gh-pages origin/gh-pages`).code !== 0) {
   shell.echo('Error: git worktree failed');
   shell.exit(1);
