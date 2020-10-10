@@ -11,8 +11,6 @@ if (!shell.which('git')) {
   shell.exit(1);
 }
 
-console.log(shell.exec('git --version').stdout.trim());
-
 if (shell.exec(`git worktree add build/gh-pages origin/gh-pages`).code !== 0) {
   shell.echo('Error: git worktree failed');
   shell.exit(1);
