@@ -1,3 +1,14 @@
+# [0.24.0](https://github.com/KnisterPeter/tsdi/compare/v0.23.0...v0.24.0) (2020-10-10)
+
+
+### Features
+
+* add container hierarchies ([#1115](https://github.com/KnisterPeter/tsdi/issues/1115)) ([6096b63](https://github.com/KnisterPeter/tsdi/commit/6096b63bb984311b4a5bf65501d677095fdb30b9)), closes [#271](https://github.com/KnisterPeter/tsdi/issues/271)
+* allow scoped selected container configuration ([520d6be](https://github.com/KnisterPeter/tsdi/commit/520d6bebd93c9d5541b10086f2b45ab8a7a3af11))
+* define the external constructor name ([#1114](https://github.com/KnisterPeter/tsdi/issues/1114)) ([bbdcad0](https://github.com/KnisterPeter/tsdi/commit/bbdcad0f801a17345f1148b783aa34d6c0be60b2)), closes [#390](https://github.com/KnisterPeter/tsdi/issues/390)
+
+
+
 # [0.23.0](https://github.com/KnisterPeter/tsdi/compare/v0.22.0...v0.23.0) (2020-09-15)
 
 
