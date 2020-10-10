@@ -20,10 +20,10 @@ jobs:
         with:
           node-version: 12
       - run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
           npm install -g yarn
           cd website
           yarn install
           yarn build
-          git config user.name github-actions
-          git config user.email github-actions@github.com
           yarn publish-gh-pages
