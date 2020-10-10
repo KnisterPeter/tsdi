@@ -16,14 +16,10 @@ jobs:
           ref: master
       - uses: actions/setup-node@v1
       - run: |
-          if [ -f "yarn.lock" ]; then
-            yarn install
-          else
-            npm install
-          fi
+          yarn install
       - run: |
-          git config --global user.email "mail@markus-wolf.de"
-          git config --global user.name "Markus Wolf"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
       - run: npm run release:prepare -- --yes --no-browse
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -41,7 +37,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '@${{ context.payload.sender.login }} `shipjs prepare` done'
+              body: '@${{ context.actor }} `shipjs prepare` done'
             })
 
   create_fail_comment:
@@ -57,5 +53,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '@${{ context.payload.sender.login }} `shipjs prepare` fail'
+              body: '@${{ context.actor }} `shipjs prepare` fail'
             })
