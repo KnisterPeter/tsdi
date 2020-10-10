@@ -1,0 +1,29 @@
+name: Website
+on:
+  push:
+    branches:
+      - 'master'
+    paths:
+      - 'docs/**'
+      - 'website/**'
+  release:
+    types:
+      - 'created'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Build + Deploy Website
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - run: |
+          npm install -g yarn
+          cd website
+          yarn install
+          yarn build
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          yarn publish-gh-pages

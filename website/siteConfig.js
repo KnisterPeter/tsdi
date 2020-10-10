@@ -3,8 +3,8 @@ const users = [
     caption: 'Magicline',
     image: '/img/magicline.svg',
     infoLink: 'https://www.magicline.com',
-    pinned: true
-  }
+    pinned: true,
+  },
 ];
 
 const repoUrl = 'https://github.com/KnisterPeter/tsdi';
@@ -26,7 +26,7 @@ const siteConfig = {
     { doc: 'api-tsdi', label: 'API' },
     // {page: 'help', label: 'Help'},
     // {blog: true, label: 'Blog'},
-    { href: repoUrl, label: 'GitHub' }
+    { href: repoUrl, label: 'GitHub' },
   ],
 
   users,
@@ -38,13 +38,13 @@ const siteConfig = {
 
   colors: {
     primaryColor: '#4b60b8',
-    secondaryColor: '#7883b4'
+    secondaryColor: '#7883b4',
   },
 
   copyright: `Copyright © ${new Date().getFullYear()} Markus Wolf`,
 
   highlight: {
-    theme: 'default'
+    theme: 'default',
   },
 
   scripts: ['https://buttons.github.io/buttons.js'],
@@ -52,7 +52,9 @@ const siteConfig = {
   onPageNav: 'separate',
 
   ogImage: 'img/puzzle.png',
-  twitterImage: 'img/puzzle.png'
+  twitterImage: 'img/puzzle.png',
+
+  editUrl: 'https://github.com/KnisterPeter/tsdi/tree/master/docs/',
 };
 
 module.exports = siteConfig;
