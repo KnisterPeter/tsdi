@@ -1,3 +1,7 @@
+## [0.24.1](https://github.com/KnisterPeter/tsdi/compare/v0.24.0...v0.24.1) (2020-10-10)
+
+
+
 # [0.24.0](https://github.com/KnisterPeter/tsdi/compare/v0.23.0...v0.24.0) (2020-10-10)
 
 
