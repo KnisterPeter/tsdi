@@ -10,11 +10,11 @@ jobs:
       startsWith(github.event.comment.body, '@shipjs prepare')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v1
         with:
           fetch-depth: 0
           ref: master
-      - uses: actions/setup-node@master
+      - uses: actions/setup-node@v1
       - run: |
           if [ -f "yarn.lock" ]; then
             yarn install
@@ -33,7 +33,7 @@ jobs:
     needs: manual_prepare
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/github@master
+      - uses: actions/github@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -44,7 +44,7 @@ jobs:
     needs: manual_prepare
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/github@master
+      - uses: actions/github@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
