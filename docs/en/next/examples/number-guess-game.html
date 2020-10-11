@@ -1,0 +1,373 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Number Guess Game · TSDI</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="This is a simple game where you need to guess a random number to win. We use it to show different features of TSDI and how to setup a project."/><meta name="docsearch:version" content="next"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Number Guess Game · TSDI"/><meta property="og:type" content="website"/><meta property="og:url" content="https://tsdi.js.org/"/><meta property="og:description" content="This is a simple game where you need to guess a random number to win. We use it to show different features of TSDI and how to setup a project."/><meta property="og:image" content="https://tsdi.js.org/img/puzzle.png"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://tsdi.js.org/img/puzzle.png"/><link rel="shortcut icon" href="/img/puzzle.png"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,700"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="https://unpkg.com/vanilla-back-to-top@7.1.14/dist/vanilla-back-to-top.min.js"></script><script>
+        document.addEventListener('DOMContentLoaded', function() {
+          addBackToTop(
+            {"zIndex":100}
+          )
+        });
+        </script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/prism.css"/><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/en"><img class="logo" src="/img/puzzle.png" alt="TSDI"/><h2 class="headerTitleWithLogo">TSDI</h2></a><a href="/en/versions"><h3>next</h3></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/docs/en/next/getting-started" target="_self">Docs</a></li><li class=""><a href="/docs/en/next/api-tsdi" target="_self">API</a></li><li class=""><a href="https://github.com/KnisterPeter/tsdi" target="_self">GitHub</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Examples</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">TSDI</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/en/next/getting-started">Getting Started</a></li><li class="navListItem"><a class="navItem" href="/docs/en/next/features">Features</a></li><li class="navListItem"><a class="navItem" href="/docs/en/next/externals">Externals</a></li><li class="navListItem"><a class="navItem" href="/docs/en/next/alternative-syntax">Alternative Syntax</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Examples</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/docs/en/next/examples/number-guess-game">Number Guess Game</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/KnisterPeter/tsdi/tree/master/docs/examples/number-guess-game.md" target="_blank" rel="noreferrer noopener">Edit</a><h1 id="__docusaurus" class="postHeaderTitle">Number Guess Game</h1></header><article><div><span><p>This is a simple game where you need to guess a random number to win. We use it to show different features of TSDI and how to setup a project.</p>
+<h2><a class="anchor" aria-hidden="true" id="tldr"></a><a href="#tldr" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>tl;dr</h2>
+<p>We have a <a href="https://codesandbox.io/s/tsdi-number-guess-game-ynq7d">CodeSandbox</a> where you can see all this in action.</p>
+<iframe src="https://codesandbox.io/embed/tsdi-number-guess-game-ynq7d?fontsize=14&hidenavigation=1&theme=dark&view=editor&module=/src/container.ts,/src/game.ts,/src/app.tsx"
+     style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
+     title="TSDI  Number Guess Game"
+     allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+     sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
+   ></iframe>
+<h2><a class="anchor" aria-hidden="true" id="setup"></a><a href="#setup" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Setup</h2>
+<p>For this game we use React and MobX to do the rendering and state management. And we use TSDI to glue the gaps between.
+The app is bundled using parcel.</p>
+<h3><a class="anchor" aria-hidden="true" id="metadata"></a><a href="#metadata" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Metadata</h3>
+<p>Create a <code>package.json</code> file with the following content:</p>
+<blockquote>
+<p>A bit special here might be the <code>index.html</code> as value of the <code>main</code> attribute. This is take by parcel.</p>
+</blockquote>
+<pre><code class="hljs css language-json"><span class="token punctuation">{</span>
+  <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"tsdi-number-guess-game"</span><span class="token punctuation">,</span>
+  <span class="token property">"version"</span><span class="token operator">:</span> <span class="token string">"1.0.0"</span><span class="token punctuation">,</span>
+  <span class="token property">"description"</span><span class="token operator">:</span> <span class="token string">""</span><span class="token punctuation">,</span>
+  <span class="token property">"main"</span><span class="token operator">:</span> <span class="token string">"index.html"</span><span class="token punctuation">,</span>
+  <span class="token property">"scripts"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"start"</span><span class="token operator">:</span> <span class="token string">"parcel index.html --open"</span><span class="token punctuation">,</span>
+    <span class="token property">"build"</span><span class="token operator">:</span> <span class="token string">"parcel build index.html"</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">"dependencies"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"mobx"</span><span class="token operator">:</span> <span class="token string">"6.0.1"</span><span class="token punctuation">,</span>
+    <span class="token property">"mobx-react"</span><span class="token operator">:</span> <span class="token string">"7.0.0"</span><span class="token punctuation">,</span>
+    <span class="token property">"react"</span><span class="token operator">:</span> <span class="token string">"16.13.1"</span><span class="token punctuation">,</span>
+    <span class="token property">"react-dom"</span><span class="token operator">:</span> <span class="token string">"16.13.1"</span><span class="token punctuation">,</span>
+    <span class="token property">"reflect-metadata"</span><span class="token operator">:</span> <span class="token string">"0.1.13"</span><span class="token punctuation">,</span>
+    <span class="token property">"tsdi"</span><span class="token operator">:</span> <span class="token string">"0.23.0"</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">"devDependencies"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"@types/react"</span><span class="token operator">:</span> <span class="token string">"16.9.51"</span><span class="token punctuation">,</span>
+    <span class="token property">"@types/react-dom"</span><span class="token operator">:</span> <span class="token string">"16.9.8"</span><span class="token punctuation">,</span>
+    <span class="token property">"parcel-bundler"</span><span class="token operator">:</span> <span class="token string">"^1.6.1"</span><span class="token punctuation">,</span>
+    <span class="token property">"prettier"</span><span class="token operator">:</span> <span class="token string">"2.1.2"</span><span class="token punctuation">,</span>
+    <span class="token property">"typescript"</span><span class="token operator">:</span> <span class="token string">"4.0.3"</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">"keywords"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"prettier"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>Then run yarn and setup typescript:</p>
+<pre><code class="hljs"><span class="hljs-variable">$ </span>yarn
+<span class="hljs-variable">$ </span>yarn tsc -init
+</code></pre>
+<p>Change the content of <code>tsconfig.json</code> to:</p>
+<pre><code class="hljs css language-json"><span class="token punctuation">{</span>
+  <span class="token property">"compilerOptions"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"strict"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token property">"module"</span><span class="token operator">:</span> <span class="token string">"ESNext"</span><span class="token punctuation">,</span>
+    <span class="token property">"target"</span><span class="token operator">:</span> <span class="token string">"es2018"</span><span class="token punctuation">,</span>
+    <span class="token property">"jsx"</span><span class="token operator">:</span> <span class="token string">"react"</span><span class="token punctuation">,</span>
+    <span class="token property">"esModuleInterop"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token property">"sourceMap"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token property">"allowJs"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token property">"lib"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"es6"</span><span class="token punctuation">,</span> <span class="token string">"dom"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token property">"rootDir"</span><span class="token operator">:</span> <span class="token string">"src"</span><span class="token punctuation">,</span>
+    <span class="token property">"moduleResolution"</span><span class="token operator">:</span> <span class="token string">"node"</span><span class="token punctuation">,</span>
+    <span class="token property">"experimentalDecorators"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token property">"emitDecoratorMetadata"</span><span class="token operator">:</span> <span class="token boolean">true</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<ul>
+<li>We use <code>esnext</code> as module output here to enable parcel tree-shaking</li>
+<li>We only want to support newer browses (target <code>es2018</code>)</li>
+<li>The important bits here are <code>experimentalDecorators</code> and <code>emitDecoratorMetadata</code> to add required information for TSDI into the transpiled sources.</li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="html"></a><a href="#html" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>HTML</h3>
+<p>Create the <code>index.html</code> referenced in the <code>package.json</code> with the following content:</p>
+<pre><code class="hljs css language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>head</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>title</span><span class="token punctuation">></span></span>Parcel Sandbox<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>title</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">charset</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>UTF-8<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>head</span><span class="token punctuation">></span></span>
+
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>app<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>src/index.tsx<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">></span></span>
+</code></pre>
+<p>There is nothing special in this file. The added script here will be transpiled and replaced with the bundled by parcel.</p>
+<h3><a class="anchor" aria-hidden="true" id="react"></a><a href="#react" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>React</h3>
+<p>Create a <code>src/index.tsx</code> file and let React render the application:</p>
+<pre><code class="hljs css language-ts"><span class="token comment">// This import is required by TSDI and should be added once for your project</span>
+<span class="token keyword">import</span> <span class="token string">'reflect-metadata'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token operator">*</span> <span class="token keyword">as</span> React <span class="token keyword">from</span> <span class="token string">'react'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> render <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'react-dom'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token punctuation">{</span> App <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'./app'</span><span class="token punctuation">;</span>
+
+<span class="token function">render</span><span class="token punctuation">(</span><span class="token operator">&lt;</span>App <span class="token operator">/</span><span class="token operator">></span><span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="game-files"></a><a href="#game-files" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Game Files</h2>
+<h3><a class="anchor" aria-hidden="true" id="container"></a><a href="#container" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Container</h3>
+<p><code>src/container.ts</code></p>
+<p>To setup TSDI we just call the constructor. To automatically register all components into this container we also call <code>enableComponentScanner</code> on the instance.</p>
+<p>We do create a custom React hook here (<code>useTSDI</code>) to make the container available to function components.
+We could also directly use the exported container instance since the management of state is done by the container. But a custom hook might be more natural to react users.</p>
+<pre><code class="hljs css language-ts"><span class="token keyword">import</span> <span class="token punctuation">{</span> Constructable<span class="token punctuation">,</span> <span class="token constant">TSDI</span> <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'tsdi'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">export</span> <span class="token keyword">const</span> tsdi <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name"><span class="token constant">TSDI</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+tsdi<span class="token punctuation">.</span><span class="token function">enableComponentScanner</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">export</span> <span class="token keyword">const</span> useTSDI <span class="token operator">=</span> <span class="token operator">&lt;</span><span class="token constant">T</span><span class="token operator">></span><span class="token punctuation">(</span>component<span class="token operator">:</span> Constructable<span class="token operator">&lt;</span><span class="token constant">T</span><span class="token operator">></span><span class="token punctuation">)</span><span class="token operator">:</span> <span class="token constant">T</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> tsdi<span class="token punctuation">.</span><span class="token keyword">get</span><span class="token punctuation">(</span>component<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="game"></a><a href="#game" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Game</h3>
+<p><code>src/game.ts</code></p>
+<p>This is the game logic. It holds the random number to guess and the current state of the game. This includes the current guess, the history of tries and the current comparison state.</p>
+<p>We use MobX here to create our state and derived properties.</p>
+<pre><code class="hljs css language-ts"><span class="token keyword">import</span> <span class="token punctuation">{</span> component<span class="token punctuation">,</span> initialize <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'tsdi'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> action<span class="token punctuation">,</span> computed<span class="token punctuation">,</span> makeObservable<span class="token punctuation">,</span> observable <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'mobx'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">export</span> <span class="token keyword">enum</span> State <span class="token punctuation">{</span>
+  <span class="token keyword">undefined</span><span class="token punctuation">,</span> <span class="token comment">// freshly started game, no guess available</span>
+  smaller<span class="token punctuation">,</span> <span class="token comment">// the random number is smaller to the guess</span>
+  bigger<span class="token punctuation">,</span> <span class="token comment">// the random number is bigger to the guess</span>
+  equal<span class="token punctuation">,</span> <span class="token comment">// the random number is equal to the guess</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// this decorator makes the component managed by TSDI</span>
+@component
+<span class="token keyword">export</span> <span class="token keyword">class</span> <span class="token class-name">Game</span> <span class="token punctuation">{</span>
+  @observable
+  <span class="token keyword">public</span> numerOfGames <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span> <span class="token comment">// used to reset the game state</span>
+
+  @observable
+  <span class="token keyword">private</span> <span class="token builtin">number</span> <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+
+  @observable
+  <span class="token keyword">private</span> guess <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+
+  @observable
+  <span class="token keyword">public</span> <span class="token keyword">readonly</span> tries<span class="token operator">:</span> <span class="token builtin">number</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+  @computed
+  <span class="token keyword">public</span> <span class="token keyword">get</span> <span class="token function">state</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span> State <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>tries<span class="token punctuation">.</span>length <span class="token operator">===</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span> State<span class="token punctuation">.</span><span class="token keyword">undefined</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token builtin">number</span> <span class="token operator">&lt;</span> <span class="token keyword">this</span><span class="token punctuation">.</span>guess<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span> State<span class="token punctuation">.</span>smaller<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token builtin">number</span> <span class="token operator">></span> <span class="token keyword">this</span><span class="token punctuation">.</span>guess<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span> State<span class="token punctuation">.</span>bigger<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span> State<span class="token punctuation">.</span>equal<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">makeObservable</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment">// this method is called as soon as TSDI created the game</span>
+  @initialize
+  <span class="token keyword">protected</span> <span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span> <span class="token keyword">void</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">reset</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  @action
+  <span class="token keyword">public</span> <span class="token function">onGuess</span><span class="token punctuation">(</span>value<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">)</span><span class="token operator">:</span> <span class="token keyword">void</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>guess <span class="token operator">=</span> <span class="token function">Number</span><span class="token punctuation">(</span>value<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>tries<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>guess<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  @action
+  <span class="token keyword">public</span> <span class="token function">reset</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span> <span class="token keyword">void</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>tries<span class="token punctuation">.</span><span class="token function">splice</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>tries<span class="token punctuation">.</span>length<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token builtin">number</span> <span class="token operator">=</span> Math<span class="token punctuation">.</span><span class="token function">ceil</span><span class="token punctuation">(</span>Math<span class="token punctuation">.</span><span class="token function">random</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>guess <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>numerOfGames<span class="token operator">++</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="application"></a><a href="#application" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Application</h3>
+<p><code>src/app.tsx</code></p>
+<p>The application shows the usage of injecting TSDI components into React components (in this case class components).</p>
+<p>We are injecting our main <code>Game</code> instance into our UI to render the current game state.</p>
+<p>The <code>App</code> component is marked as <code>@external</code> and <code>@observable</code>.</p>
+<pre><code class="hljs css language-ts"><span class="token keyword">import</span> <span class="token operator">*</span> <span class="token keyword">as</span> React <span class="token keyword">from</span> <span class="token string">'react'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> external<span class="token punctuation">,</span> inject <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'tsdi'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> observer <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'mobx-react'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token punctuation">{</span> Game <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'./game'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> GuessInput <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'./guess-input'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> GuessState <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'./guess-state'</span><span class="token punctuation">;</span>
+
+@observer
+<span class="token comment">// this connects the react component to the TSDI injection container.</span>
+<span class="token comment">// we cannot use @component here, since react takes care of the lifecycle of</span>
+<span class="token comment">// components instead of the injection container.</span>
+@external
+<span class="token keyword">export</span> <span class="token keyword">class</span> <span class="token class-name">App</span> <span class="token keyword">extends</span> <span class="token class-name">React</span><span class="token punctuation">.</span>Component <span class="token punctuation">{</span>
+  <span class="token comment">// let TSDI inject (and if not available yet create it) the game instance</span>
+  @inject
+  <span class="token keyword">private</span> game<span class="token operator">!</span><span class="token operator">:</span> Game<span class="token punctuation">;</span>
+
+  <span class="token keyword">public</span> <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span> React<span class="token punctuation">.</span>ReactNode <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span>
+      <span class="token operator">&lt;</span>div<span class="token operator">></span>
+        <span class="token operator">&lt;</span>p<span class="token operator">></span>Please guess a <span class="token builtin">number</span> between <span class="token number">0</span> and <span class="token number">100</span><span class="token operator">!</span><span class="token operator">&lt;</span><span class="token operator">/</span>p<span class="token operator">></span>
+        <span class="token operator">&lt;</span>div<span class="token operator">></span>
+          Your guess<span class="token operator">:</span>
+          <span class="token operator">&lt;</span>GuessInput key<span class="token operator">=</span><span class="token punctuation">{</span><span class="token keyword">this</span><span class="token punctuation">.</span>game<span class="token punctuation">.</span>numerOfGames<span class="token punctuation">}</span> <span class="token operator">/</span><span class="token operator">></span>
+        <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+        <span class="token operator">&lt;</span>GuessState <span class="token operator">/</span><span class="token operator">></span>
+        <span class="token operator">&lt;</span>ol<span class="token operator">></span>
+          <span class="token punctuation">{</span><span class="token keyword">this</span><span class="token punctuation">.</span>game<span class="token punctuation">.</span>tries<span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token builtin">number</span><span class="token punctuation">,</span> idx<span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">(</span>
+            <span class="token operator">&lt;</span>li key<span class="token operator">=</span><span class="token punctuation">{</span>idx<span class="token punctuation">}</span><span class="token operator">></span><span class="token punctuation">{</span><span class="token builtin">number</span><span class="token punctuation">}</span><span class="token operator">&lt;</span><span class="token operator">/</span>li<span class="token operator">></span>
+          <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">}</span>
+        <span class="token operator">&lt;</span><span class="token operator">/</span>ol<span class="token operator">></span>
+      <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="guess-input"></a><a href="#guess-input" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Guess Input</h3>
+<p><code>src/guess-input.tsx</code></p>
+<p>This is our guess input component which takes the users guess and triggers a new comparison.</p>
+<p>It is implemented as React function component.</p>
+<pre><code class="hljs css language-ts"><span class="token keyword">import</span> <span class="token operator">*</span> <span class="token keyword">as</span> React <span class="token keyword">from</span> <span class="token string">'react'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token punctuation">{</span> useTSDI <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'./container'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> Game <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'./game'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">export</span> <span class="token keyword">const</span> <span class="token function-variable function">GuessInput</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  <span class="token comment">// use a local state here to manage intermediate user input</span>
+  <span class="token keyword">const</span> <span class="token punctuation">[</span>local<span class="token punctuation">,</span> setLocal<span class="token punctuation">]</span> <span class="token operator">=</span> React<span class="token punctuation">.</span><span class="token generic-function"><span class="token function">useState</span><span class="token generic class-name"><span class="token operator">&lt;</span><span class="token builtin">string</span><span class="token operator">></span></span></span><span class="token punctuation">(</span><span class="token string">''</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">// use our custom react hook to get access to our game instance</span>
+  <span class="token keyword">const</span> game <span class="token operator">=</span> <span class="token function">useTSDI</span><span class="token punctuation">(</span>Game<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">return</span> <span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>form
+      onSubmit<span class="token operator">=</span><span class="token punctuation">{</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+        e<span class="token punctuation">.</span><span class="token function">preventDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        game<span class="token punctuation">.</span><span class="token function">onGuess</span><span class="token punctuation">(</span>local<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span><span class="token punctuation">}</span>
+    <span class="token operator">></span>
+      <span class="token operator">&lt;</span>input
+        <span class="token keyword">type</span><span class="token operator">=</span><span class="token string">"number"</span>
+        value<span class="token operator">=</span><span class="token punctuation">{</span>local<span class="token punctuation">}</span>
+        onChange<span class="token operator">=</span><span class="token punctuation">{</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">setLocal</span><span class="token punctuation">(</span>e<span class="token punctuation">.</span>currentTarget<span class="token punctuation">.</span>value<span class="token punctuation">)</span><span class="token punctuation">}</span>
+      <span class="token operator">/</span><span class="token operator">></span>
+      <span class="token operator">&lt;</span>button <span class="token keyword">type</span><span class="token operator">=</span><span class="token string">"submit"</span><span class="token operator">></span>Try<span class="token operator">!</span><span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">></span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>form<span class="token operator">></span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="guess-state"></a><a href="#guess-state" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Guess State</h3>
+<p><code>src/guess-state.tsx</code></p>
+<p>This display the current guess comparison state to the user and in case of
+a match, we are able to start a new game.</p>
+<pre><code class="hljs css language-ts"><span class="token keyword">import</span> <span class="token operator">*</span> <span class="token keyword">as</span> React <span class="token keyword">from</span> <span class="token string">'react'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> observer <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'mobx-react'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token punctuation">{</span> useTSDI <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'./container'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> Game<span class="token punctuation">,</span> State <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'./game'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">export</span> <span class="token keyword">const</span> GuessState <span class="token operator">=</span> <span class="token function">observer</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  <span class="token comment">// use our custom react hook to get access to our game instance</span>
+  <span class="token keyword">const</span> game <span class="token operator">=</span> <span class="token function">useTSDI</span><span class="token punctuation">(</span>Game<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">switch</span> <span class="token punctuation">(</span>game<span class="token punctuation">.</span>state<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">case</span> State<span class="token punctuation">.</span>bigger<span class="token operator">:</span>
+      <span class="token keyword">return</span> <span class="token operator">&lt;</span><span class="token operator">></span>My <span class="token builtin">number</span> <span class="token keyword">is</span> bigger<span class="token operator">&lt;</span><span class="token operator">/</span><span class="token operator">></span><span class="token punctuation">;</span>
+    <span class="token keyword">case</span> State<span class="token punctuation">.</span>equal<span class="token operator">:</span>
+      <span class="token keyword">return</span> <span class="token punctuation">(</span>
+        <span class="token operator">&lt;</span><span class="token operator">></span>
+          Congratulations<span class="token operator">!</span><span class="token operator">!</span><span class="token operator">!</span><span class="token punctuation">{</span><span class="token string">' '</span><span class="token punctuation">}</span>
+          <span class="token operator">&lt;</span>button onClick<span class="token operator">=</span><span class="token punctuation">{</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> game<span class="token punctuation">.</span><span class="token function">reset</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token operator">></span>Restart<span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">></span>
+        <span class="token operator">&lt;</span><span class="token operator">/</span><span class="token operator">></span>
+      <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">case</span> State<span class="token punctuation">.</span>smaller<span class="token operator">:</span>
+      <span class="token keyword">return</span> <span class="token operator">&lt;</span><span class="token operator">></span>My <span class="token builtin">number</span> <span class="token keyword">is</span> smaller<span class="token operator">&lt;</span><span class="token operator">/</span><span class="token operator">></span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">return</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="additional-explanations"></a><a href="#additional-explanations" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Additional explanations</h2>
+<p>It might be confusing to mix class components and function components here. This is done to show the flexibility of TSDI here.</p>
+<p>Also the number guess game is fairly easy and wouldn't require any state management solution (TSDI + MobX) at all. Take this only as a showcase for more complex cases.</p>
+<p><strong>Note:</strong> TSDI is not limited to the combination of React and MobX, but since MobX supports decorators this is a natural fit for us.</p>
+<p>TSDI is a general purpose DI container and could be used without any of the referenced libraries in this example.</p>
+</span></div></article></div><div class="docLastUpdate"><em>Last updated on 10/11/2020</em></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/en/next/alternative-syntax"><span class="arrow-prev">← </span><span>Alternative Syntax</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#tldr">tl;dr</a></li><li><a href="#setup">Setup</a><ul class="toc-headings"><li><a href="#metadata">Metadata</a></li><li><a href="#html">HTML</a></li><li><a href="#react">React</a></li></ul></li><li><a href="#game-files">Game Files</a><ul class="toc-headings"><li><a href="#container">Container</a></li><li><a href="#game">Game</a></li><li><a href="#application">Application</a></li><li><a href="#guess-input">Guess Input</a></li><li><a href="#guess-state">Guess State</a></li></ul></li><li><a href="#additional-explanations">Additional explanations</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/puzzle.png" alt="TSDI" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/getting-started.html">Getting Started</a><a href="/docs/en/api-tsdi.html">API Reference</a></div><div><h5>Community</h5><a href="/en/users.html">User Showcase</a></div><div><h5>More</h5><a href="https://github.com/KnisterPeter/tsdi">GitHub</a><a class="github-button" href="https://github.com/KnisterPeter/tsdi" data-icon="octicon-star" data-show-count="true" aria-label="Star knisterpeter/tsdi on GitHub">Star</a></div></section><section class="copyright">Copyright © 2020 Markus Wolf</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                appId: 'app-id',
+                apiKey: 'my-api-key',
+                indexName: 'my-index-name',
+                inputSelector: '#search_input_react',
+                algoliaOptions: {}
+              });
+            </script></body></html>
