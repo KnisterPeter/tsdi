@@ -65,6 +65,7 @@ export type Mock<T> = { -readonly [P in keyof T]: T[P] };
 
 export interface LifecycleListener {
   onCreate?(component: any): void;
+  onReady?(component: any): void;
   onDestroy?(component: any): void;
 }
 
@@ -151,25 +152,21 @@ export class TSDI {
 
   public addLifecycleListener(lifecycleListener: LifecycleListener): void {
     this.lifecycleListeners.push(lifecycleListener);
-    Object.keys(this.instances).forEach((idx) => {
-      this.notifyOnCreate(this.instances[parseInt(idx, 10)]);
-    });
+    Object.keys(this.instances).forEach((idx) =>
+      this.notifyOnCreate(this.instances[parseInt(idx, 10)])
+    );
   }
 
   private notifyOnCreate(component: any): void {
-    this.lifecycleListeners.forEach((l) => {
-      if (l.onCreate) {
-        l.onCreate(component);
-      }
-    });
+    this.lifecycleListeners.forEach((l) => l.onCreate?.(component));
+  }
+
+  private notifyOnReady(component: any): void {
+    this.lifecycleListeners.forEach((l) => l.onReady?.(component));
   }
 
   private notifyOnDestroy(component: any): void {
-    this.lifecycleListeners.forEach((l) => {
-      if (l.onDestroy) {
-        l.onDestroy(component);
-      }
-    });
+    this.lifecycleListeners.forEach((l) => l.onDestroy?.(component));
   }
 
   public addProperty(key: string, value: any): void {
@@ -537,13 +534,24 @@ export class TSDI {
       if (awaiter) {
         this.addInitializerPromise(
           instance,
-          awaiter.then(() => instance[init].call(instance) || Promise.resolve())
+          awaiter
+            .then(() => instance[init].call(instance) || Promise.resolve())
+            .then(() => this.notifyOnReady(instance))
         );
       } else {
-        this.addInitializerPromise(instance, instance[init].call(instance));
+        this.addInitializerPromise(
+          instance,
+          (instance[init].call(instance) || Promise.resolve()).then(() =>
+            this.notifyOnReady(instance)
+          )
+        );
       }
     } else if (awaiter) {
+      // tslint:disable-next-line: no-floating-promises
+      awaiter.then(() => this.notifyOnReady(instance));
       this.addInitializerPromise(instance, awaiter);
+    } else {
+      this.notifyOnReady(instance);
     }
   }
 
