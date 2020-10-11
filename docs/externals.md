@@ -14,7 +14,7 @@ In this cases your components should be marked with the `@external` decorator.
 The decorator overrides the `constructor()` of all components and injects dependencies
 even if the lifecycle is uncontrolled.
 
-```js
+```ts
 import { TSDI, Component, External } from 'tsdi';
 
 @Component
@@ -35,8 +35,7 @@ class C {
   }
 
   @Initialize()
-  public init() {
-  }
+  public init() {}
 }
 
 const tsdi: TSDI = new TSDI();
@@ -55,7 +54,7 @@ TSDI instance (most likely you have one container in production).
 To be more customizable (for example have one container per request)
 it is possible to overwrite this method and resolve the required TSDI instance by yourself.
 
-```js
+```ts
 const createNamespace = require('cls-hooked').createNamespace;
 const local = createNamespace('local');
 

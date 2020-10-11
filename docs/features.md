@@ -17,12 +17,11 @@ To hook into component creation and destruction there are two
 decorators available. `@initialize` and `@destroy`.
 They are call on the respective lifecycle event.
 
-```js
+```ts
 import { component, initialize, destroy } from 'tsdi';
 
 @component
 export class User {
-
   private timer: NodeJS.Timer;
 
   @initialize
@@ -36,7 +35,6 @@ export class User {
   public destroy(): void {
     clearInterval(this.timer);
   }
-
 }
 ```
 
@@ -45,7 +43,7 @@ export class User {
 Instead of using the type of the component (the type of the class) as identifier for injection it is also possible to
 specify the name as a custom string as depicted in the following example:
 
-```js
+```ts
 import { TSDI, Component, Inject } from 'tsdi';
 
 @Component()
@@ -53,12 +51,12 @@ class A {}
 
 @Component()
 class B extends A {}
-@Component({name: 'Bar'})
+@Component({ name: 'Bar' })
 class C extends A {}
 
-@Component({name: 'Foo'})
+@Component({ name: 'Foo' })
 class D extends A {
-  @Inject({name: 'Bar'})
+  @Inject({ name: 'Bar' })
   private a: A;
 }
 
@@ -75,12 +73,12 @@ name based injection.
 In cases in which it is necessary to simply inject a single atomic value, as for example a config value, it is possible
 to define a property using `tsdi.addProperty(...)`. it can then be injected normally using name based injection.
 
-```js
+```ts
 import { TSDI, Component, Inject } from 'tsdi';
 
 @Component()
 class A {
-  @Inject({name: 'config-key'})
+  @Inject({ name: 'config-key' })
   public some: string;
 }
 
@@ -95,7 +93,7 @@ using a `@Factory()` instead.
 
 ## Constructor parameter injection
 
-```js
+```ts
 import { TSDI, Component, Inject } from 'tsdi';
 
 @Component()
@@ -120,7 +118,7 @@ Sometimes it can be useful to inject a new instance of a Component everytime it 
 you can configure the component to not be singleton `{ singleton: false }` and a new instance will be created everytime
 it is retrieved or injected.
 
-```js
+```ts
 import { TSDI, Component } from 'tsdi';
 
 @Component({ singleton: false })
@@ -147,7 +145,7 @@ In cases in which you need to be able to inject dependencies which are not just 
 simply not maintained by you it is possible to define a `@Factory()` which creates these dependencies and makes them
 injectable:
 
-```js
+```ts
 import { TSDI, Component, Factory } from 'tsdi';
 
 class A {}
@@ -173,12 +171,12 @@ tsdi.get(A);
 You can mark individual injections as `{ lazy: true }`, which will lead to the injected `@Component()`s being
 created only when they are first touched.
 
-```js
+```ts
 import { TSDI, Component, Inject } from 'tsdi';
 
 @Component()
 class A {
-  @Inject({lazy: true})
+  @Inject({ lazy: true })
   public some: Dependency;
 }
 
@@ -190,7 +188,7 @@ console.log(a.some); // <-- at this point some is created and return (on first p
 
 ## Lifecycle listeners
 
-```js
+```ts
 import { TSDI, Component, Inject } from 'tsdi';
 
 @component
@@ -216,7 +214,7 @@ tsdi.close();
 You can mark an individual `@Component()` as `{ eager: true }` which will make sure that this component
 is instanced as soon as it is discovered by TSDI.
 
-```js
+```ts
 import { TSDI, Component, Inject } from 'tsdi';
 
 @component({ eager: true })
@@ -233,13 +231,12 @@ set the environment variable `DEBUG` (node) or a localStorage key (browser) `deb
 
 ## Automocks
 
-```js
+```ts
 import { TSDI, component, inject, initialize } from 'tsdi';
 
 @component
 class Foo {
-  public foo(): void {
-  }
+  public foo(): void {}
 }
 
 @component
@@ -274,10 +271,10 @@ Scopes could be seen as lifecycle bounds for a managed dependency.
 By that it is meant that components with a defined scope are only as long as
 the scope is entered/valid.
 
-```js
+```ts
 import { TSDI, component, destroy } from 'tsdi';
 
-@component({scope: 'some-scope'})
+@component({ scope: 'some-scope' })
 class Foo {
   @destroy
   private close(): void {
@@ -308,10 +305,10 @@ to access an application should check the availability.
 This also means it could be dynamic dependencies which could could be injected
 in more static ones.
 
-```js
+```ts
 import { TSDI, component, inject } from 'tsdi';
 
-@component({scope: 'some-scope'})
+@component({ scope: 'some-scope' })
 class Foo {
   public foo(): void {
     // do something
@@ -320,7 +317,7 @@ class Foo {
 
 @component
 class Bar {
-  @inject({dynamic: true})
+  @inject({ dynamic: true })
   private foo: Foo;
 
   public bar(): void {
@@ -329,13 +326,13 @@ class Bar {
 }
 
 const bar = tsdi.get(Bar); // <-- bar is constructed without a foo
-bar.bar() // <-- this will throw, since foo is not available
+bar.bar(); // <-- this will throw, since foo is not available
 tsdi.getScope('some-scope').enter();
-bar.bar() // <-- this will be okay, since foo is available here
+bar.bar(); // <-- this will be okay, since foo is available here
 tsdi.getScope('some-scope').leave();
-bar.bar() // <-- this will throw, since foo is not available
+bar.bar(); // <-- this will throw, since foo is not available
 tsdi.getScope('some-scope').enter();
-bar.bar() // <-- this will be okay, since a new foo is available here
+bar.bar(); // <-- this will be okay, since a new foo is available here
 ```
 
 ## StrictPropertyInitialization
@@ -343,12 +340,11 @@ bar.bar() // <-- this will be okay, since a new foo is available here
 The new `--strictPropertyInitialization` in TypeScript 2.7 could be used with TSDI by
 using the _definite assignment assertion modifiers_.
 
-```js
+```ts
 import { component, inject } from 'tsdi';
 
 @component
-class Foo {
-}
+class Foo {}
 
 @component
 class Bar {
@@ -367,7 +363,7 @@ When injected into another component the depending component's `@initialize` met
 after the dependencies initializer has resolved. This is for example useful when injecting a
 something like a database connection which needs asynchronous setup code:
 
-```js
+```ts
 import { component, inject } from 'tsdi';
 
 @component
@@ -405,7 +401,7 @@ Another reason to give your container a bit more structure is, if you need to ha
 
 > Just like with `enableComponentScanner()`, externals with configured sets could only occur in one container at once. It does not even give a good error message when misconfigured.
 
-```js
+```ts
 @component
 class Dice {
   public roll(): number {
@@ -414,8 +410,7 @@ class Dice {
 }
 
 class Player {
-  constructor(public dice: Dice) {
-  }
+  constructor(public dice: Dice) {}
 }
 
 class Game {
@@ -470,7 +465,7 @@ For example in a http server, there could be a container created during applicat
 
 This is possible in combination with [`configured sets`](#configured-sets) and a hierarchy of containers like this.
 
-```js
+```ts
 class OuterConfig {
   @configure
   public both(): Both {
@@ -482,7 +477,6 @@ class OuterConfig {
     return new OnlyOuter();
   }
 }
-
 
 class InnerConfig {
   @configure
@@ -496,5 +490,4 @@ const inner = new TSDI(new InnerConfig(), outer); // <--- note the second parame
 
 inner.get(Both).target; // === 'inner'
 inner.get(OuterOnly); // will be resolved from the parent container
-
 ```

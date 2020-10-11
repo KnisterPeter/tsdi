@@ -42,7 +42,7 @@ Button.defaultProps = {
   target: '_self',
 };
 
-const SplashContainer = props => (
+const SplashContainer = (props) => (
   <div className="homeContainer">
     <div className="homeSplashFade">
       <div className="wrapper homeWrapper">{props.children}</div>
@@ -50,20 +50,20 @@ const SplashContainer = props => (
   </div>
 );
 
-const Logo = props => (
+const Logo = (props) => (
   <div className="projectLogo">
     <img src={props.img_src} />
   </div>
 );
 
-const ProjectTitle = props => (
+const ProjectTitle = (props) => (
   <h2 className="projectTitle">
     {siteConfig.title}
     <small>{siteConfig.tagline}</small>
   </h2>
 );
 
-const PromoSection = props => (
+const PromoSection = (props) => (
   <div className="section promoSection">
     <div className="promoRow">
       <div className="pluginRowBlock">{props.children}</div>
@@ -80,7 +80,9 @@ class HomeSplash extends React.Component {
         <div className="inner">
           <ProjectTitle />
           <PromoSection>
-            <Button href={docUrl('getting-started.html', language)}>Getting started</Button>
+            <Button href={docUrl('getting-started.html', language)}>
+              Getting started
+            </Button>
             {/* <Button href={docUrl('doc1.html', language)}>Example Link</Button> */}
             {/* <Button href={docUrl('doc2.html', language)}>Example Link 2</Button> */}
           </PromoSection>
@@ -90,16 +92,17 @@ class HomeSplash extends React.Component {
   }
 }
 
-const Block = props => (
+const Block = (props) => (
   <Container
     padding={['bottom', 'top']}
     id={props.id}
-    background={props.background}>
+    background={props.background}
+  >
     <GridBlock align="center" contents={props.children} layout={props.layout} />
   </Container>
 );
 
-const Features = props => (
+const Features = (props) => (
   <Block layout="fourColumn">
     {[
       {
@@ -118,16 +121,17 @@ const Features = props => (
   </Block>
 );
 
-const FeatureCallout = props => (
+const FeatureCallout = (props) => (
   <div
     className="productShowcaseSection paddingBottom"
-    style={{textAlign: 'center'}}>
+    style={{ textAlign: 'center' }}
+  >
     <h2>Feature Callout</h2>
     <MarkdownBlock>These are features of this project</MarkdownBlock>
   </div>
 );
 
-const LearnHow = props => (
+const LearnHow = (props) => (
   <Block background="light">
     {[
       {
@@ -140,7 +144,7 @@ const LearnHow = props => (
   </Block>
 );
 
-const TryOut = props => (
+const TryOut = (props) => (
   <Block id="try">
     {[
       {
@@ -153,7 +157,7 @@ const TryOut = props => (
   </Block>
 );
 
-const Description = props => (
+const Description = (props) => (
   <Block background="dark">
     {[
       {
@@ -166,12 +170,12 @@ const Description = props => (
   </Block>
 );
 
-const Showcase = props => {
+const Showcase = (props) => {
   if ((siteConfig.users || []).length === 0) {
     return null;
   }
   const showcase = siteConfig.users
-    .filter(user => {
+    .filter((user) => {
       return user.pinned;
     })
     .map((user, i) => {

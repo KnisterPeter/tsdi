@@ -32,10 +32,18 @@ class Versions extends React.Component {
                 <tr>
                   <th>{latestVersion}</th>
                   <td>
-                    <a href={`${siteConfig.baseUrl}docs/en/getting-started.html`}>Documentation</a>
+                    <a
+                      href={`${siteConfig.baseUrl}docs/en/getting-started.html`}
+                    >
+                      Documentation
+                    </a>
                   </td>
                   <td>
-                    <a href={`https://github.com/KnisterPeter/tsdi/releases/tag/v${latestVersion}`}>Release Notes</a>
+                    <a
+                      href={`https://github.com/KnisterPeter/tsdi/releases/tag/v${latestVersion}`}
+                    >
+                      Release Notes
+                    </a>
                   </td>
                 </tr>
               </tbody>
@@ -46,10 +54,16 @@ class Versions extends React.Component {
                 <tr>
                   <th>master</th>
                   <td>
-                    <a href={`${siteConfig.baseUrl}docs/en/next/getting-started.html`}>Documentation</a>
+                    <a
+                      href={`${siteConfig.baseUrl}docs/en/next/getting-started.html`}
+                    >
+                      Documentation
+                    </a>
                   </td>
                   <td>
-                    <a href="https://github.com/KnisterPeter/tsdi">Source Code</a>
+                    <a href="https://github.com/KnisterPeter/tsdi">
+                      Source Code
+                    </a>
                   </td>
                 </tr>
               </tbody>
@@ -58,15 +72,23 @@ class Versions extends React.Component {
             <table className="versions">
               <tbody>
                 {versions.map(
-                  version =>
+                  (version) =>
                     version !== latestVersion && (
-                      <tr>
+                      <tr key={version}>
                         <th>{version}</th>
                         <td>
-                          <a href={`${siteConfig.baseUrl}docs/en/${version}/getting-started.html`}>Documentation</a>
+                          <a
+                            href={`${siteConfig.baseUrl}docs/en/${version}/getting-started.html`}
+                          >
+                            Documentation
+                          </a>
                         </td>
                         <td>
-                          <a href={`https://github.com/KnisterPeter/tsdi/releases/tag/v${version}`}>Release Notes</a>
+                          <a
+                            href={`https://github.com/KnisterPeter/tsdi/releases/tag/v${version}`}
+                          >
+                            Release Notes
+                          </a>
                         </td>
                       </tr>
                     )
@@ -75,7 +97,11 @@ class Versions extends React.Component {
             </table>
             <p>
               You can find past versions of this project{' '}
-              <a href="https://github.com/KnisterPeter/tsdi/releases"> on GitHub </a>.
+              <a href="https://github.com/KnisterPeter/tsdi/releases">
+                {' '}
+                on GitHub{' '}
+              </a>
+              .
             </p>
           </div>
         </Container>

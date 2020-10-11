@@ -17,6 +17,9 @@ const siteConfig = {
   repoUrl,
   cname: 'tsdi.js.org',
   noIndex: false,
+  cleanUrl: true,
+  enableUpdateTime: true,
+  scrollToTop: true,
 
   projectName: 'tsdi',
   organizationName: 'KnisterPeter',
@@ -27,6 +30,7 @@ const siteConfig = {
     // {page: 'help', label: 'Help'},
     // {blog: true, label: 'Blog'},
     { href: repoUrl, label: 'GitHub' },
+    { search: true },
   ],
 
   users,
@@ -40,6 +44,7 @@ const siteConfig = {
     primaryColor: '#4b60b8',
     secondaryColor: '#7883b4',
   },
+  usePrism: true,
 
   copyright: `Copyright © ${new Date().getFullYear()} Markus Wolf`,
 
@@ -48,13 +53,23 @@ const siteConfig = {
   },
 
   scripts: ['https://buttons.github.io/buttons.js'],
+  stylesheets: [
+    'https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,700',
+  ],
 
   onPageNav: 'separate',
 
   ogImage: 'img/puzzle.png',
   twitterImage: 'img/puzzle.png',
 
-  editUrl: 'https://github.com/KnisterPeter/tsdi/tree/master/docs/',
+  editUrl: `${repoUrl}/tree/master/docs/`,
+
+  algolia: {
+    apiKey: 'my-api-key',
+    indexName: 'my-index-name',
+    appId: 'app-id', // Optional, if you run the DocSearch crawler on your own
+    algoliaOptions: {}, // Optional, if provided by Algolia
+  },
 };
 
 module.exports = siteConfig;

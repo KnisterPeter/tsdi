@@ -14,6 +14,9 @@
       "api-tsdi": {
         "title": "TSDI"
       },
+      "examples/number-guess-game": {
+        "title": "Number Guess Game"
+      },
       "externals": {
         "title": "Externals"
       },
@@ -58,6 +61,7 @@
     },
     "categories": {
       "TSDI": "TSDI",
+      "Examples": "Examples",
       "API": "API"
     }
   },

@@ -1,6 +1,7 @@
 {
   "docs": {
-    "TSDI": ["getting-started", "features", "externals", "alternative-syntax"]
+    "TSDI": ["getting-started", "features", "externals", "alternative-syntax"],
+    "Examples": ["examples/number-guess-game"]
   },
   "api": {
     "API": ["api-tsdi", "api-lifecyclelistener"]

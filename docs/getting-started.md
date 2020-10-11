@@ -41,7 +41,7 @@ TSDI will keep and inject dependencies which would otherwise need to be handed d
 You need to create an instance of the TSDI container and register your
 components to it.
 
-```js
+```ts
 import { TSDI } from 'tsdi';
 
 const tsdi = new TSDI();
@@ -53,7 +53,7 @@ Classes of which instances should be kept and injectable have to be marked with 
 
 Each class marked with `@component` will be tracked by TSDI as well as instanced together with the container instance.
 
-```js
+```ts
 // ...
 
 @component
@@ -66,7 +66,7 @@ class Database {
 
 In order to connect dependencies add a `@inject` decorated property with the required type to a component.
 
-```js
+```ts
 // ...
 
 @component
@@ -85,7 +85,7 @@ Your components need to be registered in the TSDI instance
 so a dependency graph could be created from all parts of
 your system.
 
-```js
+```ts
 // ...
 
 tsdi.register(Database);
@@ -99,11 +99,11 @@ TSDI will create the requested component for you and
 return it - configured with all required dependencies -
 to you.
 
-```js
+```ts
 // ...
 
 const user = tsdi.get(User);
-user.load(1).then(data => {
+user.load(1).then((data) => {
   // ...
 });
 ```
@@ -112,7 +112,7 @@ user.load(1).then(data => {
 
 All parts together as one example.
 
-```js
+```ts
 import { TSDI } from 'tsdi';
 
 const tsdi = new TSDI();
@@ -137,7 +137,7 @@ tsdi.register(Database);
 tsdi.register(User);
 
 const user = tsdi.get(User);
-user.load(1).then(data => {
+user.load(1).then((data) => {
   // ...
 });
 ```
