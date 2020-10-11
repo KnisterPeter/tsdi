@@ -158,6 +158,14 @@ export class TSDI {
       this.notifyOnCreate(this.instances[parseInt(idx, 10)])
     );
 
+    Object.values(this.instances)
+      .map(
+        (instance) => [instance, this.getInitializerPromise(instance)] as const
+      )
+      .forEach(([instance, promise]) =>
+        promise?.then(() => this.notifyOnReady(instance))
+      );
+
     return () => {
       const idx = this.lifecycleListeners.findIndex(
         (l) => l === lifecycleListener
@@ -864,6 +872,20 @@ export class TSDI {
       this.throwComponentNotFoundError(component, hint);
     }
     return this.getOrCreate<T>(metadata, idx);
+  }
+
+  public async asyncGet<T>(component: Constructable<T>): Promise<T> {
+    return new Promise((resolve) => {
+      const removeLifecycleListener = this.addLifecycleListener({
+        onReady(comp: any): void {
+          if (comp instanceof component) {
+            removeLifecycleListener();
+            resolve(comp);
+          }
+        },
+      });
+      this.get(component);
+    });
   }
 
   public override(component: Constructable<any>, override: any): void {
