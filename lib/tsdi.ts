@@ -150,11 +150,20 @@ export class TSDI {
     this.parent = parent;
   }
 
-  public addLifecycleListener(lifecycleListener: LifecycleListener): void {
+  public addLifecycleListener(
+    lifecycleListener: LifecycleListener
+  ): () => void {
     this.lifecycleListeners.push(lifecycleListener);
     Object.keys(this.instances).forEach((idx) =>
       this.notifyOnCreate(this.instances[parseInt(idx, 10)])
     );
+
+    return () => {
+      const idx = this.lifecycleListeners.findIndex(
+        (l) => l === lifecycleListener
+      );
+      this.lifecycleListeners.splice(idx, 1);
+    };
   }
 
   private notifyOnCreate(component: any): void {
