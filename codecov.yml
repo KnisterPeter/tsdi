@@ -1,0 +1,2 @@
+ignore:
+  - 'lib/__tests__'
