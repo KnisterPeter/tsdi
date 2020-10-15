@@ -1,6 +1,6 @@
 {
   "name": "tsdi",
-  "version": "0.24.1",
+  "version": "0.25.0",
   "description": "Dependency Injection container (IoC) for TypeScript",
   "source": "lib/index.ts",
   "main": "dist/index.js",

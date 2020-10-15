@@ -1,3 +1,14 @@
+# [0.25.0](https://github.com/KnisterPeter/tsdi/compare/v0.24.1...v0.25.0) (2020-10-15)
+
+
+### Features
+
+* add onReady lifecycle ([#1122](https://github.com/KnisterPeter/tsdi/issues/1122)) ([f884ba4](https://github.com/KnisterPeter/tsdi/commit/f884ba4e8cf1678b9e36411584cdbf5890b2b1d7)), closes [#1121](https://github.com/KnisterPeter/tsdi/issues/1121)
+* add promise based get method for async components ([#1124](https://github.com/KnisterPeter/tsdi/issues/1124)) ([72d0a67](https://github.com/KnisterPeter/tsdi/commit/72d0a67689c782ec3ce96851425c553554c37af6))
+* allow to remove lifecycle listeners ([#1123](https://github.com/KnisterPeter/tsdi/issues/1123)) ([71cf873](https://github.com/KnisterPeter/tsdi/commit/71cf8733de90b1040ac9efba98b91e47fdcda546))
+
+
+
 ## [0.24.1](https://github.com/KnisterPeter/tsdi/compare/v0.24.0...v0.24.1) (2020-10-10)
 
 
