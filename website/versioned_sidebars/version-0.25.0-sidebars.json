@@ -1,0 +1,19 @@
+{
+  "version-0.25.0-docs": {
+    "TSDI": [
+      "version-0.25.0-getting-started",
+      "version-0.25.0-features",
+      "version-0.25.0-externals",
+      "version-0.25.0-alternative-syntax"
+    ],
+    "Examples": [
+      "version-0.25.0-examples/number-guess-game"
+    ]
+  },
+  "version-0.25.0-api": {
+    "API": [
+      "version-0.25.0-api-tsdi",
+      "version-0.25.0-api-lifecyclelistener"
+    ]
+  }
+}
