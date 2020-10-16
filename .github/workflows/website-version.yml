@@ -24,7 +24,7 @@ jobs:
           npm install -g yarn
           cd website
           yarn install
-          yarn run version ${GITHUB_REF#v}
+          yarn run version ${GITHUB_REF#refs/tags/v}
           git add --all
           git commit -m "docs: create new website version"
           git push origin master
