@@ -1,6 +1,6 @@
 // tslint:disable: no-implicit-dependencies
 import { assert } from 'chai';
-import { TSDI, component, initialize, inject } from '..';
+import { TSDI, component, initialize } from '..';
 
 describe('TSDI', () => {
   let tsdi: TSDI;
