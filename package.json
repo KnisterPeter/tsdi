@@ -25,7 +25,7 @@
     "build:watch": "microbundle watch & tsc --project ./lib/__tests__/tsconfig.json --watch & tsc --project ./lib/__integration__/tsconfig.json --watch",
     "pretest": "yarn build && tsc -p ./lib/__tests__",
     "test": "yarn test:no-build",
-    "test:no-build": "nyc mocha dist/__tests__",
+    "test:no-build": "nyc mocha --enable-source-maps --check-leaks --inline-diffs dist/__tests__",
     "coverage": "codecov",
     "integration": "tsc --project ./lib/__integration__/tsconfig.json",
     "precypress:run": "yarn build && yarn integration",
