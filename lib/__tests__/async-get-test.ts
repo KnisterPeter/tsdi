@@ -41,7 +41,7 @@ describe('TSDI', () => {
           setTimeout(() => {
             runInit = true;
             resolve();
-          }, 1000);
+          }, 25);
         });
       }
     }

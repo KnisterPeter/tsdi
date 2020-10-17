@@ -16,7 +16,7 @@ jobs:
           node-version: ${{ matrix.node }}
       - run: npm install -g yarn
       - run: yarn install
-      - run: yarn test
+      - run: yarn test --forbid-only
       - uses: codecov/codecov-action@v1.0.2
         with:
           token: ${{secrets.CODECOV_TOKEN}}
