@@ -52,6 +52,18 @@
       },
       "version-0.24.0/version-0.24.0-features": {
         "title": "Features"
+      },
+      "version-0.25.0/examples/version-0.25.0-number-guess-game": {
+        "title": "Number Guess Game"
+      },
+      "version-0.25.0/version-0.25.0-externals": {
+        "title": "Externals"
+      },
+      "version-0.25.0/version-0.25.0-features": {
+        "title": "Features"
+      },
+      "version-0.25.0/version-0.25.0-getting-started": {
+        "title": "Getting Started"
       }
     },
     "links": {

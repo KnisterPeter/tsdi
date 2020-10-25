@@ -65,10 +65,8 @@ const siteConfig = {
   editUrl: `${repoUrl}/tree/master/docs/`,
 
   algolia: {
-    apiKey: 'my-api-key',
-    indexName: 'my-index-name',
-    appId: 'app-id', // Optional, if you run the DocSearch crawler on your own
-    algoliaOptions: {}, // Optional, if provided by Algolia
+    apiKey: '0cc8e3ecca7c004368ba20d2bc890c5d',
+    indexName: 'tsdi',
   },
 };
 
