@@ -64,7 +64,7 @@
     "microbundle": "0.12.4",
     "mocha": "8.2.1",
     "nyc": "15.1.0",
-    "prettier": "2.1.2",
+    "prettier": "2.2.0",
     "rimraf": "3.0.2",
     "shelljs": "0.8.4",
     "shipjs": "0.23.0",
