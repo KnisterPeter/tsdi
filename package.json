@@ -17,6 +17,9 @@
     "node": ">=10.0.0"
   },
   "scripts": {
+    "postinstall": "husky install",
+    "prepublish": "pinst --disable",
+    "postpublish": "pinst --enable",
     "linter": "tslint --project ./tsconfig.json",
     "linter:integration": "tslint --project ./lib/__integration__/tsconfig.json",
     "clean": "rimraf .nyc_output coverage dist website/build",
@@ -64,6 +67,7 @@
     "microbundle": "0.12.4",
     "mocha": "8.2.1",
     "nyc": "15.1.0",
+    "pinst": "^2.1.1",
     "prettier": "2.2.1",
     "rimraf": "3.0.2",
     "shelljs": "0.8.4",
@@ -107,12 +111,6 @@
       "website/",
       "lib/__integration__/"
     ]
-  },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint --env HUSKY_GIT_PARAMS",
-      "pre-commit": "lint-staged"
-    }
   },
   "renovate": {
     "lockFileMaintenance": {
