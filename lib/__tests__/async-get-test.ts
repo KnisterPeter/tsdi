@@ -54,7 +54,7 @@ describe('TSDI', () => {
 
   it('should return async dependency when they where previously ready', async () => {
     let resolve: (() => void) | undefined;
-    const promise = new Promise((_resolve) => (resolve = _resolve));
+    const promise = new Promise<void>((_resolve) => (resolve = _resolve));
 
     @component
     class Component {
