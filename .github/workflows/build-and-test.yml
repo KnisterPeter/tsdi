@@ -17,7 +17,7 @@ jobs:
       - run: npm install -g yarn
       - run: yarn install
       - run: yarn test --forbid-only
-      - uses: codecov/codecov-action@v1.1.0
+      - uses: codecov/codecov-action@v1.1.1
         with:
           token: ${{secrets.CODECOV_TOKEN}}
 
