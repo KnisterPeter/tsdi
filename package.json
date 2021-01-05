@@ -60,7 +60,7 @@
     "chai": "4.2.0",
     "codecov": "3.8.1",
     "cypress": "6.2.1",
-    "fkill": "7.0.1",
+    "fkill": "7.1.0",
     "get-port": "5.1.1",
     "husky": "5.0.6",
     "lint-staged": "10.5.3",
