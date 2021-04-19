@@ -1105,9 +1105,9 @@
     lodash.once "^4.1.1"
 
 "@hapi/hoek@^9.0.0":
-  version "9.1.1"
-  resolved "https://registry.yarnpkg.com/@hapi/hoek/-/hoek-9.1.1.tgz#9daf5745156fd84b8e9889a2dc721f0c58e894aa"
-  integrity sha512-CAEbWH7OIur6jEOzaai83jq3FmKmv4PmX1JYfs9IrYcGEVI/lyL1EXJGCj7eFVJ0bg5QR8LMxBlEtA+xKiLpFw==
+  version "9.2.0"
+  resolved "https://registry.yarnpkg.com/@hapi/hoek/-/hoek-9.2.0.tgz#f3933a44e365864f4dad5db94158106d511e8131"
+  integrity sha512-sqKVVVOe5ivCaXDWivIJYVSaEgdQK9ul7a4Kity5Iw7u9+wBAPbX1RMSnLLmp7O4Vzj0WOWwMAJsTL00xwaNug==
 
 "@hapi/topo@^5.0.0":
   version "5.0.0"
@@ -1421,20 +1421,15 @@
   resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-8.2.2.tgz#91daa226eb8c2ff261e6a8cbf8c7304641e095e0"
   integrity sha512-Lwh0lzzqT5Pqh6z61P3c3P5nm6fzQK/MMHl9UKeneAeInVflBSz1O2EkX6gM6xfJd7FBXBY5purtLx7fUiZ7Hw==
 
-"@types/node@*", "@types/node@>= 8", "@types/node@>=8.9.0":
-  version "14.14.37"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.14.37.tgz#a3dd8da4eb84a996c36e331df98d82abd76b516e"
-  integrity sha512-XYmBiy+ohOR4Lh5jE379fV2IU+6Jn4g5qASinhitfyO71b/sCo6MKsMLF5tc7Zf2CE8hViVQyYSobJNke8OvUw==
+"@types/node@*", "@types/node@14.14.41", "@types/node@>= 8", "@types/node@>=8.9.0":
+  version "14.14.41"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.14.41.tgz#d0b939d94c1d7bd53d04824af45f1139b8c45615"
+  integrity sha512-dueRKfaJL4RTtSa7bWeTK1M+VH+Gns73oCgzvYfHZywRCoPSd8EkXBL0mZ9unPTveBn+D9phZBaxuzpwjWkW0g==
 
 "@types/node@12.12.50":
   version "12.12.50"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.12.50.tgz#e9b2e85fafc15f2a8aa8fdd41091b983da5fd6ee"
   integrity sha512-5ImO01Fb8YsEOYpV+aeyGYztcYcjGsBvN4D7G5r1ef2cuQOpymjWNQi5V0rKHE6PC2ru3HkoUr/Br2/8GUA84w==
-
-"@types/node@14.14.41":
-  version "14.14.41"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.14.41.tgz#d0b939d94c1d7bd53d04824af45f1139b8c45615"
-  integrity sha512-dueRKfaJL4RTtSa7bWeTK1M+VH+Gns73oCgzvYfHZywRCoPSd8EkXBL0mZ9unPTveBn+D9phZBaxuzpwjWkW0g==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.0"
@@ -1855,15 +1850,15 @@ browser-stdout@1.3.1:
   integrity sha512-qhAVI1+Av2X7qelOfAIYwXONood6XlZE/fXaBSmW/T5SzLAmCgzi+eiWE7fUvbHaeNBQH13UftjpXxsfLkMpgw==
 
 browserslist@^4.0.0, browserslist@^4.14.5, browserslist@^4.16.3:
-  version "4.16.3"
-  resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-4.16.3.tgz#340aa46940d7db878748567c5dea24a48ddf3717"
-  integrity sha512-vIyhWmIkULaq04Gt93txdh+j02yX/JzlyhLYbV3YQCn/zvES3JnY7TifHHvvr1w5hTDluNKMkV05cs4vy8Q7sw==
+  version "4.16.4"
+  resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-4.16.4.tgz#7ebf913487f40caf4637b892b268069951c35d58"
+  integrity sha512-d7rCxYV8I9kj41RH8UKYnvDYCRENUlHRgyXy/Rhr/1BaeLGfiCptEdFE8MIrvGfWbBFNjVYx76SQWvNX1j+/cQ==
   dependencies:
-    caniuse-lite "^1.0.30001181"
-    colorette "^1.2.1"
-    electron-to-chromium "^1.3.649"
+    caniuse-lite "^1.0.30001208"
+    colorette "^1.2.2"
+    electron-to-chromium "^1.3.712"
     escalade "^3.1.1"
-    node-releases "^1.1.70"
+    node-releases "^1.1.71"
 
 buffer-crc32@~0.2.3:
   version "0.2.13"
@@ -1982,10 +1977,10 @@ caniuse-api@^3.0.0:
     lodash.memoize "^4.1.2"
     lodash.uniq "^4.5.0"
 
-caniuse-lite@^1.0.0, caniuse-lite@^1.0.30001181, caniuse-lite@^1.0.30001196:
-  version "1.0.30001208"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001208.tgz#a999014a35cebd4f98c405930a057a0d75352eb9"
-  integrity sha512-OE5UE4+nBOro8Dyvv0lfx+SRtfVIOM9uhKqFmJeUbGriqhhStgp1A0OyBpgy3OUF8AhYCT+PVwPC1gMl2ZcQMA==
+caniuse-lite@^1.0.0, caniuse-lite@^1.0.30001196, caniuse-lite@^1.0.30001208:
+  version "1.0.30001210"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001210.tgz#7c12d029e93b725cc2fe44a5eaabd9b838250d33"
+  integrity sha512-avmGf0Jo00I8vB0I89J4Pba48kddasErV7slu7wrkyM5uY9gE5P+B+V3hjABv8Hp4YNG2nBqIUFUXlnqNteXEA==
 
 capital-case@^1.0.3, capital-case@^1.0.4:
   version "1.0.4"
@@ -2250,7 +2245,7 @@ color@^3.0.0:
     color-convert "^1.9.1"
     color-string "^1.5.4"
 
-colorette@^1.2.1, colorette@^1.2.2:
+colorette@^1.2.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/colorette/-/colorette-1.2.2.tgz#cbcc79d5e99caea2dbf10eb3a26fd8b3e6acfa94"
   integrity sha512-MKGMzyfeuutC/ZJ1cba9NqcNpfeqMUcYmyF1ZFY6/Cn7CNSAKx6a+s48sqLqyAiZuaP2TcqMhoo+dlwFnVxT9w==
@@ -2856,10 +2851,10 @@ ejs@^3.0.0:
   dependencies:
     jake "^10.6.1"
 
-electron-to-chromium@^1.3.649:
-  version "1.3.712"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.712.tgz#ae467ffe5f95961c6d41ceefe858fc36eb53b38f"
-  integrity sha512-3kRVibBeCM4vsgoHHGKHmPocLqtFAGTrebXxxtgKs87hNUzXrX2NuS3jnBys7IozCnw7viQlozxKkmty2KNfrw==
+electron-to-chromium@^1.3.712:
+  version "1.3.717"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.717.tgz#78d4c857070755fb58ab64bcc173db1d51cbc25f"
+  integrity sha512-OfzVPIqD1MkJ7fX+yTl2nKyOE4FReeVfMCzzxQS+Kp43hZYwHwThlGP+EGIZRXJsxCM7dqo8Y65NOX/HP12iXQ==
 
 elegant-spinner@^1.0.1:
   version "1.0.1"
@@ -3164,9 +3159,9 @@ filelist@^1.0.1:
     minimatch "^3.0.4"
 
 filesize@^6.1.0:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/filesize/-/filesize-6.1.0.tgz#e81bdaa780e2451d714d71c0d7a4f3238d37ad00"
-  integrity sha512-LpCHtPQ3sFx67z+uh2HnSyWSLLu5Jxo21795uRDuar/EOuYWXib5EmPaGIBuSnRqH2IODiKA2k5re/K9OnN/Yg==
+  version "6.2.5"
+  resolved "https://registry.yarnpkg.com/filesize/-/filesize-6.2.5.tgz#ee4de0e71ba03f1d6814a40085249343ccfc7ac3"
+  integrity sha512-JkM1y2+IpnEwp3pbXOUXR+9ytuZE07ZnWb/OR0H/WOSkjWASpmXgC0ZBIs4/SAYq9wHqExeQxcYNoJKf6s0RCg==
 
 fill-range@^7.0.1:
   version "7.0.1"
@@ -3386,9 +3381,9 @@ get-stream@^5.0.0:
     pump "^3.0.0"
 
 get-stream@^6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/get-stream/-/get-stream-6.0.0.tgz#3e0012cb6827319da2706e601a1583e8629a6718"
-  integrity sha512-A1B3Bh1UmL0bidM/YX2NsCOTnGJePL9rO/M+Mw3m9f2gUpfokS0hi5Eah0WSUEWZdZhIZtMjkIYS7mDfOqNHbg==
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/get-stream/-/get-stream-6.0.1.tgz#a262d8eef67aced57c2852ad6167526a43cbf7b7"
+  integrity sha512-ts6Wi+2j3jQjqi70w5AlN8DFnkSwC+MqmxEzdEALB2qXZYV3X/b1CTfgPLGJNMeAWxdPfU8FO1ms3NUfaHCPYg==
 
 getos@^3.2.1:
   version "3.2.1"
@@ -4370,9 +4365,9 @@ listr-verbose-renderer@^0.5.0:
     figures "^2.0.0"
 
 listr2@^3.2.2:
-  version "3.6.2"
-  resolved "https://registry.yarnpkg.com/listr2/-/listr2-3.6.2.tgz#7260159f9108523eaa430d4a674db65b6c2d08cc"
-  integrity sha512-B2vlu7Zx/2OAMVUovJ7Tv1kQ2v2oXd0nZKzkSAcRCej269d8gkS/gupDEdNl23KQ3ZjVD8hQmifrrBFbx8F9LA==
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/listr2/-/listr2-3.7.0.tgz#cb7a80b12eae385ac023c4ba82328036132e56f1"
+  integrity sha512-qctvOB7/AoHZPYnFgA75OhR+w9UnXsMMSNoTvkSuBbR0XA9bFno1L54UdJh5BHZD0pc9RNzFhAMUGM9gzbCTyQ==
   dependencies:
     chalk "^4.1.0"
     cli-truncate "^2.1.0"
@@ -4870,7 +4865,7 @@ node-preload@^0.2.1:
   dependencies:
     process-on-spawn "^1.0.0"
 
-node-releases@^1.1.70:
+node-releases@^1.1.71:
   version "1.1.71"
   resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-1.1.71.tgz#cb1334b179896b1c89ecfdd4b725fb7bbdfc7dbb"
   integrity sha512-zR6HoT6LrLCRBwukmrVbHv0EpEQjksO6GmFcZQQuCAy139BEsoVKPYnf3jongYW83fAa1torLGYwxxky/p28sg==
@@ -4980,9 +4975,9 @@ object-assign@^4.0.1, object-assign@^4.1.0:
   integrity sha1-IQmtx5ZYh8/AXLvUQsrIv7s2CGM=
 
 object-inspect@^1.9.0:
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/object-inspect/-/object-inspect-1.9.0.tgz#c90521d74e1127b67266ded3394ad6116986533a"
-  integrity sha512-i3Bp9iTqwhaLZBxGkRfo5ZbE07BQRT7MGu8+nNgwW9ItGp1TzCTw2DLEoWwjClxBjOFI/hWljTAmYGCEwmtnOw==
+  version "1.10.2"
+  resolved "https://registry.yarnpkg.com/object-inspect/-/object-inspect-1.10.2.tgz#b6385a3e2b7cae0b5eafcf90cddf85d128767f30"
+  integrity sha512-gz58rdPpadwztRrPjZE9DZLOABUpTGdcANUgOwBFO1C+HZZhePoP83M65WGDmbpwFYJSWqavbl4SgDn4k8RYTA==
 
 object-keys@^1.0.12, object-keys@^1.1.1:
   version "1.1.1"
@@ -6157,9 +6152,9 @@ rollup-pluginutils@^2.8.2:
     estree-walker "^0.6.1"
 
 rollup@^2.35.1:
-  version "2.45.1"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.45.1.tgz#eae2b94dc2088b4e0a3b7197a5a1ee0bdd589d5c"
-  integrity sha512-vPD+JoDj3CY8k6m1bLcAFttXMe78P4CMxoau0iLVS60+S9kLsv2379xaGy4NgYWu+h2WTlucpoLPAoUoixFBag==
+  version "2.45.2"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.45.2.tgz#8fb85917c9f35605720e92328f3ccbfba6f78b48"
+  integrity sha512-kRRU7wXzFHUzBIv0GfoFFIN3m9oteY4uAsKllIpQDId5cfnkWF2J130l+27dzDju0E6MScKiV0ZM5Bw8m4blYQ==
   optionalDependencies:
     fsevents "~2.3.1"
 
