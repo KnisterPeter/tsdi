@@ -68,7 +68,7 @@
     "mocha": "8.4.0",
     "nyc": "15.1.0",
     "pinst": "^2.1.1",
-    "prettier": "2.2.1",
+    "prettier": "2.3.0",
     "rimraf": "3.0.2",
     "shelljs": "0.8.4",
     "shipjs": "0.23.2",
