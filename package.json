@@ -48,7 +48,7 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@commitlint/cli": "12.1.1",
+    "@commitlint/cli": "12.1.4",
     "@commitlint/config-conventional": "12.1.3",
     "@istanbuljs/nyc-config-typescript": "1.0.1",
     "@knisterpeter/standard-tslint": "1.7.2",
