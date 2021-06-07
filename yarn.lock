@@ -4674,10 +4674,10 @@ merge2@^1.2.3, merge2@^1.3.0:
   resolved "https://registry.yarnpkg.com/merge2/-/merge2-1.4.1.tgz#4368892f885e907455a6fd7dc55c0c9d404990ae"
   integrity sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==
 
-microbundle@0.13.1:
-  version "0.13.1"
-  resolved "https://registry.yarnpkg.com/microbundle/-/microbundle-0.13.1.tgz#c65307026f2862147bd4dcea267eb2f3eaa9e79d"
-  integrity sha512-dwwSJp5WjQ3eRievTItnZtqa2blufQJgeExUWCwvKFYKB3L4xOAZ6bPdRVgzq1rKmi8RybNo6eukJU3Zcx+1JA==
+microbundle@0.13.2:
+  version "0.13.2"
+  resolved "https://registry.yarnpkg.com/microbundle/-/microbundle-0.13.2.tgz#e624aefa745eaff5ea0638e78a20b9c7ad81c284"
+  integrity sha512-LJN69gY7osa+KoLcR6J1pGTmH+CRWUI73sRc6BKpAwtJjjYWNhiCDXglB0yRBEyw1DTF9ZMH/VXkbf2o2AjLXA==
   dependencies:
     "@babel/core" "^7.12.10"
     "@babel/plugin-proposal-class-properties" "7.12.1"
@@ -4715,6 +4715,7 @@ microbundle@0.13.1:
     rollup-plugin-terser "^7.0.2"
     rollup-plugin-typescript2 "^0.29.0"
     sade "^1.7.4"
+    terser "^5.7.0"
     tiny-glob "^0.2.8"
     tslib "^2.0.3"
     typescript "^4.1.3"
@@ -6807,7 +6808,7 @@ tempfile@^3.0.0:
     temp-dir "^2.0.0"
     uuid "^3.3.2"
 
-terser@^5.0.0:
+terser@^5.0.0, terser@^5.7.0:
   version "5.7.0"
   resolved "https://registry.yarnpkg.com/terser/-/terser-5.7.0.tgz#a761eeec206bc87b605ab13029876ead938ae693"
   integrity sha512-HP5/9hp2UaZt5fYkuhNBR8YyRcT8juw8+uFbAme53iN9hblvKnLUTKkmwJG6ocWpIKf8UK4DoeWG4ty0J6S6/g==
