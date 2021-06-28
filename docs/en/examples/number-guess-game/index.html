@@ -171,7 +171,7 @@ We could also directly use the exported container instance since the management 
 tsdi<span class="token punctuation">.</span><span class="token function">enableComponentScanner</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 <span class="token keyword">export</span> <span class="token keyword">const</span> useTSDI <span class="token operator">=</span> <span class="token operator">&lt;</span><span class="token constant">T</span><span class="token operator">></span><span class="token punctuation">(</span>component<span class="token operator">:</span> Constructable<span class="token operator">&lt;</span><span class="token constant">T</span><span class="token operator">></span><span class="token punctuation">)</span><span class="token operator">:</span> <span class="token constant">T</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
-  <span class="token keyword">return</span> tsdi<span class="token punctuation">.</span><span class="token keyword">get</span><span class="token punctuation">(</span>component<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span> tsdi<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>component<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span><span class="token punctuation">;</span>
 </code></pre>
 <h3><a class="anchor" aria-hidden="true" id="game"></a><a href="#game" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Game</h3>
@@ -189,24 +189,24 @@ tsdi<span class="token punctuation">.</span><span class="token function">enableC
 <span class="token punctuation">}</span>
 
 <span class="token comment">// this decorator makes the component managed by TSDI</span>
-@component
+<span class="token decorator"><span class="token at operator">@</span><span class="token function">component</span></span>
 <span class="token keyword">export</span> <span class="token keyword">class</span> <span class="token class-name">Game</span> <span class="token punctuation">{</span>
-  @observable
+  <span class="token decorator"><span class="token at operator">@</span><span class="token function">observable</span></span>
   <span class="token keyword">public</span> numerOfGames <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span> <span class="token comment">// used to reset the game state</span>
 
-  @observable
+  <span class="token decorator"><span class="token at operator">@</span><span class="token function">observable</span></span>
   <span class="token keyword">private</span> <span class="token builtin">number</span> <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
 
-  @observable
+  <span class="token decorator"><span class="token at operator">@</span><span class="token function">observable</span></span>
   <span class="token keyword">private</span> guess <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
 
-  @observable
+  <span class="token decorator"><span class="token at operator">@</span><span class="token function">observable</span></span>
   <span class="token keyword">public</span> <span class="token keyword">readonly</span> tries<span class="token operator">:</span> <span class="token builtin">number</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
 
-  @computed
+  <span class="token decorator"><span class="token at operator">@</span><span class="token function">computed</span></span>
   <span class="token keyword">public</span> <span class="token keyword">get</span> <span class="token function">state</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span> State <span class="token punctuation">{</span>
     <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>tries<span class="token punctuation">.</span>length <span class="token operator">===</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-      <span class="token keyword">return</span> State<span class="token punctuation">.</span><span class="token keyword">undefined</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span> State<span class="token punctuation">.</span>undefined<span class="token punctuation">;</span>
     <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token builtin">number</span> <span class="token operator">&lt;</span> <span class="token keyword">this</span><span class="token punctuation">.</span>guess<span class="token punctuation">)</span> <span class="token punctuation">{</span>
       <span class="token keyword">return</span> State<span class="token punctuation">.</span>smaller<span class="token punctuation">;</span>
     <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token builtin">number</span> <span class="token operator">></span> <span class="token keyword">this</span><span class="token punctuation">.</span>guess<span class="token punctuation">)</span> <span class="token punctuation">{</span>
@@ -216,23 +216,23 @@ tsdi<span class="token punctuation">.</span><span class="token function">enableC
     <span class="token punctuation">}</span>
   <span class="token punctuation">}</span>
 
-  <span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
     <span class="token function">makeObservable</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token punctuation">}</span>
 
   <span class="token comment">// this method is called as soon as TSDI created the game</span>
-  @initialize
+  <span class="token decorator"><span class="token at operator">@</span><span class="token function">initialize</span></span>
   <span class="token keyword">protected</span> <span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span> <span class="token keyword">void</span> <span class="token punctuation">{</span>
     <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">reset</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token punctuation">}</span>
 
-  @action
+  <span class="token decorator"><span class="token at operator">@</span><span class="token function">action</span></span>
   <span class="token keyword">public</span> <span class="token function">onGuess</span><span class="token punctuation">(</span>value<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">)</span><span class="token operator">:</span> <span class="token keyword">void</span> <span class="token punctuation">{</span>
     <span class="token keyword">this</span><span class="token punctuation">.</span>guess <span class="token operator">=</span> <span class="token function">Number</span><span class="token punctuation">(</span>value<span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token keyword">this</span><span class="token punctuation">.</span>tries<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>guess<span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token punctuation">}</span>
 
-  @action
+  <span class="token decorator"><span class="token at operator">@</span><span class="token function">action</span></span>
   <span class="token keyword">public</span> <span class="token function">reset</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span> <span class="token keyword">void</span> <span class="token punctuation">{</span>
     <span class="token keyword">this</span><span class="token punctuation">.</span>tries<span class="token punctuation">.</span><span class="token function">splice</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>tries<span class="token punctuation">.</span>length<span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token builtin">number</span> <span class="token operator">=</span> Math<span class="token punctuation">.</span><span class="token function">ceil</span><span class="token punctuation">(</span>Math<span class="token punctuation">.</span><span class="token function">random</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -254,14 +254,14 @@ tsdi<span class="token punctuation">.</span><span class="token function">enableC
 <span class="token keyword">import</span> <span class="token punctuation">{</span> GuessInput <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'./guess-input'</span><span class="token punctuation">;</span>
 <span class="token keyword">import</span> <span class="token punctuation">{</span> GuessState <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'./guess-state'</span><span class="token punctuation">;</span>
 
-@observer
+<span class="token decorator"><span class="token at operator">@</span><span class="token function">observer</span></span>
 <span class="token comment">// this connects the react component to the TSDI injection container.</span>
 <span class="token comment">// we cannot use @component here, since react takes care of the lifecycle of</span>
 <span class="token comment">// components instead of the injection container.</span>
-@external
+<span class="token decorator"><span class="token at operator">@</span><span class="token function">external</span></span>
 <span class="token keyword">export</span> <span class="token keyword">class</span> <span class="token class-name">App</span> <span class="token keyword">extends</span> <span class="token class-name">React</span><span class="token punctuation">.</span>Component <span class="token punctuation">{</span>
   <span class="token comment">// let TSDI inject (and if not available yet create it) the game instance</span>
-  @inject
+  <span class="token decorator"><span class="token at operator">@</span><span class="token function">inject</span></span>
   <span class="token keyword">private</span> game<span class="token operator">!</span><span class="token operator">:</span> Game<span class="token punctuation">;</span>
 
   <span class="token keyword">public</span> <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span> React<span class="token punctuation">.</span>ReactNode <span class="token punctuation">{</span>
@@ -306,11 +306,11 @@ tsdi<span class="token punctuation">.</span><span class="token function">enableC
       <span class="token punctuation">}</span><span class="token punctuation">}</span>
     <span class="token operator">></span>
       <span class="token operator">&lt;</span>input
-        <span class="token keyword">type</span><span class="token operator">=</span><span class="token string">"number"</span>
+        type<span class="token operator">=</span><span class="token string">"number"</span>
         value<span class="token operator">=</span><span class="token punctuation">{</span>local<span class="token punctuation">}</span>
         onChange<span class="token operator">=</span><span class="token punctuation">{</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">setLocal</span><span class="token punctuation">(</span>e<span class="token punctuation">.</span>currentTarget<span class="token punctuation">.</span>value<span class="token punctuation">)</span><span class="token punctuation">}</span>
       <span class="token operator">/</span><span class="token operator">></span>
-      <span class="token operator">&lt;</span>button <span class="token keyword">type</span><span class="token operator">=</span><span class="token string">"submit"</span><span class="token operator">></span>Try<span class="token operator">!</span><span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">></span>
+      <span class="token operator">&lt;</span>button type<span class="token operator">=</span><span class="token string">"submit"</span><span class="token operator">></span>Try<span class="token operator">!</span><span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">></span>
     <span class="token operator">&lt;</span><span class="token operator">/</span>form<span class="token operator">></span>
   <span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span><span class="token punctuation">;</span>

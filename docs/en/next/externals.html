@@ -70,24 +70,24 @@ The decorator overrides the <code>constructor()</code> of all components and inj
 even if the lifecycle is uncontrolled.</p>
 <pre><code class="hljs css language-ts"><span class="token keyword">import</span> <span class="token punctuation">{</span> <span class="token constant">TSDI</span><span class="token punctuation">,</span> Component<span class="token punctuation">,</span> External <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'tsdi'</span><span class="token punctuation">;</span>
 
-@Component
+<span class="token decorator"><span class="token at operator">@</span><span class="token function">Component</span></span>
 <span class="token keyword">class</span> <span class="token class-name"><span class="token constant">A</span></span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
 
-@Component
+<span class="token decorator"><span class="token at operator">@</span><span class="token function">Component</span></span>
 <span class="token keyword">class</span> <span class="token class-name"><span class="token constant">B</span></span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
 
-@<span class="token function">External</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token decorator"><span class="token at operator">@</span><span class="token function">External</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span class="token keyword">class</span> <span class="token class-name"><span class="token constant">C</span></span> <span class="token punctuation">{</span>
-  @<span class="token function">Inject</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token decorator"><span class="token at operator">@</span><span class="token function">Inject</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span>
   <span class="token keyword">public</span> a<span class="token operator">:</span> <span class="token constant">A</span><span class="token punctuation">;</span>
 
   <span class="token keyword">public</span> b<span class="token operator">:</span> <span class="token constant">B</span><span class="token punctuation">;</span>
 
-  <span class="token keyword">constructor</span><span class="token punctuation">(</span>@<span class="token function">Inject</span><span class="token punctuation">(</span><span class="token punctuation">)</span> b<span class="token operator">:</span> <span class="token constant">B</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token decorator"><span class="token at operator">@</span><span class="token function">Inject</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span> b<span class="token operator">:</span> <span class="token constant">B</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
     <span class="token keyword">this</span><span class="token punctuation">.</span>b <span class="token operator">=</span> b<span class="token punctuation">;</span>
   <span class="token punctuation">}</span>
 
-  @<span class="token function">Initialize</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token decorator"><span class="token at operator">@</span><span class="token function">Initialize</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span>
   <span class="token keyword">public</span> <span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
 
@@ -106,18 +106,18 @@ it is possible to overwrite this method and resolve the required TSDI instance b
 <pre><code class="hljs css language-ts"><span class="token keyword">const</span> createNamespace <span class="token operator">=</span> <span class="token keyword">require</span><span class="token punctuation">(</span><span class="token string">'cls-hooked'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>createNamespace<span class="token punctuation">;</span>
 <span class="token keyword">const</span> local <span class="token operator">=</span> <span class="token function">createNamespace</span><span class="token punctuation">(</span><span class="token string">'local'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-<span class="token constant">TSDI</span><span class="token punctuation">.</span><span class="token function-variable function">externalContainerResolver</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> local<span class="token punctuation">.</span><span class="token keyword">get</span><span class="token punctuation">(</span><span class="token string">'tsdi'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token constant">TSDI</span><span class="token punctuation">.</span><span class="token function-variable function">externalContainerResolver</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> local<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">'tsdi'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 <span class="token function">server</span><span class="token punctuation">(</span><span class="token punctuation">(</span>req<span class="token punctuation">,</span> res<span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
   <span class="token comment">// incoming http request</span>
   local<span class="token punctuation">.</span><span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
     <span class="token keyword">const</span> tsdi <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name"><span class="token constant">TSDI</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token keyword">try</span> <span class="token punctuation">{</span>
-      local<span class="token punctuation">.</span><span class="token keyword">set</span><span class="token punctuation">(</span><span class="token string">'tsdi'</span><span class="token punctuation">,</span> tsdi<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      local<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span><span class="token string">'tsdi'</span><span class="token punctuation">,</span> tsdi<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
       <span class="token comment">// handle request</span>
     <span class="token punctuation">}</span> <span class="token keyword">finally</span> <span class="token punctuation">{</span>
-      containers<span class="token punctuation">.</span><span class="token keyword">delete</span><span class="token punctuation">(</span>req<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      containers<span class="token punctuation">.</span><span class="token function">delete</span><span class="token punctuation">(</span>req<span class="token punctuation">)</span><span class="token punctuation">;</span>
       tsdi<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token punctuation">}</span>
   <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
