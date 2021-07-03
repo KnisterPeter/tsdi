@@ -55,7 +55,7 @@
     "@types/chai": "4.2.19",
     "@types/debug": "4.1.6",
     "@types/mocha": "8.2.2",
-    "@types/node": "15.14.1",
+    "@types/node": "16.0.0",
     "@types/shelljs": "0.8.8",
     "chai": "4.3.4",
     "codecov": "3.8.2",
