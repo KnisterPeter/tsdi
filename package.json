@@ -63,7 +63,7 @@
     "fkill": "7.2.1",
     "get-port": "5.1.1",
     "husky": "6.0.0",
-    "lint-staged": "11.0.0",
+    "lint-staged": "11.0.1",
     "microbundle": "0.13.3",
     "mocha": "8.4.0",
     "nyc": "15.1.0",
