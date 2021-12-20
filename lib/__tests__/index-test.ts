@@ -179,7 +179,10 @@ describe('TSDI', () => {
         tsdi.get(NonRegisteredComponent);
         assert.fail('Should throw');
       } catch (e) {
-        assert.equal(e.message, "Component 'NonRegisteredComponent' not found");
+        assert.equal(
+          (e as Error).message,
+          "Component 'NonRegisteredComponent' not found"
+        );
       }
     });
 
@@ -630,7 +633,7 @@ describe('TSDI', () => {
         assert.fail('Should throw error');
       } catch (e) {
         assert.match(
-          e.message,
+          (e as Error).message,
           /Duplicate name 'Component' for known Components/
         );
       }
