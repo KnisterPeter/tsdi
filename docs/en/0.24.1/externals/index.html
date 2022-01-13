@@ -79,9 +79,9 @@ even if the lifecycle is uncontrolled.</p>
 @<span class="token function">External</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span class="token keyword">class</span> <span class="token class-name">C</span> <span class="token punctuation">{</span>
   @<span class="token function">Inject</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-  <span class="token keyword">public</span> a<span class="token operator">:</span> <span class="token constant">A</span><span class="token punctuation">;</span>
+  <span class="token keyword">public</span> <span class="token literal-property property">a</span><span class="token operator">:</span> <span class="token constant">A</span><span class="token punctuation">;</span>
 
-  <span class="token keyword">public</span> b<span class="token operator">:</span> <span class="token constant">B</span><span class="token punctuation">;</span>
+  <span class="token keyword">public</span> <span class="token literal-property property">b</span><span class="token operator">:</span> <span class="token constant">B</span><span class="token punctuation">;</span>
 
   <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token parameter">@<span class="token function">Inject</span><span class="token punctuation">(</span><span class="token punctuation">)</span> b<span class="token operator">:</span> <span class="token constant">B</span></span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
     <span class="token keyword">this</span><span class="token punctuation">.</span>b <span class="token operator">=</span> b<span class="token punctuation">;</span>
@@ -92,7 +92,7 @@ even if the lifecycle is uncontrolled.</p>
   <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
 
-<span class="token keyword">const</span> tsdi<span class="token operator">:</span> <span class="token constant">TSDI</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">TSDI</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> <span class="token literal-property property">tsdi</span><span class="token operator">:</span> <span class="token constant">TSDI</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">TSDI</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 tsdi<span class="token punctuation">.</span><span class="token function">enableComponentScanner</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 <span class="token keyword">const</span> c <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">C</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
