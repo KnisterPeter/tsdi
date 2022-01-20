@@ -54,7 +54,7 @@
     "@knisterpeter/standard-tslint": "1.7.2",
     "@types/chai": "4.3.0",
     "@types/debug": "4.1.7",
-    "@types/mocha": "9.0.0",
+    "@types/mocha": "9.1.0",
     "@types/node": "17.0.10",
     "@types/shelljs": "0.8.11",
     "chai": "4.3.4",
