@@ -52,7 +52,7 @@
     "@commitlint/config-conventional": "16.2.4",
     "@istanbuljs/nyc-config-typescript": "1.0.2",
     "@knisterpeter/standard-tslint": "1.7.2",
-    "@types/chai": "4.3.4",
+    "@types/chai": "4.3.5",
     "@types/debug": "4.1.7",
     "@types/mocha": "9.1.1",
     "@types/node": "18.15.3",
