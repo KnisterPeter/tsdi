@@ -61,7 +61,7 @@
     "codecov": "3.8.3",
     "cypress": "9.7.0",
     "fkill": "7.2.1",
-    "get-port": "5.1.1",
+    "get-port": "7.0.0",
     "husky": "7.0.4",
     "lint-staged": "11.2.6",
     "microbundle": "0.15.1",
