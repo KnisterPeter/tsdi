@@ -57,7 +57,7 @@
     "@types/mocha": "9.1.1",
     "@types/node": "20.5.7",
     "@types/shelljs": "0.8.12",
-    "chai": "4.3.7",
+    "chai": "4.3.8",
     "codecov": "3.8.3",
     "cypress": "9.7.0",
     "fkill": "7.2.1",
