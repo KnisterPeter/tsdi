@@ -56,7 +56,7 @@
     "@types/debug": "4.1.11",
     "@types/mocha": "9.1.1",
     "@types/node": "20.8.10",
-    "@types/shelljs": "0.8.14",
+    "@types/shelljs": "0.8.15",
     "chai": "4.3.10",
     "codecov": "3.8.3",
     "cypress": "9.7.0",
